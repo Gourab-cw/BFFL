@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "927264643140",
+    "project_id": "health-and-wellness-39c4f",
+    "storage_bucket": "health-and-wellness-39c4f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:927264643140:android:3fc218ea5cf2f5baf4c411",
+        "android_client_info": {
+          "package_name": "com.circuitworldin.bffl"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAR1BOZeGbzXAs8diQhL3Wm6nnIBF17-cQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:927264643140:android:7a74d4cd95dceb6ff4c411",
+        "android_client_info": {
+          "package_name": "com.example.healthandwellness"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAR1BOZeGbzXAs8diQhL3Wm6nnIBF17-cQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
