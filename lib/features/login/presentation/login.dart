@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get.dart';
+import 'package:healthandwellness/app/mainstore.dart';
+import 'package:healthandwellness/core/utility/firebase_service.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
 
 class Login extends StatefulWidget {
@@ -95,6 +98,10 @@ class _LoginState extends State<Login> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       ButtonHelperG(
+                        onTap: () async {
+                          MainStore mainStore = Get.find<MainStore>();
+                          await mainStore.firebaseG.makeLogin(AuthType.google);
+                        },
                         borderRadius: 60,
                         background: Colors.grey.shade100,
                         shadow: [],

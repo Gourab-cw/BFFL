@@ -13,6 +13,7 @@ void main() {
   runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
     MainStore mainStore = Get.put(MainStore());
+
     runApp(const MyApp());
   }, (error, stackTrace) async {});
 }

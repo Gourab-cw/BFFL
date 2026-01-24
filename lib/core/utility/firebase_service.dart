@@ -1,12 +1,23 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:get/get.dart';
+import 'package:healthandwellness/core/utility/helper.dart';
 import 'package:uuid/uuid.dart';
 
-import '../firebase_options.dart';
+import '../../firebase_options.dart';
 
-class FirebaseService {
+abstract class FirebaseBaseService {
+  // Firebase app
+  FirebaseApp? _firebaseApp;
+
+  FirebaseApp? getApp() => _firebaseApp;
+
+  // FCM Token
+  String? token;
+
   // Firebase Messaging Instance
   late FirebaseMessaging _firebaseMessaging;
 
@@ -20,21 +31,23 @@ class FirebaseService {
       // flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.requestNotificationsPermission();
       // }
       debugPrint(">>>>>>>>>>>>>>>> coming for firebase initialize <<<<<<<<<<<<<");
-      await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-      _firebaseMessaging = FirebaseMessaging.instance;
-      // Request for iOS notification permissions
-      await _firebaseMessaging.requestPermission();
+      _firebaseApp = await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+      if (GetPlatform.isMobile || GetPlatform.isWeb) {
+        _firebaseMessaging = FirebaseMessaging.instance;
+        // Request for iOS notification permissions
+        await _firebaseMessaging.requestPermission();
 
-      // Configure Firebase Messaging
-      _configureFirebaseMessaging();
+        // Configure Firebase Messaging
+        _configureFirebaseMessaging();
 
-      // Initialize Local Notifications (for background and terminated state)
-      _initializeLocalNotifications();
+        // Initialize Local Notifications (for background and terminated state)
+        _initializeLocalNotifications();
 
-      // Get the FCM token (to send push notifications)
-      if (getFCMToken) {
-        String? token = await _firebaseMessaging.getToken();
-        debugPrint("================= > FCM Token: $token <=========================");
+        // Get the FCM token (to send push notifications)
+        if (getFCMToken) {
+          token = await _firebaseMessaging.getToken();
+          debugPrint("================= > FCM Token: $token <=========================");
+        }
       }
     } catch (e) {
       debugPrint("================= > Firebase Error: $e <=========================");
@@ -165,5 +178,52 @@ class FirebaseService {
   Future<void> unsubscribeFromTopic(String topic) async {
     await _firebaseMessaging.unsubscribeFromTopic(topic);
     print("Unsubscribed from topic: $topic");
+  }
+}
+
+enum AuthType { google, facebook, twitter }
+
+class FirebaseLogInService extends FirebaseBaseService {
+  FirebaseAuth? auth;
+
+  FirebaseLogInService() {
+    _init();
+  }
+
+  Future<void> _init() async {
+    if (getApp() != null) {
+      await initialize(); // ✅ async allowed here
+    }
+  }
+
+  Future<void> makeLogin(AuthType type) async {
+    FirebaseApp? firebaseApp = getApp();
+
+    if (firebaseApp != null) {
+      auth ??= FirebaseAuth.instanceFor(app: firebaseApp);
+
+      if (auth != null) {
+        AuthProvider provider = GoogleAuthProvider();
+        if (type == AuthType.google) {
+          provider = GoogleAuthProvider();
+        }
+        if (type == AuthType.facebook) {
+          provider = FacebookAuthProvider();
+        }
+        if (type == AuthType.twitter) {
+          provider = TwitterAuthProvider();
+        }
+        UserCredential cred = await auth!.signInWithProvider(provider);
+        logG(cred.user?.uid);
+      }
+    }
+  }
+}
+
+class FirebaseG extends FirebaseLogInService {
+  FirebaseG() {
+    if (getApp() == null) {
+      initialize();
+    }
   }
 }

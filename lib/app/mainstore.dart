@@ -1,6 +1,9 @@
 import 'package:get/get.dart';
 
+import '../core/utility/firebase_service.dart';
+
 class MainStore extends GetxController {
+  late FirebaseG firebaseG;
   Rx<bool> giveCallLogRequiredPermission = false.obs;
   Rx<bool> locationAllowed = false.obs;
   Rx<bool> showLocationDisclaimer = false.obs;
@@ -12,6 +15,13 @@ class MainStore extends GetxController {
   RxMap<dynamic, dynamic> authData = {}.obs;
   RxDouble longitude = 0.0.obs;
   RxDouble latitude = 0.0.obs;
+
+  @override
+  void onInit() {
+    // TODO: implement onInit
+    firebaseG = FirebaseG();
+    super.onInit();
+  }
 }
 
 getAuth() {
