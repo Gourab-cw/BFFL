@@ -1,9 +1,12 @@
 import 'package:get/get.dart';
+import 'package:healthandwellness/core/utility/app_loader.dart';
 
 import '../core/utility/firebase_service.dart';
 
 class MainStore extends GetxController {
   late FirebaseG firebaseG;
+
+  AppLoaderController appLoaderController = AppLoaderController();
   Rx<bool> giveCallLogRequiredPermission = false.obs;
   Rx<bool> locationAllowed = false.obs;
   Rx<bool> showLocationDisclaimer = false.obs;
@@ -15,6 +18,14 @@ class MainStore extends GetxController {
   RxMap<dynamic, dynamic> authData = {}.obs;
   RxDouble longitude = 0.0.obs;
   RxDouble latitude = 0.0.obs;
+
+  void makeLoading() {
+    appLoaderController.loading.value = true;
+  }
+
+  void stopLoading() {
+    appLoaderController.loading.value = false;
+  }
 
   @override
   void onInit() {

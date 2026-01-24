@@ -340,7 +340,7 @@ class TextBox extends StatefulWidget {
     this.onTap,
     this.onTapOutside,
     this.height = 40,
-    this.fontSize = 12,
+    this.fontSize = 13,
     this.width,
     this.fontWeight = FontWeight.w400,
     this.onlyBottomBorder = false,

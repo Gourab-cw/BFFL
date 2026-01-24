@@ -13,7 +13,13 @@ abstract class FirebaseBaseService {
   // Firebase app
   FirebaseApp? _firebaseApp;
 
-  FirebaseApp? getApp() => _firebaseApp;
+  Future<FirebaseApp> getApp() async {
+    if (_firebaseApp == null) {
+      await initialize();
+      return _firebaseApp!;
+    }
+    return _firebaseApp!;
+  }
 
   // FCM Token
   String? token;
@@ -184,38 +190,85 @@ abstract class FirebaseBaseService {
 enum AuthType { google, facebook, twitter }
 
 class FirebaseLogInService extends FirebaseBaseService {
-  FirebaseAuth? auth;
+  FirebaseAuth? _auth;
 
   FirebaseLogInService() {
-    _init();
+    authInit();
   }
 
-  Future<void> _init() async {
-    if (getApp() != null) {
-      await initialize(); // ✅ async allowed here
+  Future<void> authInit() async {
+    _auth ??= FirebaseAuth.instanceFor(app: await getApp());
+  }
+
+  Future<FirebaseAuth> getAuth() async {
+    if (_auth == null) {
+      await authInit();
+      return _auth!;
+    }
+    return _auth!;
+  }
+
+  Future<void> makeProviderLogin(AuthType type) async {
+    FirebaseApp firebaseApp = await getApp();
+    final auth = await getAuth();
+    AuthProvider provider = GoogleAuthProvider();
+    if (type == AuthType.google) {
+      provider = GoogleAuthProvider();
+    }
+    if (type == AuthType.facebook) {
+      provider = FacebookAuthProvider();
+    }
+    if (type == AuthType.twitter) {
+      provider = TwitterAuthProvider();
+    }
+    UserCredential cred = await auth.signInWithProvider(provider);
+    logG(cred.user?.uid);
+  }
+
+  Future<void> makeEmailLogin({required String email, required String password}) async {
+    if (!GetUtils.isEmail(email)) {
+      return showAlert('Give a valid mail', AlertType.error);
+    }
+    if (password.length < 6) {
+      return showAlert("Password length should be more then 5", AlertType.error);
+    }
+    final auth = await getAuth();
+    try {
+      await auth.signInWithEmailAndPassword(email: email, password: password);
+    } on FirebaseAuthException catch (e) {
+      print("issuee----- ${e.code} ${e.message}");
+      switch (e.code) {
+        case 'user-not-found':
+          showAlert("User not found", AlertType.error);
+          break;
+        case 'wrong-password':
+          showAlert("Wrong password", AlertType.error);
+          break;
+        case 'invalid-email':
+          showAlert("Invalid email", AlertType.error);
+          break;
+        default:
+          showAlert(e.message ?? "Login failed", AlertType.error);
+      }
+    } catch (e) {
+      throw Exception(e.toString());
     }
   }
 
-  Future<void> makeLogin(AuthType type) async {
-    FirebaseApp? firebaseApp = getApp();
-
-    if (firebaseApp != null) {
-      auth ??= FirebaseAuth.instanceFor(app: firebaseApp);
-
-      if (auth != null) {
-        AuthProvider provider = GoogleAuthProvider();
-        if (type == AuthType.google) {
-          provider = GoogleAuthProvider();
-        }
-        if (type == AuthType.facebook) {
-          provider = FacebookAuthProvider();
-        }
-        if (type == AuthType.twitter) {
-          provider = TwitterAuthProvider();
-        }
-        UserCredential cred = await auth!.signInWithProvider(provider);
-        logG(cred.user?.uid);
-      }
+  Future<void> createNewUser({required String name, required String email, required String password}) async {
+    if (name.trim().length < 3) {
+      return showAlert("Give a valid name!", AlertType.error);
+    }
+    final auth = await getAuth();
+    try {
+      UserCredential cred = await auth.createUserWithEmailAndPassword(email: email, password: password);
+      await cred.user?.updateDisplayName(name);
+      await cred.user?.reload();
+      logG(cred.user?.uid);
+    } on FirebaseAuthException catch (e) {
+      throw Exception(e.message);
+    } catch (e) {
+      throw Exception(e.toString());
     }
   }
 }
