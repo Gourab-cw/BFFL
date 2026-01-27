@@ -6,6 +6,8 @@ import 'package:healthandwellness/app/provider.dart';
 import 'package:healthandwellness/core/utility/app_loader.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
 
+import '../../../core/widget/bottom_nav_bar.dart';
+
 
 class Home extends ConsumerStatefulWidget {
    Home({super.key});
@@ -21,6 +23,7 @@ class _HomeState extends ConsumerState<Home> {
   Widget build(BuildContext context) {
     final user = ref.watch(userProvider);
     return AppLoader(child: Scaffold(
+      bottomNavigationBar: BottomNavbar(),
       body: Padding(
         padding: EdgeInsets.only(
           top: safePadding.top,

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -194,6 +195,7 @@ enum AuthType { google, facebook, twitter }
 class FirebaseLogInService extends FirebaseBaseService {
   FirebaseAuth? _auth;
 
+
   Future<void> authInit() async {
     _auth ??= FirebaseAuth.instanceFor(app: await getApp());
   }
@@ -223,7 +225,7 @@ class FirebaseLogInService extends FirebaseBaseService {
     logG(cred.user?.uid);
   }
 
-  Future<UserG?> makeEmailLogin({required String email, required String password}) async {
+  Future<User?> makeEmailLogin({required String email, required String password}) async {
     if (!GetUtils.isEmail(email)) {
       return showAlert('Give a valid mail', AlertType.error);
     }
@@ -234,11 +236,7 @@ class FirebaseLogInService extends FirebaseBaseService {
     try {
       UserCredential uc = await auth.signInWithEmailAndPassword(email: email, password: password);
       if (uc.user != null) {
-        return UserG(
-          uid: parseString(data: uc.user?.uid, defaultValue: ""),
-          name: parseString(data: uc.user?.displayName, defaultValue: ""),
-          mail: parseString(data: uc.user?.email, defaultValue: ""),
-        );
+        return uc.user;
       } else {
         showAlert("No user found!", AlertType.error);
       }
@@ -260,9 +258,10 @@ class FirebaseLogInService extends FirebaseBaseService {
     } catch (e) {
       throw Exception(e.toString());
     }
+    return null;
   }
 
-  Future<UserG?> createNewUser({required String name, required String email, required String password}) async {
+  Future<User?> createNewUser({required String name, required String email, required String password}) async {
     if (name.trim().length < 3) {
       return showAlert("Give a valid name!", AlertType.error);
     }
@@ -272,11 +271,7 @@ class FirebaseLogInService extends FirebaseBaseService {
       await uc.user?.updateDisplayName(name);
       await uc.user?.reload();
       if (uc.user != null) {
-        return UserG(
-          uid: parseString(data: uc.user?.uid, defaultValue: ""),
-          name: parseString(data: uc.user?.displayName, defaultValue: ""),
-          mail: parseString(data: uc.user?.email, defaultValue: ""),
-        );
+        return uc.user;
       } else {
         showAlert("Error on new user creation!", AlertType.error);
       }
@@ -288,4 +283,18 @@ class FirebaseLogInService extends FirebaseBaseService {
   }
 }
 
-class FirebaseG extends FirebaseLogInService {}
+mixin FirebaseDBService on FirebaseBaseService{
+  FirebaseFirestore? _db;
+
+  Future<FirebaseFirestore> getDB()async{
+    if(_db==null){
+      _db = FirebaseFirestore.instance;
+      return _db!;
+    }
+    return _db!;
+  }
+
+}
+
+
+class FirebaseG extends FirebaseLogInService with FirebaseDBService {}

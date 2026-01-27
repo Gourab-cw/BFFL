@@ -64,6 +64,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '927264643140',
     projectId: 'health-and-wellness-39c4f',
     storageBucket: 'health-and-wellness-39c4f.firebasestorage.app',
+    iosClientId: '927264643140-qctpkne6cut1q8fcd66o7ogii1n3gihp.apps.googleusercontent.com',
     iosBundleId: 'com.example.healthandwellness',
   );
 
@@ -73,6 +74,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '927264643140',
     projectId: 'health-and-wellness-39c4f',
     storageBucket: 'health-and-wellness-39c4f.firebasestorage.app',
+    iosClientId: '927264643140-qctpkne6cut1q8fcd66o7ogii1n3gihp.apps.googleusercontent.com',
     iosBundleId: 'com.example.healthandwellness',
   );
 
@@ -85,4 +87,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'health-and-wellness-39c4f.firebasestorage.app',
     measurementId: 'G-QZXF8B4QCN',
   );
+
 }
