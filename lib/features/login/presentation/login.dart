@@ -37,7 +37,15 @@ class _LoginState extends ConsumerState<Login> {
   @override
   void initState() {
     // TODO: implement initState
-    ref.read(userProvider.notifier).checkIfUserLogin();
+    try {
+      ref.read(userProvider.notifier).checkIfUserLogin().then((d) {
+        if (d) {
+          Get.offAllNamed("/home");
+        }
+      });
+    } catch (e) {
+      showAlert("$e", AlertType.error);
+    }
     super.initState();
   }
 
@@ -132,7 +140,9 @@ class _LoginState extends ConsumerState<Login> {
                         mainStore.makeLoading();
                         if (isCreateAccount) {
                           try {
-                            await ref.read(userProvider.notifier).addUser( email: emailController.text, password: passwordController.text,name: nameController.text,);
+                            await ref
+                                .read(userProvider.notifier)
+                                .addUser(email: emailController.text, password: passwordController.text, name: nameController.text);
                           } catch (e) {
                             showAlert("$e", AlertType.error);
                           } finally {

@@ -1,13 +1,12 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:get/get.dart';
 import 'package:healthandwellness/core/utility/firebase_service.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
 import 'package:healthandwellness/features/login/data/user.dart';
+
 import '../../../app/firebase_provider.dart';
 
-
 class UserNotifier extends Notifier<UserG?> {
-
   late FirebaseG firebase;
 
   @override
@@ -16,25 +15,23 @@ class UserNotifier extends Notifier<UserG?> {
     return null;
   }
 
-  Future<void> checkIfUserLogin()async{
+  Future<bool> checkIfUserLogin() async {
     final auth = await firebase.getAuth();
-    auth.authStateChanges().listen((user){
-      if(user!=null){
-        if(state!=null && state?.uid!=user.uid){
-          state = UserG(uid: user.uid, name: parseString(data: user.displayName, defaultValue: ""), mail: parseString(data: user.email, defaultValue: ""));
-        }else if(state==null){
-          state = UserG(uid: user.uid, name: parseString(data: user.displayName, defaultValue: ""), mail: parseString(data: user.email, defaultValue: ""));
-        }
-        Get.offAllNamed("/home");
-      }else{
-        state=null;
-        Get.offAllNamed("/login");
-      }
-    });
+    if (auth.currentUser != null) {
+      User user = auth.currentUser!;
+      state = UserG(
+        uid: user.uid,
+        name: parseString(data: user.displayName, defaultValue: ""),
+        mail: parseString(data: user.email, defaultValue: ""),
+      );
+      return true;
+    } else {
+      return false;
+    }
   }
 
-  Future<void> emailLogin({required String email,required String password}) async {
-    try{
+  Future<void> emailLogin({required String email, required String password}) async {
+    try {
       // 1️⃣ Get Firebase instance
       final firebase = ref.read(firebaseProvider);
 
@@ -43,21 +40,21 @@ class UserNotifier extends Notifier<UserG?> {
 
       // 3️⃣ Update state
       state = user;
-    }catch(e){
+    } catch (e) {
       showAlert("$e", AlertType.error);
     }
   }
 
-  Future<void> addUser({required String email, required String password,required String name})async{
-    try{
+  Future<void> addUser({required String email, required String password, required String name}) async {
+    try {
       final firebase = ref.read(firebaseProvider);
 
       // 2️⃣ Call Firebase function
-      final UserG? user = await firebase.createNewUser(email: email, password: password,name: name);
+      final UserG? user = await firebase.createNewUser(email: email, password: password, name: name);
 
       // 3️⃣ Update state
       state = user;
-    }catch(e){
+    } catch (e) {
       showAlert("$e", AlertType.error);
     }
   }

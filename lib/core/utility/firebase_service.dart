@@ -39,6 +39,7 @@ abstract class FirebaseBaseService {
       // }
       debugPrint(">>>>>>>>>>>>>>>> coming for firebase initialize <<<<<<<<<<<<<");
       _firebaseApp = await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
       if (GetPlatform.isMobile || GetPlatform.isWeb) {
         _firebaseMessaging = FirebaseMessaging.instance;
         // Request for iOS notification permissions
@@ -231,18 +232,18 @@ class FirebaseLogInService extends FirebaseBaseService {
     }
     final auth = await getAuth();
     try {
-     UserCredential uc = await auth.signInWithEmailAndPassword(email: email, password: password);
-     if(uc.user!=null){
-       return UserG(
-         uid: parseString(data: uc.user?.uid, defaultValue: ""),
-         name: parseString(data: uc.user?.displayName, defaultValue: ""),
-         mail: parseString(data: uc.user?.email, defaultValue: ""),
-       );
-     }else{
-       showAlert("No user found!", AlertType.error);
-     }
-
+      UserCredential uc = await auth.signInWithEmailAndPassword(email: email, password: password);
+      if (uc.user != null) {
+        return UserG(
+          uid: parseString(data: uc.user?.uid, defaultValue: ""),
+          name: parseString(data: uc.user?.displayName, defaultValue: ""),
+          mail: parseString(data: uc.user?.email, defaultValue: ""),
+        );
+      } else {
+        showAlert("No user found!", AlertType.error);
+      }
     } on FirebaseAuthException catch (e) {
+      logG(e.code);
       switch (e.code) {
         case 'user-not-found':
           showAlert("User not found", AlertType.error);
@@ -270,13 +271,13 @@ class FirebaseLogInService extends FirebaseBaseService {
       UserCredential uc = await auth.createUserWithEmailAndPassword(email: email, password: password);
       await uc.user?.updateDisplayName(name);
       await uc.user?.reload();
-      if(uc.user!=null) {
+      if (uc.user != null) {
         return UserG(
           uid: parseString(data: uc.user?.uid, defaultValue: ""),
           name: parseString(data: uc.user?.displayName, defaultValue: ""),
           mail: parseString(data: uc.user?.email, defaultValue: ""),
         );
-      }else{
+      } else {
         showAlert("Error on new user creation!", AlertType.error);
       }
     } on FirebaseAuthException catch (e) {
@@ -287,5 +288,4 @@ class FirebaseLogInService extends FirebaseBaseService {
   }
 }
 
-class FirebaseG extends FirebaseLogInService {
-}
+class FirebaseG extends FirebaseLogInService {}
