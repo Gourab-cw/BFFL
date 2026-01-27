@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
+import 'package:healthandwellness/features/login/data/user.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../firebase_options.dart';
@@ -192,10 +193,6 @@ enum AuthType { google, facebook, twitter }
 class FirebaseLogInService extends FirebaseBaseService {
   FirebaseAuth? _auth;
 
-  FirebaseLogInService() {
-    authInit();
-  }
-
   Future<void> authInit() async {
     _auth ??= FirebaseAuth.instanceFor(app: await getApp());
   }
@@ -225,7 +222,7 @@ class FirebaseLogInService extends FirebaseBaseService {
     logG(cred.user?.uid);
   }
 
-  Future<void> makeEmailLogin({required String email, required String password}) async {
+  Future<UserG?> makeEmailLogin({required String email, required String password}) async {
     if (!GetUtils.isEmail(email)) {
       return showAlert('Give a valid mail', AlertType.error);
     }
@@ -234,9 +231,18 @@ class FirebaseLogInService extends FirebaseBaseService {
     }
     final auth = await getAuth();
     try {
-      await auth.signInWithEmailAndPassword(email: email, password: password);
+     UserCredential uc = await auth.signInWithEmailAndPassword(email: email, password: password);
+     if(uc.user!=null){
+       return UserG(
+         uid: parseString(data: uc.user?.uid, defaultValue: ""),
+         name: parseString(data: uc.user?.displayName, defaultValue: ""),
+         mail: parseString(data: uc.user?.email, defaultValue: ""),
+       );
+     }else{
+       showAlert("No user found!", AlertType.error);
+     }
+
     } on FirebaseAuthException catch (e) {
-      print("issuee----- ${e.code} ${e.message}");
       switch (e.code) {
         case 'user-not-found':
           showAlert("User not found", AlertType.error);
@@ -255,16 +261,24 @@ class FirebaseLogInService extends FirebaseBaseService {
     }
   }
 
-  Future<void> createNewUser({required String name, required String email, required String password}) async {
+  Future<UserG?> createNewUser({required String name, required String email, required String password}) async {
     if (name.trim().length < 3) {
       return showAlert("Give a valid name!", AlertType.error);
     }
     final auth = await getAuth();
     try {
-      UserCredential cred = await auth.createUserWithEmailAndPassword(email: email, password: password);
-      await cred.user?.updateDisplayName(name);
-      await cred.user?.reload();
-      logG(cred.user?.uid);
+      UserCredential uc = await auth.createUserWithEmailAndPassword(email: email, password: password);
+      await uc.user?.updateDisplayName(name);
+      await uc.user?.reload();
+      if(uc.user!=null) {
+        return UserG(
+          uid: parseString(data: uc.user?.uid, defaultValue: ""),
+          name: parseString(data: uc.user?.displayName, defaultValue: ""),
+          mail: parseString(data: uc.user?.email, defaultValue: ""),
+        );
+      }else{
+        showAlert("Error on new user creation!", AlertType.error);
+      }
     } on FirebaseAuthException catch (e) {
       throw Exception(e.message);
     } catch (e) {
@@ -274,9 +288,4 @@ class FirebaseLogInService extends FirebaseBaseService {
 }
 
 class FirebaseG extends FirebaseLogInService {
-  FirebaseG() {
-    if (getApp() == null) {
-      initialize();
-    }
-  }
 }

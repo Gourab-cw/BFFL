@@ -7,13 +7,13 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:healthandwellness/features/test/presentation/count_ui.dart';
 
 import 'app/mainstore.dart';
+import 'app/routes.dart';
 import 'features/login/presentation/login.dart';
 
 void main() {
   runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
     MainStore mainStore = Get.put(MainStore());
-
     runApp(const MyApp());
   }, (error, stackTrace) async {});
 }
@@ -24,15 +24,18 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      title: 'Health and Wellness',
-      theme: ThemeData(
-        useMaterial3: true,
-        useSystemColors: true,
-        textTheme: GoogleFonts.monaSansTextTheme(ThemeData.light().textTheme),
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.grey.shade100),
+    return ProviderScope(
+      child: GetMaterialApp(
+        title: 'Health and Wellness',
+        theme: ThemeData(
+          useMaterial3: true,
+          useSystemColors: true,
+          textTheme: GoogleFonts.monaSansTextTheme(ThemeData.light().textTheme),
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.grey.shade100),
+        ),
+        getPages: routes,
+        home: Login(),
       ),
-      home: ProviderScope(child: Login()),
     );
   }
 }

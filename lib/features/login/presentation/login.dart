@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:healthandwellness/app/mainstore.dart';
+import 'package:healthandwellness/app/provider.dart';
 import 'package:healthandwellness/core/utility/app_loader.dart';
 import 'package:healthandwellness/core/utility/firebase_service.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
 
-class Login extends StatefulWidget {
+class Login extends ConsumerStatefulWidget {
   const Login({super.key});
 
   @override
-  State<Login> createState() => _LoginState();
+  ConsumerState<Login> createState() => _LoginState();
 }
 
-class _LoginState extends State<Login> {
+class _LoginState extends ConsumerState<Login> {
   MainStore mainStore = Get.find<MainStore>();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
@@ -30,6 +32,13 @@ class _LoginState extends State<Login> {
     nameController.clear();
     emailController.clear();
     passwordController.clear();
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    ref.read(userProvider.notifier).checkIfUserLogin();
+    super.initState();
   }
 
   @override
@@ -123,7 +132,7 @@ class _LoginState extends State<Login> {
                         mainStore.makeLoading();
                         if (isCreateAccount) {
                           try {
-                            await mainStore.firebaseG.createNewUser(name: nameController.text, email: emailController.text, password: passwordController.text);
+                            await ref.read(userProvider.notifier).addUser( email: emailController.text, password: passwordController.text,name: nameController.text,);
                           } catch (e) {
                             showAlert("$e", AlertType.error);
                           } finally {
@@ -131,7 +140,7 @@ class _LoginState extends State<Login> {
                           }
                         } else {
                           try {
-                            await mainStore.firebaseG.makeEmailLogin(email: emailController.text, password: passwordController.text);
+                            await ref.read(userProvider.notifier).emailLogin(email: emailController.text, password: passwordController.text);
                           } catch (e) {
                             showAlert("$e", AlertType.error);
                           } finally {
