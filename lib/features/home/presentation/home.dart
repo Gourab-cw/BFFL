@@ -5,6 +5,7 @@ import 'package:healthandwellness/app/mainstore.dart';
 import 'package:healthandwellness/app/provider.dart';
 import 'package:healthandwellness/core/utility/app_loader.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
+import 'package:moon_design/moon_design.dart';
 
 import '../../../core/widget/bottom_nav_bar.dart';
 
@@ -22,42 +23,50 @@ class _HomeState extends ConsumerState<Home> {
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(userProvider);
-    return AppLoader(child: Scaffold(
-      bottomNavigationBar: BottomNavbar(),
-      body: Padding(
-        padding: EdgeInsets.only(
-          top: safePadding.top,
-          bottom: safePadding.bottom,
-          left: safePadding.left+5,
-          right: safePadding.right+5,
-        ),
-        child: Column(
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                Row(
-                  spacing: 5,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
+            Row(
+              spacing: 5,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                    decoration: BoxDecoration(
                         color: Colors.green.shade300,
                         borderRadius: BorderRadius.circular(40)
-                      ),
-                        padding: EdgeInsets.all(4),
-                        child: Icon(Icons.person_rounded,color: Colors.green.shade900,size: 24,)),
-                    TextHelper(text: "Hello, ${user?.name ?? ""}",fontsize: 15,fontweight: FontWeight.w600,),
-                  ],
-                ),
-                ButtonHelperG(
-                  background: Colors.transparent,
-                  icon: Icon(Icons.notifications),
-                )
-              ],)
+                    ),
+                    padding: EdgeInsets.all(4),
+                    child: Icon(Icons.person_rounded,color: Colors.green.shade900,size: 24,)),
+                TextHelper(text: "Hello, ${user?.name ?? ""}",fontsize: 15,fontweight: FontWeight.w600,),
+              ],
+            ),
+            ButtonHelperG(
+              background: Colors.transparent,
+              icon: Icon(Icons.notifications),
+            )
+          ],),
+
+        // Button Row
+        Wrap(
+          children: [
+            ButtonHelperG(
+              onTap: (){
+                Get.toNamed("/useradd");
+              },
+              height: 45,
+              icon: Icon(MoonIcons.generic_user_24_regular,color: Colors.green.shade900,size: 28,),
+              label: TextHelper(text: "Add Member +",fontsize: 14,color: Colors.green.shade900,fontweight: FontWeight.w600,), width: 200,background: Colors.lightGreenAccent.shade700,),
+            ButtonHelperG(
+              withBorder: true,
+              height: 45,
+              type: ButtonHelperTypeG.outlined,
+              icon: Icon(MoonIcons.generic_ticket_24_regular,color: Colors.green.shade900,size: 28,),
+              label: TextHelper(text: "Book a service",fontsize: 14,color: Colors.green.shade900,fontweight: FontWeight.w600,), width: 200,background: Colors.lightGreenAccent.shade700,),
           ],
-        ),
-      ),
-    ));
+        )
+      ],
+    );
   }
 }

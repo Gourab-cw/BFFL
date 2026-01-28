@@ -18,14 +18,16 @@ class _ServiceViewState extends ConsumerState<ServiceView> {
   final MainStore mainStore = Get.find<MainStore>();
   late final EdgeInsets safePadding = MediaQuery.paddingOf(context);
   Future<void> fetchingServices()async{
-    mainStore.makeLoading();
+    // mainStore.makeLoading();
     try{
+      ref.read(appLoaderProvider.notifier).startLoading();
       final serviceProvider = ref.read(serviceStateProvider.notifier);
      await serviceProvider.getServiceList();
     }catch(e){
       showAlert("$e", AlertType.error);
     }finally{
-      mainStore.stopLoading();
+      // mainStore.stopLoading();
+      ref.read(appLoaderProvider.notifier).stopLoading();
     }
   }
 
@@ -39,29 +41,18 @@ class _ServiceViewState extends ConsumerState<ServiceView> {
   @override
   Widget build(BuildContext context) {
     final serviceProvider = ref.watch(serviceStateProvider);
-    return AppLoader(child: Scaffold(
-        bottomNavigationBar: BottomNavbar(),
-        body: Padding(
-            padding: EdgeInsets.only(
-              top: safePadding.top,
-              bottom: safePadding.bottom,
-              left: safePadding.left+5,
-              right: safePadding.right+5,
-            ),
-            child: SingleChildScrollView(
-              child: Column(
-                  children: [
-                    Wrap(
-                      children: [
-                        ...serviceProvider.services.map((m)=>Container(
-                          child: TextHelper(text: m.name),
-                        ))
-                      ],
-                    )
-                  ]),
+    return SingleChildScrollView(
+      child: Column(
+          children: [
+            Wrap(
+              children: [
+                ...serviceProvider.services.map((m)=>Container(
+                  child: TextHelper(text: m.name),
+                ))
+              ],
             )
-        )
-    ));
+          ]),
+    );
   }
 
 

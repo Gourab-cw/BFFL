@@ -5,6 +5,7 @@ import 'package:healthandwellness/app/mainstore.dart';
 import 'package:healthandwellness/app/provider.dart';
 import 'package:moon_design/moon_design.dart';
 
+import '../utility/app_loader.dart';
 import '../utility/helper.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -37,6 +38,7 @@ class _BottomnavbarState extends ConsumerState<BottomNavbar> {
               onTap: () {
                 SystemSound.play(SystemSoundType.click);
                 mainStore.bottomNavBarIndex.value = 0;
+                // Get.toNamed("/home");
               },
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -71,7 +73,7 @@ class _BottomnavbarState extends ConsumerState<BottomNavbar> {
               onTap: () {
                 SystemSound.play(SystemSoundType.click);
                 mainStore.bottomNavBarIndex.value = 1;
-                Get.toNamed("/serviceview");
+                // Get.toNamed("/serviceview");
               },
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -139,13 +141,13 @@ class _BottomnavbarState extends ConsumerState<BottomNavbar> {
             GestureDetector(
                 onTap: () async{
                   SystemSound.play(SystemSoundType.click);
-                  mainStore.makeLoading();
+                  ref.read(appLoaderProvider.notifier).startLoading();
                  try{
                    await ref.read(userProvider.notifier).logOut();
                  }catch(e){
                    showAlert("$e", AlertType.error);
                  }finally{
-                   mainStore.stopLoading();
+                   ref.read(appLoaderProvider.notifier).stopLoading();
                  }
                 },
                 child: Column(

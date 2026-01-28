@@ -6,6 +6,7 @@ import 'package:healthandwellness/core/utility/helper.dart';
 import 'package:healthandwellness/features/login/data/user.dart';
 import 'package:get/get.dart';
 import '../../../app/firebase_provider.dart';
+import '../../../core/Picklist/picklist_item.dart';
 
 class UserNotifier extends Notifier<UserG?> {
   late FirebaseG firebase;
@@ -14,6 +15,31 @@ class UserNotifier extends Notifier<UserG?> {
   UserG? build() {
     firebase = ref.read(firebaseProvider);
     return null;
+  }
+
+  Future<void> seedPicklists(List<PicklistItem> items,FirebaseFirestore db) async {
+    final batch = db.batch();
+
+
+    for (final item in items) {
+      final docId = '${item.typeId}_${item.id}';
+      final ref = db
+          .collection('picklists')
+          .doc(docId);
+
+
+      batch.set(
+        ref,
+        {
+          ...item.toMap(),
+          'createdAt': FieldValue.serverTimestamp(),
+        },
+        SetOptions(merge: true),
+      );
+    }
+
+
+    await batch.commit();
   }
 
   Future<bool> checkIfUserLogin() async {
@@ -27,6 +53,26 @@ class UserNotifier extends Notifier<UserG?> {
           await db.collection("User").doc(user.uid).update({"token":firebase.token});
         }
         state = UserG.fromJSON(makeMapSerialize(querySnapshot.data()));
+        await seedPicklists([
+          // Gender
+          PicklistItem(id: 'MALE', name: 'Male', typeId: 'GENDER', order: 1),
+          PicklistItem(id: 'FEMALE', name: 'Female', typeId: 'GENDER', order: 2),
+          PicklistItem(id: 'OTHER', name: 'Other', typeId: 'GENDER', order: 3),
+
+          // Blood Group
+          PicklistItem(id: 'A_POS', name: 'A+', typeId: 'BLOOD_GROUP', order: 1),
+          PicklistItem(id: 'A_NEG', name: 'A-', typeId: 'BLOOD_GROUP', order: 2),
+          PicklistItem(id: 'B_POS', name: 'B+', typeId: 'BLOOD_GROUP', order: 3),
+          PicklistItem(id: 'B_NEG', name: 'B-', typeId: 'BLOOD_GROUP', order: 4),
+          PicklistItem(id: 'O_POS', name: 'O+', typeId: 'BLOOD_GROUP', order: 5),
+          PicklistItem(id: 'O_NEG', name: 'O-', typeId: 'BLOOD_GROUP', order: 6),
+          PicklistItem(id: 'AB_POS', name: 'AB+', typeId: 'BLOOD_GROUP', order: 7),
+          PicklistItem(id: 'AB_NEG', name: 'AB-', typeId: 'BLOOD_GROUP', order: 8),
+
+          // Marital Status
+          PicklistItem(id: 'SINGLE', name: 'Single', typeId: 'MARITAL_STATUS', order: 1),
+          PicklistItem(id: 'MARRIED', name: 'Married', typeId: 'MARITAL_STATUS', order: 2),
+        ],db);
         return true;
       }
       else{
