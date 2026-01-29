@@ -1,53 +1,49 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:healthandwellness/app/firebase_provider.dart';
+import 'package:get/get.dart';
 import 'package:healthandwellness/core/Picklist/picklist_item.dart';
 import 'package:healthandwellness/core/utility/firebase_service.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
 
-
-class PickListNotifier extends Notifier<List<PicklistItem>>{
+class PickListBinding extends Bindings {
   @override
-  List<PicklistItem> build() {
-    // TODO: implement build
-    return [];
+  void dependencies() {
+    // TODO: implement dependencies
+    Get.lazyPut(() => PickListNotifier(), fenix: true);
   }
-  
-  Future<void> getPickLists()async{
-    if(state.isEmpty){
-      final firebaseG = ref.read(firebaseProvider);
-      final db = await firebaseG.getDB();
-      final resp = await db.collection("picklists").where("isActive",isEqualTo: true).get();
-      final List<PicklistItem> list = resp.docs.map((r)=>PicklistItem.fromJSON(makeMapSerialize(r))).toList();
-      state = list;
-    }
+}
+
+class PickListNotifier extends GetxController {
+  List<PicklistItem> state = [];
+
+  Future<void> getPickLists() async {
+    // if (state.isNotEmpty) {
+    final firebaseG = Get.find<FB>();
+    final db = await firebaseG.getDB();
+    final resp = await db.collection("picklists").where("isActive", isEqualTo: true).get();
+    final List<PicklistItem> list = resp.docs.map((r) {
+      return PicklistItem.fromJSON(makeMapSerialize(r.data()));
+    }).toList();
+    state = list;
+    update();
+    // }
   }
 
   List<Map<String, String>> getGenderPicklist() {
-    return state
-        .where((e) => e.typeId == 'GENDER')
-        .map((e) => {
-      'id': e.id,
-      'name': e.name,
-    }).toList();
+    return state.where((e) => e.typeId == 'GENDER').map((e) => {'id': e.id, 'name': e.name}).toList();
   }
 
   List<Map<String, String>> getBloodGroupPicklist() {
-    return state
-        .where((e) => e.typeId == 'BLOOD_GROUP')
-        .map((e) => {
-      'id': e.id,
-      'name': e.name,
-    })
-        .toList();
+    return state.where((e) => e.typeId == 'BLOOD_GROUP').map((e) => {'id': e.id, 'name': e.name}).toList();
   }
 
   List<Map<String, String>> getMaritalStatusPicklist() {
-    return state
-        .where((e) => e.typeId == 'MARITAL_STATUS')
-        .map((e) => {
-      'id': e.id,
-      'name': e.name,
-    }).toList();
+    return state.where((e) => e.typeId == 'MARITAL_STATUS').map((e) => {'id': e.id, 'name': e.name}).toList();
   }
 
+  List<Map<String, String>> getReferredPicklist() {
+    return state.where((e) => e.typeId == 'REFERRED').map((e) => {'id': e.id, 'name': e.name}).toList();
+  }
+
+  List<Map<String, String>> getUserServicePicklist() {
+    return state.where((e) => e.typeId == 'USER_SERVICE').map((e) => {'id': e.id, 'name': e.name}).toList();
+  }
 }

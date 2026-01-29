@@ -1,22 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:healthandwellness/app/mainstore.dart';
-import 'package:healthandwellness/app/provider.dart';
 import 'package:healthandwellness/core/utility/app_loader.dart';
 import 'package:healthandwellness/core/utility/firebase_service.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
 
-class Login extends ConsumerStatefulWidget {
+import '../repository/user_notifier.dart';
+
+class Login extends StatefulWidget {
   const Login({super.key});
 
   @override
-  ConsumerState<Login> createState() => _LoginState();
+  State<Login> createState() => _LoginState();
 }
 
-class _LoginState extends ConsumerState<Login> {
+class _LoginState extends State<Login> {
   MainStore mainStore = Get.find<MainStore>();
+  final loaderController = Get.find<AppLoaderController>();
+  UserNotifier user = Get.find<UserNotifier>();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -37,15 +39,11 @@ class _LoginState extends ConsumerState<Login> {
   @override
   void initState() {
     // TODO: implement initState
-    Future((){
+    Future(() {
       try {
-        ref.read(appLoaderProvider.notifier).startLoading();
-        ref.read(userProvider.notifier).checkIfUserLogin().then((d) {
-          // if (d) {
-          //   Get.offAllNamed("/home");
-          // }
-        }).whenComplete((){
-          ref.read(appLoaderProvider.notifier).stopLoading();
+        loaderController.startLoading();
+        user.checkIfUserLogin().whenComplete(() {
+          loaderController.stopLoading();
         });
       } catch (e) {
         showAlert("$e", AlertType.error);
@@ -60,7 +58,7 @@ class _LoginState extends ConsumerState<Login> {
     return SingleChildScrollView(
       child: Column(
         children: [
-          const SizedBox(height: 50,),
+          const SizedBox(height: 50),
           TextHelper(
             text: "Health & Wellness",
             fontsize: 25,
@@ -70,7 +68,7 @@ class _LoginState extends ConsumerState<Login> {
             padding: EdgeInsets.all(30),
           ),
           SizedBox(
-            height: MediaQuery.sizeOf(context).height*0.7,
+            height: MediaQuery.sizeOf(context).height * 0.7,
             child: Center(
               child: Container(
                 margin: EdgeInsets.all(12),
@@ -143,27 +141,25 @@ class _LoginState extends ConsumerState<Login> {
                     ),
                     ButtonHelperG(
                       onTap: () async {
-                        ref.read(appLoaderProvider.notifier).startLoading();
+                        // ref.read(appLoaderProvider.notifier).startLoading();
                         if (isCreateAccount) {
                           try {
-                            await ref
-                                .read(userProvider.notifier)
-                                .addUser(email: emailController.text, password: passwordController.text, name: nameController.text);
+                            await user.addUser(email: emailController.text, password: passwordController.text, name: nameController.text);
                           } catch (e) {
                             showAlert("$e", AlertType.error);
                           } finally {
-                            ref.read(appLoaderProvider.notifier).stopLoading();
+                            // ref.read(appLoaderProvider.notifier).stopLoading();
                           }
                         } else {
                           try {
-                            bool redirect = await ref.read(userProvider.notifier).emailLogin(email: emailController.text, password: passwordController.text);
-                            if(redirect){
-                              Get.offAllNamed("/home");
-                            }
+                            bool redirect = await user.emailLogin(email: emailController.text, password: passwordController.text);
+                            // if(redirect){
+                            //   Get.offAllNamed("/home");
+                            // }
                           } catch (e) {
                             showAlert("$e", AlertType.error);
                           } finally {
-                            ref.read(appLoaderProvider.notifier).stopLoading();
+                            // ref.read(appLoaderProvider.notifier).stopLoading();
                           }
                         }
                       },

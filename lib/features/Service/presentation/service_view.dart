@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:healthandwellness/app/provider.dart';
 import 'package:get/get.dart';
+import 'package:healthandwellness/app/provider.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
+
 import '../../../app/mainstore.dart';
 import '../../../core/utility/app_loader.dart';
-import '../../../core/widget/bottom_nav_bar.dart';
 
 class ServiceView extends ConsumerStatefulWidget {
   const ServiceView({super.key});
@@ -16,25 +16,28 @@ class ServiceView extends ConsumerStatefulWidget {
 
 class _ServiceViewState extends ConsumerState<ServiceView> {
   final MainStore mainStore = Get.find<MainStore>();
+  final AppLoaderController loaderController = Get.find<AppLoaderController>();
   late final EdgeInsets safePadding = MediaQuery.paddingOf(context);
-  Future<void> fetchingServices()async{
+  Future<void> fetchingServices() async {
     // mainStore.makeLoading();
-    try{
-      ref.read(appLoaderProvider.notifier).startLoading();
+    try {
+      loaderController.startLoading();
       final serviceProvider = ref.read(serviceStateProvider.notifier);
-     await serviceProvider.getServiceList();
-    }catch(e){
+      await serviceProvider.getServiceList();
+    } catch (e) {
       showAlert("$e", AlertType.error);
-    }finally{
+    } finally {
       // mainStore.stopLoading();
-      ref.read(appLoaderProvider.notifier).stopLoading();
+      loaderController.stopLoading();
     }
   }
 
   @override
   void initState() {
     // TODO: implement initState
-    fetchingServices();
+    Future(() {
+      fetchingServices();
+    });
     super.initState();
   }
 
@@ -43,17 +46,12 @@ class _ServiceViewState extends ConsumerState<ServiceView> {
     final serviceProvider = ref.watch(serviceStateProvider);
     return SingleChildScrollView(
       child: Column(
-          children: [
-            Wrap(
-              children: [
-                ...serviceProvider.services.map((m)=>Container(
-                  child: TextHelper(text: m.name),
-                ))
-              ],
-            )
-          ]),
+        children: [
+          Wrap(
+            children: [...serviceProvider.services.map((m) => Container(child: TextHelper(text: m.name)))],
+          ),
+        ],
+      ),
     );
   }
-
-
 }

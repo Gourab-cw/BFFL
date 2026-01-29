@@ -1,41 +1,16 @@
 import 'dart:async';
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:get/get.dart';
 
-class AppLoaderState {
-  final bool loading;
-
-  const AppLoaderState({this.loading = false});
-
-  AppLoaderState copyWith({bool? loading}) {
-    return AppLoaderState(
-      loading: loading ?? this.loading,
-    );
-  }
-}
-
-final appLoaderProvider =
-NotifierProvider<AppLoaderNotifier, AppLoaderState>(
-  AppLoaderNotifier.new,
-);
-
-class AppLoaderNotifier extends Notifier<AppLoaderState> {
+class AppLoaderController extends GetxController {
+  final RxBool loading = false.obs;
   Timer? _timer;
 
-
-  @override
-  AppLoaderState build() {
-    return const AppLoaderState();
-  }
-
-
   void startLoading({Duration timeout = const Duration(seconds: 100)}) {
-    if (state.loading) return;
+    if (loading.value) return;
 
-
-    state = state.copyWith(loading: true);
-
+    loading.value = true;
 
     _timer?.cancel();
     _timer = Timer(timeout, () {
@@ -43,52 +18,47 @@ class AppLoaderNotifier extends Notifier<AppLoaderState> {
     });
   }
 
-
   void stopLoading() {
-    if (!state.loading) return;
-
+    if (!loading.value) return;
 
     _timer?.cancel();
     _timer = null;
-    state = state.copyWith(loading: false);
+    loading.value = false;
   }
 
-
   @override
-  void dispose() {
+  void onClose() {
     _timer?.cancel();
+    super.onClose();
   }
 }
 
-
-class AppLoader extends ConsumerWidget {
+class AppLoader extends StatelessWidget {
   final Widget child;
   const AppLoader({super.key, required this.child});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final loaderState = ref.watch(appLoaderProvider);
+  Widget build(BuildContext context) {
+    final controller = Get.find<AppLoaderController>();
 
-    return PopScope(
-      canPop: !loaderState.loading,
-      child: Stack(
-        children: [
-          child,
-          if (loaderState.loading)
-            Positioned.fill(
-              child: Container(
-                color: Colors.white54,
-                child: const Center(
-                  child: SizedBox(
-                    height: 30,
-                    width: 30,
-                    child: CircularProgressIndicator(color: Colors.blue),
+    return Obx(() {
+      return PopScope(
+        canPop: !controller.loading.value,
+        child: Stack(
+          children: [
+            child,
+            if (controller.loading.value)
+              Positioned.fill(
+                child: Container(
+                  color: Colors.white54,
+                  child: const Center(
+                    child: SizedBox(height: 30, width: 30, child: CircularProgressIndicator(color: Colors.blue)),
                   ),
                 ),
               ),
-            ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
+    });
   }
 }

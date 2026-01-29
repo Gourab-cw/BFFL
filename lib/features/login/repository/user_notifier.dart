@@ -1,81 +1,39 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:healthandwellness/core/utility/firebase_service.dart';
+import 'package:get/get.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
 import 'package:healthandwellness/features/login/data/user.dart';
-import 'package:get/get.dart';
-import '../../../app/firebase_provider.dart';
-import '../../../core/Picklist/picklist_item.dart';
 
-class UserNotifier extends Notifier<UserG?> {
-  late FirebaseG firebase;
+import '../../../core/utility/firebase_service.dart';
 
+class UserNotifier extends GetxController {
+  UserG? state;
+  late FB _firebase;
   @override
-  UserG? build() {
-    firebase = ref.read(firebaseProvider);
-    return null;
-  }
-
-  Future<void> seedPicklists(List<PicklistItem> items,FirebaseFirestore db) async {
-    final batch = db.batch();
-
-
-    for (final item in items) {
-      final docId = '${item.typeId}_${item.id}';
-      final ref = db
-          .collection('picklists')
-          .doc(docId);
-
-
-      batch.set(
-        ref,
-        {
-          ...item.toMap(),
-          'createdAt': FieldValue.serverTimestamp(),
-        },
-        SetOptions(merge: true),
-      );
-    }
-
-
-    await batch.commit();
+  void onInit() async {
+    // TODO: implement onInit
+    final FB fb = Get.find<FB>();
+    _firebase = fb;
+    super.onInit();
   }
 
   Future<bool> checkIfUserLogin() async {
-    final auth = await firebase.getAuth();
-    if (auth.currentUser != null) {
-      User user = auth.currentUser!;
-      FirebaseFirestore db = await firebase.getDB();
+    final auth = await _firebase.getAuth();
+    final User? u = await auth.authStateChanges().where((u) => u != null).first.timeout(const Duration(seconds: 5));
+    if (auth.currentUser != null || u != null) {
+      User user = u ?? auth.currentUser!;
+      FirebaseFirestore db = await _firebase.getDB();
       final querySnapshot = await db.collection("User").doc(user.uid).get();
-      if(querySnapshot.exists && querySnapshot["isActive"]==true){
-        if(firebase.token!=null){
-          await db.collection("User").doc(user.uid).update({"token":firebase.token});
+      if (querySnapshot.exists && querySnapshot["isActive"] == true) {
+        if (_firebase.token != null) {
+          await db.collection("User").doc(user.uid).update({"token": _firebase.token});
         }
         state = UserG.fromJSON(makeMapSerialize(querySnapshot.data()));
-        await seedPicklists([
-          // Gender
-          PicklistItem(id: 'MALE', name: 'Male', typeId: 'GENDER', order: 1),
-          PicklistItem(id: 'FEMALE', name: 'Female', typeId: 'GENDER', order: 2),
-          PicklistItem(id: 'OTHER', name: 'Other', typeId: 'GENDER', order: 3),
-
-          // Blood Group
-          PicklistItem(id: 'A_POS', name: 'A+', typeId: 'BLOOD_GROUP', order: 1),
-          PicklistItem(id: 'A_NEG', name: 'A-', typeId: 'BLOOD_GROUP', order: 2),
-          PicklistItem(id: 'B_POS', name: 'B+', typeId: 'BLOOD_GROUP', order: 3),
-          PicklistItem(id: 'B_NEG', name: 'B-', typeId: 'BLOOD_GROUP', order: 4),
-          PicklistItem(id: 'O_POS', name: 'O+', typeId: 'BLOOD_GROUP', order: 5),
-          PicklistItem(id: 'O_NEG', name: 'O-', typeId: 'BLOOD_GROUP', order: 6),
-          PicklistItem(id: 'AB_POS', name: 'AB+', typeId: 'BLOOD_GROUP', order: 7),
-          PicklistItem(id: 'AB_NEG', name: 'AB-', typeId: 'BLOOD_GROUP', order: 8),
-
-          // Marital Status
-          PicklistItem(id: 'SINGLE', name: 'Single', typeId: 'MARITAL_STATUS', order: 1),
-          PicklistItem(id: 'MARRIED', name: 'Married', typeId: 'MARITAL_STATUS', order: 2),
-        ],db);
+        update();
         return true;
-      }
-      else{
+      } else {
         return false;
       }
     } else {
@@ -85,51 +43,49 @@ class UserNotifier extends Notifier<UserG?> {
 
   Future<bool> emailLogin({required String email, required String password}) async {
     try {
-      // 1️⃣ Get Firebase instance
-      final firebase = ref.read(firebaseProvider);
+      // 1️⃣ Get _firebase instance
 
-      // 2️⃣ Call Firebase function
-      final User? user = await firebase.makeEmailLogin(email: email, password: password);
+      // 2️⃣ Call _firebase function
+      final User? user = await _firebase.makeEmailLogin(email: email, password: password);
 
-      if(user!=null){
-        FirebaseFirestore db = await firebase.getDB();
+      if (user != null) {
+        FirebaseFirestore db = await _firebase.getDB();
         final querySnapshot = await db.collection("User").doc(user.uid).get();
-        if(querySnapshot.exists && querySnapshot["isActive"]==true){
-          if(firebase.token!=null){
-            await db.collection("User").doc(user.uid).update({"token":firebase.token});
+        if (querySnapshot.exists && querySnapshot["isActive"] == true) {
+          if (_firebase.token != null) {
+            await db.collection("User").doc(user.uid).update({"token": _firebase.token});
           }
           state = UserG.fromJSON(makeMapSerialize(querySnapshot.data()));
+          update();
           return true;
-        }else{
+        } else {
           return false;
         }
       }
       return false;
       // 3️⃣ Update state
-
     } catch (e) {
       return false;
       showAlert("$e", AlertType.error);
     }
   }
 
-  Future<void> logOut()async{
-    try{
-      final auth = await firebase.getAuth();
+  Future<void> logOut() async {
+    try {
+      final auth = await _firebase.getAuth();
       await auth.signOut();
-      state=null;
-      Get.offAllNamed("/login");
-    }catch(e){
+      state = null;
+      update();
+      // Get.offAllNamed("/login");
+    } catch (e) {
       showAlert("$e", AlertType.error);
     }
   }
 
   Future<void> addUser({required String email, required String password, required String name}) async {
     try {
-      final firebase = ref.read(firebaseProvider);
-
-      // 2️⃣ Call Firebase function
-      final User? user = await firebase.createNewUser(email: email, password: password, name: name);
+      // 2️⃣ Call _firebase function
+      final User? user = await _firebase.createNewUser(email: email, password: password, name: name);
 
       // 3️⃣ Update state
       // state = user;

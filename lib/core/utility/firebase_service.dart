@@ -2,18 +2,48 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
-import 'package:healthandwellness/features/login/data/user.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../firebase_options.dart';
 
-abstract class FirebaseBaseService {
+abstract class FirebaseBaseService extends GetxService {
   // Firebase app
   FirebaseApp? _firebaseApp;
+
+  FirebaseAuth? _auth;
+
+  FirebaseFirestore? _db;
+
+  FirebaseStorage? _fireStore;
+
+  Future<FirebaseStorage> getStorage() async {
+    return _fireStore ??= FirebaseStorage.instanceFor(app: await getApp());
+  }
+
+  Future<void> authInit() async {
+    _auth ??= FirebaseAuth.instanceFor(app: await getApp());
+  }
+
+  Future<FirebaseFirestore> getDB() async {
+    if (_db == null) {
+      _db = FirebaseFirestore.instance;
+      return _db!;
+    }
+    return _db!;
+  }
+
+  Future<FirebaseAuth> getAuth() async {
+    if (_auth == null) {
+      await authInit();
+      return _auth!;
+    }
+    return _auth!;
+  }
 
   Future<FirebaseApp> getApp() async {
     if (_firebaseApp == null) {
@@ -21,6 +51,13 @@ abstract class FirebaseBaseService {
       return _firebaseApp!;
     }
     return _firebaseApp!;
+  }
+
+  @override
+  void onInit() async {
+    await getAuth();
+    await getDB();
+    super.onInit();
   }
 
   // FCM Token
@@ -192,24 +229,8 @@ abstract class FirebaseBaseService {
 
 enum AuthType { google, facebook, twitter }
 
-class FirebaseLogInService extends FirebaseBaseService {
-  FirebaseAuth? _auth;
-
-
-  Future<void> authInit() async {
-    _auth ??= FirebaseAuth.instanceFor(app: await getApp());
-  }
-
-  Future<FirebaseAuth> getAuth() async {
-    if (_auth == null) {
-      await authInit();
-      return _auth!;
-    }
-    return _auth!;
-  }
-
+mixin FirebaseLogInService on FirebaseBaseService {
   Future<void> makeProviderLogin(AuthType type) async {
-    FirebaseApp firebaseApp = await getApp();
     final auth = await getAuth();
     AuthProvider provider = GoogleAuthProvider();
     if (type == AuthType.google) {
@@ -222,7 +243,6 @@ class FirebaseLogInService extends FirebaseBaseService {
       provider = TwitterAuthProvider();
     }
     UserCredential cred = await auth.signInWithProvider(provider);
-    logG(cred.user?.uid);
   }
 
   Future<User?> makeEmailLogin({required String email, required String password}) async {
@@ -241,7 +261,6 @@ class FirebaseLogInService extends FirebaseBaseService {
         showAlert("No user found!", AlertType.error);
       }
     } on FirebaseAuthException catch (e) {
-      logG(e.code);
       switch (e.code) {
         case 'user-not-found':
           showAlert("User not found", AlertType.error);
@@ -280,21 +299,10 @@ class FirebaseLogInService extends FirebaseBaseService {
     } catch (e) {
       throw Exception(e.toString());
     }
+    return null;
   }
 }
 
-mixin FirebaseDBService on FirebaseBaseService{
-  FirebaseFirestore? _db;
+class FirebaseG extends FirebaseBaseService with FirebaseLogInService {}
 
-  Future<FirebaseFirestore> getDB()async{
-    if(_db==null){
-      _db = FirebaseFirestore.instance;
-      return _db!;
-    }
-    return _db!;
-  }
-
-}
-
-
-class FirebaseG extends FirebaseLogInService with FirebaseDBService {}
+class FB extends FirebaseBaseService with FirebaseLogInService {}

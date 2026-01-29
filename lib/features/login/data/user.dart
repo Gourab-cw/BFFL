@@ -1,8 +1,8 @@
 import 'package:healthandwellness/core/utility/helper.dart';
 
+enum UserType { cwAdmin, admin, branchManager, receptionist, trainer, accountant, member }
 
-enum UserType {cwAdmin,admin,branchManager,receptionist,trainer,accountant,member}
-final _userTypeMap = {
+final userTypeMap = {
   'eVfqVJWwHnLnKZPQr4tC': UserType.cwAdmin,
   'Fj3WvG9DjgG6ve0Xw3SF': UserType.admin,
   'qeTcMMfWb1zzLwsNZDZW': UserType.branchManager,
@@ -44,8 +44,8 @@ class UserG {
   String medication;
   String physicalExercise;
   String diet;
-  String referedById;
-  String referedByName;
+  String referredById;
+  String referredByName;
 
   UserG({
     required this.id,
@@ -79,8 +79,8 @@ class UserG {
     required this.medication,
     required this.physicalExercise,
     required this.diet,
-    required this.referedById,
-    required this.referedByName,
+    required this.referredById,
+    required this.referredByName,
   });
 
   factory UserG.fromJSON(Map<String, dynamic> data) => UserG(
@@ -90,20 +90,10 @@ class UserG {
     branchId: parseString(data: data["branchId"], defaultValue: ""),
     companyId: parseString(data: data["companyId"], defaultValue: ""),
     mobile: parseString(data: data["mobile"], defaultValue: ""),
-    userType: _userTypeMap[
-    parseString(data: data["userTypeId"], defaultValue: "")] ??
-        UserType.member,
+    userType: userTypeMap[parseString(data: data["userTypeId"], defaultValue: "")] ?? UserType.member,
 
-    activeFrom: parseStringToEmptyDate(
-      data: data["activeFrom"],
-      predefinedDateFormat: "yyyy-MM-dd",
-      defaultValue: null,
-    ),
-    activeTill: parseStringToEmptyDate(
-      data: data["activeTill"],
-      predefinedDateFormat: "yyyy-MM-dd",
-      defaultValue: null,
-    ),
+    activeFrom: parseStringToEmptyDate(data: data["activeFrom"], predefinedDateFormat: "yyyy-MM-dd", defaultValue: null),
+    activeTill: parseStringToEmptyDate(data: data["activeTill"], predefinedDateFormat: "yyyy-MM-dd", defaultValue: null),
 
     // 🔹 new mappings
     dob: parseString(data: data["dob"], defaultValue: ""),
@@ -120,22 +110,14 @@ class UserG {
     nationality: parseString(data: data["nationality"], defaultValue: ""),
     country: parseString(data: data["country"], defaultValue: ""),
     profession: parseString(data: data["profession"], defaultValue: ""),
-    maritalStatusId:
-    parseString(data: data["maritialStatus"], defaultValue: ""),
-    services: (data["services"] as List?)
-        ?.map((e) => e.toString())
-        .toList() ??
-        [],
-    medicalCondition:
-    parseString(data: data["medicalCondition"], defaultValue: ""),
+    maritalStatusId: parseString(data: data["maritialStatus"], defaultValue: ""),
+    services: (data["services"] as List?)?.map((e) => e.toString()).toList() ?? [],
+    medicalCondition: parseString(data: data["medicalCondition"], defaultValue: ""),
     medication: parseString(data: data["medication"], defaultValue: ""),
-    physicalExercise:
-    parseString(data: data["physicalExercise"], defaultValue: ""),
+    physicalExercise: parseString(data: data["physicalExercise"], defaultValue: ""),
     diet: parseString(data: data["diet"], defaultValue: ""),
-    referedById:
-    parseString(data: data["referedBy"], defaultValue: ""),
-    referedByName:
-    parseString(data: data["referedByname"], defaultValue: ""),
+    referredById: parseString(data: data["referredBy"], defaultValue: ""),
+    referredByName: parseString(data: data["referredByname"], defaultValue: ""),
   );
 
   // ✅ copyWith
@@ -169,8 +151,8 @@ class UserG {
     String? medication,
     String? physicalExercise,
     String? diet,
-    String? referedById,
-    String? referedByName,
+    String? referredById,
+    String? referredByName,
   }) {
     return UserG(
       id: id ?? this.id,
@@ -202,8 +184,8 @@ class UserG {
       medication: medication ?? this.medication,
       physicalExercise: physicalExercise ?? this.physicalExercise,
       diet: diet ?? this.diet,
-      referedById: referedById ?? this.referedById,
-      referedByName: referedByName ?? this.referedByName,
+      referredById: referredById ?? this.referredById,
+      referredByName: referredByName ?? this.referredByName,
     );
   }
 }

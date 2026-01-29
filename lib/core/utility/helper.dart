@@ -780,6 +780,7 @@ class _DatePickerHelperState extends State<DatePickerHelper> {
         }
         List<DateTime?>? dd0 = await showCalendarDatePicker2Dialog(
           context: context,
+          value: [widget.value],
           config: CalendarDatePicker2WithActionButtonsConfig(
             allowSameValueSelection: true,
             dynamicCalendarRows: true,
@@ -1893,7 +1894,13 @@ class _ButtonHelperGState extends State<ButtonHelperG> {
           border: isFocused
               ? Border.all(color: mainStore.isDarkEnable.value ? Colors.black : Colors.grey.shade800)
               : widget.withBorder
-              ? Border.all(color: widget.type== ButtonHelperTypeG.outlined? widget.background ?? Colors.grey.shade300 : mainStore.isDarkEnable.value ? Colors.black : Colors.grey.shade300)
+              ? Border.all(
+                  color: widget.type == ButtonHelperTypeG.outlined
+                      ? widget.background ?? Colors.grey.shade300
+                      : mainStore.isDarkEnable.value
+                      ? Colors.black
+                      : Colors.grey.shade300,
+                )
               : Border.all(color: Colors.transparent),
           borderRadius: BorderRadius.circular(widget.borderRadius),
           boxShadow:
@@ -1945,7 +1952,10 @@ class _ButtonHelperGState extends State<ButtonHelperG> {
             width: widget.width,
             height: widget.height,
             alignment: widget.alignment,
-            decoration: BoxDecoration(color: widget.type == ButtonHelperTypeG.outlined ? Colors.white : widget.background ?? Colors.green, borderRadius: BorderRadius.circular(widget.borderRadius)),
+            decoration: BoxDecoration(
+              color: widget.type == ButtonHelperTypeG.outlined ? Colors.white : widget.background ?? Colors.green,
+              borderRadius: BorderRadius.circular(widget.borderRadius),
+            ),
             child: widget.direction == ButtonHelperDirectionG.horizontal
                 ? Row(mainAxisSize: MainAxisSize.min, spacing: 5, children: [if (widget.icon != null) widget.icon!, if (widget.label != null) widget.label!])
                 : Column(
@@ -2696,4 +2706,11 @@ Future<void> makePhoneCall(String number, BuildContext context) async {
     );
   }
   showAlert("No number found to call", AlertType.error, context);
+}
+
+String generateRandomPassword({int length = 12}) {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#\$%!';
+
+  final rand = Random.secure();
+  return List.generate(length, (_) => chars[rand.nextInt(chars.length)]).join();
 }
