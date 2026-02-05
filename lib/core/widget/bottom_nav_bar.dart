@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart';
 import 'package:healthandwellness/app/mainstore.dart';
-import 'package:healthandwellness/features/login/repository/user_notifier.dart';
+import 'package:healthandwellness/features/login/repository/authenticator.dart';
 import 'package:moon_design/moon_design.dart';
 
 import '../utility/app_loader.dart';
@@ -19,7 +19,7 @@ class BottomNavbar extends ConsumerStatefulWidget {
 class _BottomnavbarState extends ConsumerState<BottomNavbar> {
   final MainStore mainStore = Get.find<MainStore>();
   final AppLoaderController loaderController = Get.find<AppLoaderController>();
-  final UserNotifier user = Get.find<UserNotifier>();
+  final Authenticator user = Get.find<Authenticator>();
   @override
   Widget build(BuildContext context) {
     final calcWidth = MediaQuery.sizeOf(context).width / (4 + 1);

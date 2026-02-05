@@ -6,7 +6,7 @@ import 'package:healthandwellness/core/utility/app_loader.dart';
 import 'package:healthandwellness/core/utility/firebase_service.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
 
-import '../repository/user_notifier.dart';
+import '../repository/authenticator.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -18,7 +18,7 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   MainStore mainStore = Get.find<MainStore>();
   final loaderController = Get.find<AppLoaderController>();
-  UserNotifier user = Get.find<UserNotifier>();
+  Authenticator user = Get.find<Authenticator>();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -142,12 +142,14 @@ class _LoginState extends State<Login> {
                     ButtonHelperG(
                       onTap: () async {
                         // ref.read(appLoaderProvider.notifier).startLoading();
+                        loaderController.startLoading();
                         if (isCreateAccount) {
                           try {
                             await user.addUser(email: emailController.text, password: passwordController.text, name: nameController.text);
                           } catch (e) {
                             showAlert("$e", AlertType.error);
                           } finally {
+                            loaderController.stopLoading();
                             // ref.read(appLoaderProvider.notifier).stopLoading();
                           }
                         } else {
@@ -159,6 +161,7 @@ class _LoginState extends State<Login> {
                           } catch (e) {
                             showAlert("$e", AlertType.error);
                           } finally {
+                            loaderController.stopLoading();
                             // ref.read(appLoaderProvider.notifier).stopLoading();
                           }
                         }

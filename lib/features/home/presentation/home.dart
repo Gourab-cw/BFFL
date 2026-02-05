@@ -5,7 +5,7 @@ import 'package:healthandwellness/app/mainstore.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
 import 'package:moon_design/moon_design.dart';
 
-import '../../login/repository/user_notifier.dart';
+import '../../login/repository/authenticator.dart';
 
 class Home extends ConsumerStatefulWidget {
   Home({super.key});
@@ -16,7 +16,7 @@ class Home extends ConsumerStatefulWidget {
 
 class _HomeState extends ConsumerState<Home> {
   final MainStore mainStore = Get.find<MainStore>();
-  final UserNotifier user = Get.find<UserNotifier>();
+  final Authenticator user = Get.find<Authenticator>();
   late final EdgeInsets safePadding = MediaQuery.paddingOf(context);
   @override
   Widget build(BuildContext context) {
@@ -50,10 +50,10 @@ class _HomeState extends ConsumerState<Home> {
                   Get.toNamed("/useradd");
                 },
                 height: 45,
-                icon: Icon(MoonIcons.generic_user_24_regular, color: Colors.green.shade900, size: 28),
-                label: TextHelper(text: "Add Member +", fontsize: 14, color: Colors.green.shade900, fontweight: FontWeight.w600),
-                width: 200,
-                background: Colors.lightGreenAccent.shade700,
+                icon: Icon(MoonIcons.generic_user_24_regular, color: Colors.white, size: 28),
+                label: TextHelper(text: "Add Member +", fontsize: 14, color: Colors.white, fontweight: FontWeight.w600),
+                width: 150,
+                background: Colors.green.shade500,
               ),
               ButtonHelperG(
                 withBorder: true,
@@ -61,7 +61,31 @@ class _HomeState extends ConsumerState<Home> {
                 type: ButtonHelperTypeG.outlined,
                 icon: Icon(MoonIcons.generic_ticket_24_regular, color: Colors.green.shade900, size: 28),
                 label: TextHelper(text: "Book a service", fontsize: 14, color: Colors.green.shade900, fontweight: FontWeight.w600),
-                width: 200,
+                width: 150,
+                background: Colors.lightGreenAccent.shade700,
+              ),
+              ButtonHelperG(
+                onTap: () {
+                  Get.toNamed('/memberlist');
+                },
+                withBorder: true,
+                height: 45,
+                type: ButtonHelperTypeG.outlined,
+                icon: Icon(MoonIcons.generic_users_24_regular, color: Colors.green.shade900, size: 28),
+                label: TextHelper(text: "Member List", fontsize: 14, color: Colors.green.shade900, fontweight: FontWeight.w600),
+                width: 150,
+                background: Colors.lightGreenAccent.shade700,
+              ),
+              ButtonHelperG(
+                onTap: () {
+                  Get.toNamed('/slotmanage');
+                },
+                withBorder: true,
+                height: 45,
+                type: ButtonHelperTypeG.outlined,
+                icon: Icon(MoonIcons.generic_users_24_regular, color: Colors.green.shade900, size: 28),
+                label: TextHelper(text: "Slot Manage", fontsize: 14, color: Colors.green.shade900, fontweight: FontWeight.w600),
+                width: 150,
                 background: Colors.lightGreenAccent.shade700,
               ),
             ],

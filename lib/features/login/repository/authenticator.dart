@@ -8,7 +8,7 @@ import 'package:healthandwellness/features/login/data/user.dart';
 
 import '../../../core/utility/firebase_service.dart';
 
-class UserNotifier extends GetxController {
+class Authenticator extends GetxController {
   UserG? state;
   late FB _firebase;
   @override
@@ -22,11 +22,12 @@ class UserNotifier extends GetxController {
   Future<bool> checkIfUserLogin() async {
     final auth = await _firebase.getAuth();
     final User? u = await auth.authStateChanges().where((u) => u != null).first.timeout(const Duration(seconds: 5));
-    if (auth.currentUser != null || u != null) {
-      User user = u ?? auth.currentUser!;
+
+    if (u != null) {
+      User user = u;
       FirebaseFirestore db = await _firebase.getDB();
       final querySnapshot = await db.collection("User").doc(user.uid).get();
-      if (querySnapshot.exists && querySnapshot["isActive"] == true) {
+      if (querySnapshot.exists && makeMapSerialize(querySnapshot.data())["isActive"] == true) {
         if (_firebase.token != null) {
           await db.collection("User").doc(user.uid).update({"token": _firebase.token});
         }
@@ -43,18 +44,15 @@ class UserNotifier extends GetxController {
 
   Future<bool> emailLogin({required String email, required String password}) async {
     try {
-      // 1️⃣ Get _firebase instance
-
-      // 2️⃣ Call _firebase function
       final User? user = await _firebase.makeEmailLogin(email: email, password: password);
-
       if (user != null) {
         FirebaseFirestore db = await _firebase.getDB();
         final querySnapshot = await db.collection("User").doc(user.uid).get();
-        if (querySnapshot.exists && querySnapshot["isActive"] == true) {
+        if (querySnapshot.exists && makeMapSerialize(querySnapshot.data())["isActive"] == true) {
           if (_firebase.token != null) {
             await db.collection("User").doc(user.uid).update({"token": _firebase.token});
           }
+          logG(makeMapSerialize(querySnapshot.data()));
           state = UserG.fromJSON(makeMapSerialize(querySnapshot.data()));
           update();
           return true;

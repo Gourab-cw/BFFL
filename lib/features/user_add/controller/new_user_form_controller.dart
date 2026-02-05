@@ -1,10 +1,11 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
-import 'package:healthandwellness/features/login/repository/user_notifier.dart';
+import 'package:healthandwellness/features/login/repository/authenticator.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../core/utility/firebase_service.dart';
@@ -51,7 +52,7 @@ class NewUserFormController extends GetxController {
 
   Future<void> saveNewMember() async {
     try {
-      final UserNotifier userState = Get.find<UserNotifier>();
+      final Authenticator userState = Get.find<Authenticator>();
       final FB fb = Get.find<FB>();
       final db = await fb.getDB();
       final auth = await fb.getAuth();
@@ -76,7 +77,8 @@ class NewUserFormController extends GetxController {
       Map<String, dynamic> data = {
         "id": userCred.user?.uid,
         "password": password,
-        "name": name.text,
+        "name": name.text.trim(),
+        "searchTerm": name.text.trim().replaceAll(" ", "").toLowerCase(),
         "mail": email.text,
         "branchId": parseString(data: userState.state?.branchId, defaultValue: ""),
         "companyId": parseString(data: userState.state?.companyId, defaultValue: ""),
@@ -87,6 +89,7 @@ class NewUserFormController extends GetxController {
         "activeFrom": "",
         "activeTill": "",
         "isApproved": false,
+        "isActive": true,
 
         // 🔹 new mappings
         "dob": dob,
@@ -111,6 +114,7 @@ class NewUserFormController extends GetxController {
         "diet": diet.text,
         "referredById": parseString(data: referredById["id"], defaultValue: ""),
         "referredByName": referredByName.text,
+        "createdAt": FieldValue.serverTimestamp(),
       };
       if (image != null && userCred.user?.uid != null) {
         File file = File(image!.path);

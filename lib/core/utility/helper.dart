@@ -9,6 +9,7 @@ import 'package:crypto/crypto.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dio/dio.dart' as _dio;
 import 'package:easy_debounce/easy_debounce.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -90,11 +91,12 @@ class TextHelper extends StatelessWidget {
     this.onlyBottomBorder = false,
     this.withBorder = false,
     this.isWrap = false,
-    this.fontsize = 11.5,
+    this.fontsize = 13,
     this.borderRadius = 8,
     this.fontweight = FontWeight.w400,
     this.textalign = TextAlign.left,
     this.bgColor,
+    this.shadow,
   });
   final String text;
   final bool isWrap;
@@ -110,6 +112,7 @@ class TextHelper extends StatelessWidget {
   final Color? color;
   final Color? bgColor;
   final EdgeInsetsGeometry? padding;
+  final List<BoxShadow>? shadow;
 
   MainStore mainStore = Get.find();
 
@@ -155,6 +158,7 @@ class TextHelper extends StatelessWidget {
               fontSize: fontsize,
               fontWeight: fontweight,
               overflow: isWrap ? TextOverflow.visible : TextOverflow.ellipsis,
+              shadows: shadow,
             ),
           ),
           if (showRequired) const Text(' *', style: TextStyle(color: Colors.red)),
@@ -307,6 +311,7 @@ class TextBox extends StatefulWidget {
   final Function(String value)? onSubmitted;
   final Function()? onLongPress;
   final Function()? onTapOutside;
+  final double leftPadding;
   final double height;
   final double? width;
   final double? fontSize;
@@ -339,6 +344,7 @@ class TextBox extends StatefulWidget {
     this.onValueChange,
     this.onTap,
     this.onTapOutside,
+    this.leftPadding = 15,
     this.height = 40,
     this.fontSize = 13,
     this.width,
@@ -438,6 +444,7 @@ class _TextBoxState extends State<TextBox> {
               fontSize: widget.fontSize,
               fontWeight: widget.fontWeight,
             ),
+            padding: EdgeInsets.only(left: widget.leftPadding),
             inputFormatters: <TextInputFormatter>[if (widget.keyboard == TextInputType.number) FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))],
             onTap: () {
               if (widget.selectTextOnFocus && widget.controller.selection.end < widget.controller.value.text.length) {
@@ -489,7 +496,7 @@ class _TextBoxState extends State<TextBox> {
           if ((widget.showAlwaysLabel || isActive) && widget.labelText != null && widget.labelText != '')
             Positioned(
               top: 0,
-              left: widget.leading == null ? 15 : 30,
+              left: widget.leading == null ? 10 : 30,
               child: Container(
                 height: 2,
                 width: getTextWidth("${widget.labelText}", TextStyle(fontSize: widget.fontSize ?? 12, fontWeight: FontWeight.w500)),
@@ -499,7 +506,7 @@ class _TextBoxState extends State<TextBox> {
           if ((widget.showAlwaysLabel || isActive) && widget.labelText != null && widget.labelText != '')
             Positioned(
               top: -8,
-              left: widget.leading == null ? 17 : 30,
+              left: widget.leading == null ? 10 : 30,
               child: Container(
                 decoration: BoxDecoration(
                   // color: widget.labelTextBackgroundColor ?? widget.backgroundColor ?? (widget.mainStore.isDarkEnable.value ? Colors.grey[800] : Colors.grey[100]),
@@ -2713,4 +2720,116 @@ String generateRandomPassword({int length = 12}) {
 
   final rand = Random.secure();
   return List.generate(length, (_) => chars[rand.nextInt(chars.length)]).join();
+}
+
+List<Map<String, dynamic>> generateOneHourSlots(String startTime, String endTime, int period) {
+  int toMinutes(String time) {
+    final parts = time.split(":");
+    return int.parse(parts[0]) * 60 + int.parse(parts[1]);
+  }
+
+  String toTime(int minutes) {
+    final h = (minutes ~/ 60).toString().padLeft(2, '0');
+    final m = (minutes % 60).toString().padLeft(2, '0');
+    return "$h:$m";
+  }
+
+  int start = toMinutes(startTime);
+  final end = toMinutes(endTime);
+
+  List<Map<String, dynamic>> slots = [];
+
+  while (start + period <= end) {
+    slots.add({"startTime": toTime(start), "endTime": toTime(start + period)});
+    start += period;
+  }
+  return slots;
+}
+
+class DateTimePicker {
+  static void dateTimePicker({
+    String? headerText,
+    DateTime? minimumDate,
+    DateTime? maximumDate,
+    DateTime? defaultDateTime,
+    required CupertinoDatePickerMode mode,
+    required BuildContext context,
+    required Function(DateTime?) onDateTimeChanged,
+  }) async {
+    DateTime? d;
+    await showCupertinoDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.white,
+        child: SizedBox(
+          width: MediaQuery.sizeOf(context).width * 0.8 > 300 ? 300 : MediaQuery.sizeOf(context).width * 0.8,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 25),
+                child: Row(
+                  children: [TextHelper(text: headerText ?? "Select Month", fontweight: FontWeight.w600)],
+                ),
+              ),
+              Container(
+                height: 200,
+                width: 300,
+                decoration: BoxDecoration(color: Colors.white),
+                child: CupertinoDatePicker(
+                  onDateTimeChanged: (v) {
+                    d = v;
+                  },
+                  dateOrder: DatePickerDateOrder.mdy,
+                  mode: mode,
+                  minimumDate: minimumDate ?? DateTime(2025),
+                  maximumDate: maximumDate ?? DateTime(2080),
+                  initialDateTime: defaultDateTime ?? DateTime.now(),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 25),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  spacing: 30,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        onDateTimeChanged(d);
+                        SystemSound.play(SystemSoundType.click);
+                        goBack(context);
+                      },
+                      child: Container(
+                        height: 30,
+                        width: 30,
+                        alignment: Alignment.center,
+                        child: TextHelper(text: "Ok", fontweight: FontWeight.w600, textalign: TextAlign.center),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () => {goBack(context), SystemSound.play(SystemSoundType.click)},
+                      child: Container(
+                        height: 30,
+                        width: 80,
+                        alignment: Alignment.center,
+                        child: TextHelper(text: "Cancel", fontweight: FontWeight.w600, textalign: TextAlign.center),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    // showDatePicker(context: context,
+    //     firstDate: DateTime(2025),
+    //     lastDate: DateTime(2085),
+    //     initialDatePickerMode: DatePickerMode.year,
+    //
+    // );
+  }
 }

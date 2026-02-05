@@ -14,6 +14,9 @@ final userTypeMap = {
 
 class UserG {
   String id;
+
+  bool isApproved;
+  bool isActive;
   String name;
   String mail;
   DateTime? activeFrom;
@@ -21,6 +24,7 @@ class UserG {
   String branchId;
   String companyId;
   String mobile;
+  String profileImage;
   UserType userType;
 
   // 🔹 New fields
@@ -49,6 +53,8 @@ class UserG {
 
   UserG({
     required this.id,
+    required this.isApproved,
+    required this.isActive,
     required this.name,
     required this.mail,
     required this.activeFrom,
@@ -81,10 +87,13 @@ class UserG {
     required this.diet,
     required this.referredById,
     required this.referredByName,
+    required this.profileImage,
   });
 
   factory UserG.fromJSON(Map<String, dynamic> data) => UserG(
     id: parseString(data: data["id"], defaultValue: ""),
+    isApproved: parseBool(data: data["isApproved"], defaultValue: false),
+    isActive: parseBool(data: data["isActive"], defaultValue: false),
     name: parseString(data: data["name"], defaultValue: ""),
     mail: parseString(data: data["mail"], defaultValue: ""),
     branchId: parseString(data: data["branchId"], defaultValue: ""),
@@ -118,11 +127,14 @@ class UserG {
     diet: parseString(data: data["diet"], defaultValue: ""),
     referredById: parseString(data: data["referredBy"], defaultValue: ""),
     referredByName: parseString(data: data["referredByname"], defaultValue: ""),
+    profileImage: parseString(data: data["profileImage"], defaultValue: ""),
   );
 
   // ✅ copyWith
   UserG copyWith({
     String? id,
+    bool? isApproved,
+    bool? isActive,
     String? name,
     String? mail,
     DateTime? activeFrom,
@@ -153,9 +165,12 @@ class UserG {
     String? diet,
     String? referredById,
     String? referredByName,
+    String? profileImage,
   }) {
     return UserG(
       id: id ?? this.id,
+      isActive: isActive ?? this.isActive,
+      isApproved: isApproved ?? this.isApproved,
       name: name ?? this.name,
       mail: mail ?? this.mail,
       activeFrom: activeFrom ?? this.activeFrom,
@@ -186,6 +201,7 @@ class UserG {
       diet: diet ?? this.diet,
       referredById: referredById ?? this.referredById,
       referredByName: referredByName ?? this.referredByName,
+      profileImage: profileImage ?? this.profileImage,
     );
   }
 }
