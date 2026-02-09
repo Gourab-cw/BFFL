@@ -14,15 +14,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:healthandwellness/app/mainstore.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 import 'package:moon_design/moon_design.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:syncfusion_flutter_charts/charts.dart' hide Position;
 import 'package:ussd_phone_call_sms/ussd_phone_call_sms.dart';
 
+GeolocatorPlatform location = GeolocatorPlatform.instance;
 void goBack(BuildContext context) {
   if (Navigator.canPop(context)) {
     Navigator.pop(context);
@@ -1026,8 +1028,9 @@ class AreaChartHelper extends StatelessWidget {
   final Color gridYLineColor;
   final Color gridXLineColor;
   final Color borderColor;
+  final Color tooltipColor;
   final BorderDrawMode borderDrawMode;
-  final Widget Function(dynamic data)? customTooltip;
+  final Widget Function(ChartData data)? customTooltip;
   AreaChartHelper({
     super.key,
     required this.dataSource,
@@ -1041,6 +1044,7 @@ class AreaChartHelper extends StatelessWidget {
     this.gridXLineColor = const Color(0x6ec8c8c8),
     this.gridYLineColor = const Color(0x6ec8c8c8),
     this.borderColor = const Color(0xff00e3ff),
+    this.tooltipColor = const Color(0xff00e3ff),
     this.borderDrawMode = BorderDrawMode.excludeBottom,
     this.tooltipcircle = true,
   });
@@ -1052,34 +1056,41 @@ class AreaChartHelper extends StatelessWidget {
       title: ChartTitle(
         text: chartTitle,
         alignment: ChartAlignment.near,
-        textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+        textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 11),
       ),
       enableAxisAnimation: false,
       zoomPanBehavior: ZoomPanBehavior(enableMouseWheelZooming: false, enableDoubleTapZooming: false, enablePanning: false),
       primaryXAxis: CategoryAxis(
-        labelPlacement: LabelPlacement.betweenTicks,
-        majorGridLines: MajorGridLines(color: gridXLineColor),
+        labelPlacement: LabelPlacement.onTicks,
+        majorGridLines: MajorGridLines(color: gridXLineColor, width: 0),
         isVisible: showXAxis,
-        labelStyle: const TextStyle(fontSize: 11),
+        labelStyle: const TextStyle(fontSize: 9.5),
         rangePadding: ChartRangePadding.auto,
       ),
-      primaryYAxis: CategoryAxis(
+      primaryYAxis: NumericAxis(
         isVisible: showYAxis,
-        majorGridLines: MajorGridLines(color: gridYLineColor),
+        labelStyle: const TextStyle(fontSize: 9.5),
+        majorGridLines: const MajorGridLines(width: 0),
+        minorGridLines: const MinorGridLines(width: 0),
       ),
       series: <CartesianSeries>[
         SplineAreaSeries(
           // FastLineSeries(
           xValueMapper: (data, _) => data.x,
           yValueMapper: (data, _) => data.y,
-          dataSource: dataSource,
+          dataSource: dataSource.where((e) {
+            if (dataSource.indexOf(e) == 0 || dataSource.indexOf(e) == dataSource.length - 1) return true;
+            return e.y > 0;
+          }).toList(),
           markerSettings: MarkerSettings(
+            color: Colors.white,
             isVisible: true,
             shape: tooltipcircle ? DataMarkerType.circle : DataMarkerType.rectangle,
-            borderColor: const Color(0xff00e3ff),
-            width: 14,
-            height: 14,
+            borderColor: tooltipColor,
+            width: 10,
+            height: 10,
           ),
+          emptyPointSettings: EmptyPointSettings(mode: EmptyPointMode.zero),
           borderDrawMode: borderDrawMode,
           enableTooltip: enableTooltip,
           name: chartTitle,
@@ -1173,19 +1184,15 @@ class BarChartHelper extends StatelessWidget {
         majorGridLines: MajorGridLines(color: gridXLineColor),
         isVisible: showXAxis,
         labelStyle: TextStyle(fontSize: 11),
-        rangePadding: ChartRangePadding.auto,
       ),
-      isTransposed: isHorizontal,
-      primaryYAxis: CategoryAxis(
-        isVisible: showYAxis,
-        majorGridLines: MajorGridLines(color: gridYLineColor),
-      ),
+      isTransposed: !isHorizontal,
+      borderWidth: 1,
       series: <CartesianSeries>[
         BarSeries(
           // FastLineSeries(
           xValueMapper: (data, _) => data.x,
           yValueMapper: (data, _) => data.y,
-          dataSource: dataSource,
+          dataSource: dataSource.where((e) => e.y > 0).toList(),
           markerSettings: MarkerSettings(
             isVisible: true,
             shape: tooltipcircle ? DataMarkerType.circle : DataMarkerType.rectangle,
@@ -2832,4 +2839,31 @@ class DateTimePicker {
     //
     // );
   }
+}
+
+Future<bool> getLocationPermission(BuildContext context) async {
+  bool denied = await Permission.location.request().isPermanentlyDenied;
+  if (denied) {
+    if (!GetPlatform.isWeb) {
+      showAlert("Allow location permission from settings!", AlertType.error, context);
+      Timer(const Duration(milliseconds: 1800), () async {
+        await openAppSettings();
+      });
+      return false;
+    } else {
+      showAlert("Allow location permission from settings!", AlertType.error, context);
+      return false;
+    }
+  } else {
+    bool locationRequested = await Permission.location.request().isGranted;
+    if (!locationRequested) {
+      showAlert("Allow location permission from settings!", AlertType.error, context);
+    }
+    return locationRequested;
+  }
+}
+
+Future<Position> getCurrentLocation() async {
+  Position pos = await location.getCurrentPosition(locationSettings: const LocationSettings(accuracy: LocationAccuracy.high, distanceFilter: 100));
+  return pos;
 }

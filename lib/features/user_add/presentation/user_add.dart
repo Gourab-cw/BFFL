@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart';
 import 'package:healthandwellness/core/Picklist/picklist_provider.dart';
 import 'package:healthandwellness/core/utility/app_loader.dart';
@@ -12,14 +11,14 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:moon_design/moon_design.dart';
 
-class UserAdd extends ConsumerStatefulWidget {
+class UserAdd extends StatefulWidget {
   const UserAdd({super.key});
 
   @override
-  ConsumerState<UserAdd> createState() => _UserAddState();
+  State<UserAdd> createState() => _UserAddState();
 }
 
-class _UserAddState extends ConsumerState<UserAdd> {
+class _UserAddState extends State<UserAdd> {
   final NewUserFormController c = Get.find<NewUserFormController>();
   final AppLoaderController loaderController = Get.find<AppLoaderController>();
   final PickListNotifier picklistNotifierRef = Get.find<PickListNotifier>();

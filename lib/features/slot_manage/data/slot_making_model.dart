@@ -11,7 +11,10 @@ class SlotModel {
   final String startTime; // HH:mm
   final String endTime; // HH:mm
   final int bookingCount;
+  final int totalAttend;
   final bool isActive;
+  final bool hasComplete;
+  final Timestamp? completeAt;
   final Timestamp createdAt;
 
   const SlotModel({
@@ -24,7 +27,10 @@ class SlotModel {
     required this.startTime,
     required this.endTime,
     required this.bookingCount,
+    required this.totalAttend,
     required this.isActive,
+    required this.hasComplete,
+    required this.completeAt,
     required this.createdAt,
   });
 
@@ -41,6 +47,9 @@ class SlotModel {
       startTime: data['startTime'] ?? '',
       endTime: data['endTime'] ?? '',
       bookingCount: parseInt(data: data["bookingCount"], defaultInt: 0),
+      totalAttend: parseInt(data: data["totalAttend"], defaultInt: 0),
+      completeAt: data['completeAt'],
+      hasComplete: parseBool(data: data['hasComplete'], defaultValue: false),
       isActive: data['isActive'] ?? false,
       createdAt: data['createdAt'] ?? Timestamp.now(),
     );
@@ -57,7 +66,10 @@ class SlotModel {
       startTime: parseString(data: data['startTime'], defaultValue: ""),
       endTime: parseString(data: data['endTime'], defaultValue: ""),
       bookingCount: parseInt(data: data["bookingCount"], defaultInt: 0),
+      totalAttend: parseInt(data: data["totalAttend"], defaultInt: 0),
       isActive: parseBool(data: data['isActive'], defaultValue: false),
+      completeAt: data['completeAt'],
+      hasComplete: parseBool(data: data['hasComplete'], defaultValue: false),
       createdAt: data['createdAt'] ?? Timestamp.now(),
     );
   }
@@ -74,6 +86,9 @@ class SlotModel {
       'startTime': startTime,
       'endTime': endTime,
       'bookingCount': bookingCount,
+      'totalAttend': totalAttend,
+      'hasComplete': hasComplete,
+      'completeAt': completeAt,
       'isActive': isActive,
       'createdAt': createdAt,
     };

@@ -8,14 +8,14 @@ import 'package:moon_design/moon_design.dart';
 import '../utility/app_loader.dart';
 import '../utility/helper.dart';
 
-class BottomNavbar extends StatefulWidget {
-  const BottomNavbar({super.key});
+class BottomNavbarTrainer extends StatefulWidget {
+  const BottomNavbarTrainer({super.key});
 
   @override
-  State<BottomNavbar> createState() => _BottomnavbarState();
+  State<BottomNavbarTrainer> createState() => _BottomNavbarTrainerState();
 }
 
-class _BottomnavbarState extends State<BottomNavbar> {
+class _BottomNavbarTrainerState extends State<BottomNavbarTrainer> {
   final MainStore mainStore = Get.find<MainStore>();
   final AppLoaderController loaderController = Get.find<AppLoaderController>();
   final Authenticator user = Get.find<Authenticator>();
@@ -86,13 +86,13 @@ class _BottomnavbarState extends State<BottomNavbar> {
                       borderRadius: BorderRadius.circular(100),
                     ),
                     child: Icon(
-                      MoonIcons.generic_ticket_24_regular,
-                      size: 23,
+                      MoonIcons.generic_users_24_regular,
+                      size: 27,
                       color: mainStore.bottomNavBarIndex.value == 1 ? Colors.green.shade900 : Colors.black,
                     ),
                   ),
                   TextHelper(
-                    text: parseString(data: 'Service', defaultValue: ''),
+                    text: parseString(data: 'Members', defaultValue: ''),
                     fontweight: FontWeight.w600,
                     fontsize: 11,
                     width: calcWidth,
@@ -119,13 +119,13 @@ class _BottomnavbarState extends State<BottomNavbar> {
                       borderRadius: BorderRadius.circular(100),
                     ),
                     child: Icon(
-                      MoonIcons.time_calendar_24_regular,
+                      MoonIcons.generic_user_24_regular,
                       size: 23,
                       color: mainStore.bottomNavBarIndex.value == 2 ? Colors.green.shade900 : Colors.black,
                     ),
                   ),
                   TextHelper(
-                    text: parseString(data: 'Calender', defaultValue: ''),
+                    text: parseString(data: 'Attendance', defaultValue: ''),
                     fontweight: FontWeight.w600,
                     fontsize: 11,
                     width: calcWidth,

@@ -122,12 +122,16 @@ class _ServiceViewState extends State<ServiceView> {
                                     Positioned(
                                       top: 5,
                                       left: 5,
-                                      child: TextHelper(
-                                        text: m.name,
-                                        color: Colors.white,
-                                        shadow: [BoxShadow(color: Colors.black, spreadRadius: 1, blurRadius: 1)],
-                                        fontweight: FontWeight.w600,
-                                        fontsize: 14,
+                                      child: SizedBox(
+                                        width: 150,
+                                        child: TextHelper(
+                                          text: m.name,
+                                          color: Colors.white,
+                                          shadow: [BoxShadow(color: Colors.black, spreadRadius: 10, blurRadius: 10)],
+                                          fontweight: FontWeight.w600,
+                                          fontsize: 14,
+                                          isWrap: true,
+                                        ),
                                       ),
                                     ),
                                     Positioned(
@@ -138,6 +142,11 @@ class _ServiceViewState extends State<ServiceView> {
                                         child: BackdropFilter(
                                           filter: ImageFilter.blur(sigmaY: 5, sigmaX: 5),
                                           child: ButtonHelperG(
+                                            onTap: () {
+                                              service.selectedService = m;
+                                              Get.toNamed('/servicedetailsview');
+                                              service.update();
+                                            },
                                             margin: 0,
                                             borderRadius: 20,
                                             background: Colors.grey.withAlpha(50),

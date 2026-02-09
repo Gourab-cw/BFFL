@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
+import 'package:healthandwellness/features/home/controller/home_controller.dart';
 import 'package:healthandwellness/features/login/data/user.dart';
 
 import '../../../core/utility/firebase_service.dart';
@@ -47,30 +48,40 @@ class Authenticator extends GetxController {
       final User? user = await _firebase.makeEmailLogin(email: email, password: password);
       if (user != null) {
         FirebaseFirestore db = await _firebase.getDB();
-        final querySnapshot = await db.collection("User").doc(user.uid).get();
-        if (querySnapshot.exists && makeMapSerialize(querySnapshot.data())["isActive"] == true) {
+        final resp = await db.collection("User").doc(user.uid).get();
+        if (!resp.exists) {
+          showAlert("No user found", AlertType.error);
+          return false;
+        }
+        if (resp.exists && makeMapSerialize(resp.data())["isActive"] == true) {
           if (_firebase.token != null) {
             await db.collection("User").doc(user.uid).update({"token": _firebase.token});
           }
-          logG(makeMapSerialize(querySnapshot.data()));
-          state = UserG.fromJSON(makeMapSerialize(querySnapshot.data()));
+          state = UserG.fromJSON(makeMapSerialize(resp.data()));
           update();
           return true;
         } else {
+          showAlert("Unauthorized access!", AlertType.error);
           return false;
         }
       }
+      showAlert("No user found", AlertType.error);
       return false;
       // 3️⃣ Update state
     } catch (e) {
-      return false;
       showAlert("$e", AlertType.error);
+      return false;
     }
   }
 
   Future<void> logOut() async {
     try {
       final auth = await _firebase.getAuth();
+      if (Get.isRegistered<HomeController>()) {
+        final homeController = Get.find<HomeController>();
+        await homeController.ss?.cancel();
+        Get.delete<HomeController>();
+      }
       await auth.signOut();
       state = null;
       update();

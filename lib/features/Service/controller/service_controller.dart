@@ -94,6 +94,8 @@ class ServiceController extends GetxController {
         "isActive": true,
         "serviceId": selectedService!.id,
         "slotId": selectedSlot?.id,
+        "startTime": selectedSlot?.startTime,
+        "endTime": selectedSlot?.endTime,
         "date": selectedSlot?.date,
         "memberId": memberId,
         "trainerId": "",
@@ -101,6 +103,7 @@ class ServiceController extends GetxController {
         "attendedAt": null,
         "feedback": "",
         "trainerFeedback": "",
+        "isTrail": false,
         "createdAt": Timestamp.now(),
       };
 
@@ -174,7 +177,7 @@ class ServiceController extends GetxController {
       if (formatHour == null) {
         return false;
       } else {
-        return s.date == date && formatHour.difference(DateTime(d.year, d.month, d.day, 12)).isNegative;
+        return s.date == date && formatHour.difference(DateTime(d.year, d.month, d.day, 13)).isNegative;
       }
     }).toList();
     s.sort((a, b) => parseInt(data: a.endTime.replaceAll(":", ""), defaultInt: 0).compareTo(parseInt(data: b.endTime.replaceAll(":", ""), defaultInt: 0)));
@@ -189,7 +192,7 @@ class ServiceController extends GetxController {
         return false;
       } else {
         return s.date == date &&
-            formatHour.difference(DateTime(d.year, d.month, d.day, 18)).isNegative &&
+            formatHour.difference(DateTime(d.year, d.month, d.day, 19)).isNegative &&
             !formatHour.difference(DateTime(d.year, d.month, d.day, 13)).isNegative;
       }
     }).toList();

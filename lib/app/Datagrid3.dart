@@ -179,8 +179,8 @@ class _DataGridHelper2State extends State<DataGridHelper3> {
   }
 
   double getAutoHeadWidth() {
-    double x = 0;
-    int count = 0;
+    double x = 0; // total width of column which have width
+    int count = 0; // count of width having column
     for (var m in widget.columnList) {
       if (m.width != null) {
         x += m.width!;
@@ -530,6 +530,7 @@ class _DataGridHelper2State extends State<DataGridHelper3> {
                           sortDataBase();
                         },
                         child: Container(
+                          height: widget.rowHeight,
                           decoration: BoxDecoration(
                             border: Border(
                               bottom: widget.withBorder ? BorderSide(width: 1, color: widget.borderColor) : BorderSide.none,
@@ -542,6 +543,7 @@ class _DataGridHelper2State extends State<DataGridHelper3> {
                             color: widget.headerColor,
                           ),
                           child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Expanded(
                                 child: TextHelper(
@@ -1247,6 +1249,7 @@ class _DataGridHelper2State extends State<DataGridHelper3> {
                           scrollDirection: Axis.horizontal,
                           controller: horizontalScrollCon,
                           child: SizedBox(
+                            // width:widget.width,
                             width: widget.dataSource.isEmpty
                                 ? widget.width
                                 : List.generate(widget.columnList.length - widget.columnFixCount, (index) {
@@ -1308,7 +1311,6 @@ class _DataGridHelper2State extends State<DataGridHelper3> {
                                           ),
                                         ),
                                       ),
-
                                 // Footer=======
                                 // Footer=======
                                 if (widget.showFooter)

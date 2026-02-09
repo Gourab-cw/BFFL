@@ -7,8 +7,17 @@ class ServiceModel {
   final bool isTrial;
   final String image;
   final int maxBooking;
+  final List<String> trainerId;
 
-  ServiceModel({required this.id, required this.name, required this.description, required this.isTrial, required this.image, required this.maxBooking});
+  ServiceModel({
+    required this.id,
+    required this.name,
+    required this.description,
+    required this.isTrial,
+    required this.image,
+    required this.maxBooking,
+    required this.trainerId,
+  });
 
   /// Create from Firestore / JSON
   factory ServiceModel.fromJson(Map<String, dynamic> json) {
@@ -19,6 +28,7 @@ class ServiceModel {
       isTrial: parseBool(data: json['isTrial'], defaultValue: false),
       image: parseString(data: json['image'], defaultValue: ""),
       maxBooking: parseInt(data: json['maxBooking'], defaultInt: 0),
+      trainerId: List<String>.from(json['trainerId'] ?? []),
     );
   }
 
@@ -28,7 +38,7 @@ class ServiceModel {
   }
 
   /// Optional: copyWith (very useful)
-  ServiceModel copyWith({String? id, String? name, String? description, bool? isTrial, String? image, int? maxBooking}) {
+  ServiceModel copyWith({String? id, String? name, String? description, bool? isTrial, String? image, int? maxBooking, List<String>? trainerId}) {
     return ServiceModel(
       id: id ?? this.id,
       name: name ?? this.name,
@@ -36,6 +46,7 @@ class ServiceModel {
       isTrial: isTrial ?? this.isTrial,
       image: image ?? this.image,
       maxBooking: maxBooking ?? this.maxBooking,
+      trainerId: trainerId ?? this.trainerId,
     );
   }
 }

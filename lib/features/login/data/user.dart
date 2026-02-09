@@ -2,7 +2,7 @@ import 'package:healthandwellness/core/utility/helper.dart';
 
 enum UserType { cwAdmin, admin, branchManager, receptionist, trainer, accountant, member }
 
-final userTypeMap = {
+final Map<String, UserType> userTypeMap = {
   'eVfqVJWwHnLnKZPQr4tC': UserType.cwAdmin,
   'Fj3WvG9DjgG6ve0Xw3SF': UserType.admin,
   'qeTcMMfWb1zzLwsNZDZW': UserType.branchManager,
@@ -10,6 +10,16 @@ final userTypeMap = {
   'JoVVKfIcwkccunAFqIdy': UserType.trainer,
   'nFgfN9g1CV401w0L2OiS': UserType.accountant,
   'Sl9TlKFGMLCGWGFyTQpd': UserType.member,
+};
+
+final Map<UserType, String> userTypeMap2 = {
+  UserType.cwAdmin: 'eVfqVJWwHnLnKZPQr4tC',
+  UserType.admin: 'Fj3WvG9DjgG6ve0Xw3SF',
+  UserType.branchManager: 'qeTcMMfWb1zzLwsNZDZW',
+  UserType.receptionist: '79L1x0XoqV7XSsQjOImp',
+  UserType.trainer: 'JoVVKfIcwkccunAFqIdy',
+  UserType.accountant: 'nFgfN9g1CV401w0L2OiS',
+  UserType.member: 'Sl9TlKFGMLCGWGFyTQpd',
 };
 
 class UserG {
@@ -99,7 +109,7 @@ class UserG {
     branchId: parseString(data: data["branchId"], defaultValue: ""),
     companyId: parseString(data: data["companyId"], defaultValue: ""),
     mobile: parseString(data: data["mobile"], defaultValue: ""),
-    userType: userTypeMap[parseString(data: data["userTypeId"], defaultValue: "")] ?? UserType.member,
+    userType: userTypeMap[parseString(data: data["userType"], defaultValue: "")] ?? UserType.member,
 
     activeFrom: parseStringToEmptyDate(data: data["activeFrom"], predefinedDateFormat: "yyyy-MM-dd", defaultValue: null),
     activeTill: parseStringToEmptyDate(data: data["activeTill"], predefinedDateFormat: "yyyy-MM-dd", defaultValue: null),

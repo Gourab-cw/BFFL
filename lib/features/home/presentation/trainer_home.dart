@@ -4,21 +4,25 @@ import 'package:healthandwellness/app/Datagrid3.dart';
 import 'package:healthandwellness/app/mainstore.dart';
 import 'package:healthandwellness/core/utility/app_loader.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
+import 'package:healthandwellness/features/slot_details_trainer/controller/slot_details_controller.dart';
 import 'package:healthandwellness/features/subscriptions/controller/subscription_controller.dart';
 import 'package:moon_design/moon_design.dart';
 
+import '../../login/data/user.dart';
 import '../../login/repository/authenticator.dart';
 import '../controller/home_controller.dart';
 
-class Home extends StatefulWidget {
-  Home({super.key});
+class HomeTrainer extends StatefulWidget {
+  const HomeTrainer({super.key});
 
   @override
-  State<Home> createState() => _HomeState();
+  State<HomeTrainer> createState() => _HomeTrainerState();
 }
 
-class _HomeState extends State<Home> {
+class _HomeTrainerState extends State<HomeTrainer> {
   final MainStore mainStore = Get.find<MainStore>();
+  final loader = Get.find<AppLoaderController>();
+  final auth = Get.find<Authenticator>();
   final SubscriptionController subscriptionController = Get.find<SubscriptionController>();
 
   late final HomeController homeController;
@@ -33,6 +37,7 @@ class _HomeState extends State<Home> {
       // HomeController exists in memory
     }
     homeController = Get.find<HomeController>();
+
     Future(() async {
       await homeController.fetchTodayBooking();
       await homeController.getUpcomingBookings();
@@ -72,100 +77,128 @@ class _HomeState extends State<Home> {
                         ButtonHelperG(background: Colors.transparent, icon: Icon(Icons.notifications)),
                       ],
                     ),
+
                     Expanded(
                       child: SingleChildScrollView(
                         scrollDirection: Axis.vertical,
                         child: Column(
                           children: [
-                            Wrap(
-                              children: [
-                                ButtonHelperG(
-                                  onTap: () {
-                                    Get.toNamed("/useradd");
-                                  },
-                                  height: 45,
-                                  icon: Icon(MoonIcons.generic_user_24_regular, color: Colors.white, size: 28),
-                                  label: TextHelper(text: "Add Member +", fontsize: 14, color: Colors.white, fontweight: FontWeight.w600),
-                                  width: 150,
-                                  background: Colors.green.shade500,
-                                ),
-                                ButtonHelperG(
-                                  withBorder: true,
-                                  height: 45,
-                                  type: ButtonHelperTypeG.outlined,
-                                  icon: Icon(MoonIcons.generic_ticket_24_regular, color: Colors.green.shade900, size: 28),
-                                  label: TextHelper(text: "Book a service", fontsize: 14, color: Colors.green.shade900, fontweight: FontWeight.w600),
-                                  width: 150,
-                                  background: Colors.lightGreenAccent.shade700,
-                                ),
-                                ButtonHelperG(
-                                  onTap: () {
-                                    Get.toNamed('/memberlist');
-                                  },
-                                  withBorder: true,
-                                  height: 45,
-                                  type: ButtonHelperTypeG.outlined,
-                                  icon: Icon(MoonIcons.generic_users_24_regular, color: Colors.green.shade900, size: 28),
-                                  label: TextHelper(text: "Member List", fontsize: 14, color: Colors.green.shade900, fontweight: FontWeight.w600),
-                                  width: 150,
-                                  background: Colors.lightGreenAccent.shade700,
-                                ),
-                                ButtonHelperG(
-                                  onTap: () {
-                                    Get.toNamed('/slotmanage');
-                                  },
-                                  withBorder: true,
-                                  height: 45,
-                                  type: ButtonHelperTypeG.outlined,
-                                  icon: Icon(MoonIcons.generic_users_24_regular, color: Colors.green.shade900, size: 28),
-                                  label: TextHelper(text: "Slot Manage", fontsize: 14, color: Colors.green.shade900, fontweight: FontWeight.w600),
-                                  width: 150,
-                                  background: Colors.lightGreenAccent.shade700,
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 30),
-                            TextHelper(text: "Upcoming bookings,", fontweight: FontWeight.w600, fontsize: 14),
+                            if (auth.state != null && auth.state!.userType == UserType.receptionist)
+                              Wrap(
+                                children: [
+                                  ButtonHelperG(
+                                    onTap: () {
+                                      // homeController.init();
+                                      // return;
+                                      Get.toNamed("/useradd");
+                                    },
+                                    height: 45,
+                                    icon: Icon(MoonIcons.generic_user_24_regular, color: Colors.white, size: 28),
+                                    label: TextHelper(text: "Add Member +", fontsize: 14, color: Colors.white, fontweight: FontWeight.w600),
+                                    width: 150,
+                                    background: Colors.green.shade500,
+                                  ),
+                                  ButtonHelperG(
+                                    withBorder: true,
+                                    height: 45,
+                                    type: ButtonHelperTypeG.outlined,
+                                    icon: Icon(MoonIcons.generic_ticket_24_regular, color: Colors.green.shade900, size: 28),
+                                    label: TextHelper(text: "Book a service", fontsize: 14, color: Colors.green.shade900, fontweight: FontWeight.w600),
+                                    width: 150,
+                                    background: Colors.lightGreenAccent.shade700,
+                                  ),
+                                  ButtonHelperG(
+                                    onTap: () {
+                                      Get.toNamed('/memberlist');
+                                    },
+                                    withBorder: true,
+                                    height: 45,
+                                    type: ButtonHelperTypeG.outlined,
+                                    icon: Icon(MoonIcons.generic_users_24_regular, color: Colors.green.shade900, size: 28),
+                                    label: TextHelper(text: "Member List", fontsize: 14, color: Colors.green.shade900, fontweight: FontWeight.w600),
+                                    width: 150,
+                                    background: Colors.lightGreenAccent.shade700,
+                                  ),
+                                  ButtonHelperG(
+                                    onTap: () {
+                                      Get.toNamed('/slotmanage');
+                                    },
+                                    withBorder: true,
+                                    height: 45,
+                                    type: ButtonHelperTypeG.outlined,
+                                    icon: Icon(MoonIcons.generic_users_24_regular, color: Colors.green.shade900, size: 28),
+                                    label: TextHelper(text: "Slot Manage", fontsize: 14, color: Colors.green.shade900, fontweight: FontWeight.w600),
+                                    width: 150,
+                                    background: Colors.lightGreenAccent.shade700,
+                                  ),
+                                ],
+                              ),
+                            // const SizedBox(height: 30),
+                            TextHelper(text: "Upcoming bookings,", fontweight: FontWeight.w600, fontsize: 14, color: Colors.blueGrey.shade800),
                             SizedBox(
-                              height: 100,
+                              height: 110,
                               child: ListView.builder(
                                 itemCount: homeController.bookings.length,
                                 scrollDirection: Axis.horizontal,
                                 itemBuilder: (ctx, index) {
                                   final m = homeController.bookings[index];
-                                  return Container(
-                                    margin: EdgeInsets.all(10),
-                                    padding: EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      border: Border.all(color: Colors.green.shade50),
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        TextHelper(
-                                          text: subscriptionController.list.firstWhereOrNull((s) => s.id == m.serviceId)?.name ?? "",
-                                          isWrap: true,
-                                          color: Colors.blueGrey.shade800,
-                                          fontweight: FontWeight.w600,
+                                  return GestureDetector(
+                                    onTap: () async {
+                                      try {
+                                        final slotCtrl = Get.find<SlotDetailsController>();
+                                        slotCtrl.slot = m;
+                                        loader.startLoading();
+                                        await slotCtrl.getSlotDetails();
+                                        Get.toNamed('/slotdetailstrainerview');
+                                      } catch (e) {
+                                        showAlert("$e", AlertType.error);
+                                      } finally {
+                                        loader.stopLoading();
+                                      }
+                                    },
+                                    child: Container(
+                                      alignment: Alignment.center,
+                                      margin: EdgeInsets.symmetric(horizontal: 5),
+                                      child: Badge(
+                                        backgroundColor: Colors.blueGrey,
+                                        isLabelVisible: m.bookingCount > 0,
+                                        label: Text(m.bookingCount.toString()),
+                                        child: Container(
+                                          // margin: EdgeInsets.all(10),
+                                          padding: EdgeInsets.all(10),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            border: Border.all(color: Colors.green.shade50),
+                                            borderRadius: BorderRadius.circular(10),
+                                          ),
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              TextHelper(
+                                                text: subscriptionController.list.firstWhereOrNull((s) => s.id == m.serviceId)?.name ?? "",
+                                                isWrap: true,
+                                                color: Colors.blueGrey.shade800,
+                                                fontweight: FontWeight.w600,
+                                              ),
+                                              Row(
+                                                spacing: 5,
+                                                children: [
+                                                  Icon(Icons.watch_later_outlined, size: 17, color: Colors.blueGrey.shade500),
+                                                  TextHelper(text: "${m.startTime} - ${m.endTime}", width: 80, fontsize: 12, color: Colors.blueGrey.shade400),
+                                                ],
+                                              ),
+                                              Row(
+                                                spacing: 5,
+                                                children: [
+                                                  Icon(Icons.calendar_month_rounded, size: 17, color: Colors.blueGrey.shade500),
+                                                  TextHelper(text: "${m.date}", width: 80, fontsize: 12, color: Colors.blueGrey.shade400),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                        Row(
-                                          spacing: 5,
-                                          children: [
-                                            Icon(Icons.watch_later_outlined, size: 17, color: Colors.blueGrey.shade500),
-                                            TextHelper(text: "${m.startTime} - ${m.endTime}", width: 80, fontsize: 12, color: Colors.blueGrey.shade400),
-                                          ],
-                                        ),
-                                        Row(
-                                          spacing: 5,
-                                          children: [
-                                            Icon(Icons.calendar_month_rounded, size: 17, color: Colors.blueGrey.shade500),
-                                            TextHelper(text: "${m.date}", width: 80, fontsize: 12, color: Colors.blueGrey.shade400),
-                                          ],
-                                        ),
-                                      ],
+                                      ),
                                     ),
                                   );
                                 },

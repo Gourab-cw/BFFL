@@ -76,7 +76,7 @@ class _CalenderReportState extends State<CalenderReport> {
                             bool? isDisabled,
                             bool? isToday,
                           }) {
-                            final tc = calenderReportController.totalCount(DateFormat('yyyy-MM-dd').format(daslotte));
+                            final tc = calenderReportController.totalCount(DateFormat('yyyy-MM-dd').format(date));
                             return Center(
                               child: Container(
                                 width: 42,
@@ -142,7 +142,7 @@ class _CalenderReportState extends State<CalenderReport> {
                                 DataGridColumnModel3(dataField: "booked", dataType: CellDataType3.int, title: "Booking"),
                               ],
                               uniqueKey: UniqueKey().toString(),
-                              width: MediaQuery.sizeOf(context).width * 0.89,
+                              width: MediaQuery.sizeOf(context).width - 48,
                             ),
                           ),
                         ],
