@@ -41,6 +41,7 @@ class _HomeTrainerState extends State<HomeTrainer> {
     Future(() async {
       await homeController.fetchTodayBooking();
       await homeController.getUpcomingBookings();
+      await homeController.init();
     });
     super.initState();
   }
@@ -134,7 +135,7 @@ class _HomeTrainerState extends State<HomeTrainer> {
                                 ],
                               ),
                             // const SizedBox(height: 30),
-                            TextHelper(text: "Upcoming bookings,", fontweight: FontWeight.w600, fontsize: 14, color: Colors.blueGrey.shade800),
+                            TextHelper(text: "Upcoming slots,", fontweight: FontWeight.w600, fontsize: 14, color: Colors.blueGrey.shade800),
                             SizedBox(
                               height: 110,
                               child: ListView.builder(

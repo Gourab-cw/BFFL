@@ -10,6 +10,7 @@ import 'package:healthandwellness/features/slot_manage/controller/slot_manage_co
 import '../features/Service/presentation/service_details_view.dart';
 import '../features/Service/presentation/service_view.dart';
 import '../features/members/controller/member_controller.dart';
+import '../features/members/presentation/member_session_details.dart';
 import '../features/slot_details_trainer/presentation/slot_details_trainer_view.dart';
 import '../features/slot_manage/presentation/slot_manage.dart';
 import '../features/subscriptions/controller/subscription_controller.dart';
@@ -21,6 +22,7 @@ final List<GetPage<dynamic>> routes = [
   GetPage(name: "/home", page: () => Home(), bindings: []),
   GetPage(name: "/slotdetailstrainerview", page: () => SlotDetailsTrainerView(), bindings: []),
   GetPage(name: "/servicedetailsview", page: () => ServiceDetailsView(), bindings: []),
+  GetPage(name: "/membersessiondetails", page: () => MemberSessionDetails(), bindings: []),
   GetPage(name: "/serviceview", page: () => ServiceView(), bindings: []),
   GetPage(name: "/", page: () => ParentScreen(), bindings: [NewUserFormControllerBinding(), PickListBinding()]),
   GetPage(name: "/useradd", page: () => UserAdd(), binding: NewUserFormControllerBinding()),

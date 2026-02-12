@@ -32,7 +32,7 @@ class Subscription {
     isActive: parseBool(data: data['isActive'], defaultValue: false),
     isTrail: parseBool(data: data['isTrail'], defaultValue: false),
     maxBooking: parseInt(data: data['maxBooking'], defaultInt: 0),
-    trainerIds: (data['trainerIds'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
+    trainerIds: (data['trainerId'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
   );
 
   Subscription copyWith({

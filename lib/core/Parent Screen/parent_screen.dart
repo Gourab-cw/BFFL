@@ -10,6 +10,7 @@ import 'package:healthandwellness/features/login/repository/authenticator.dart';
 
 import '../../features/attendance/attendance.dart';
 import '../../features/calendar_report/presentation/calender_report.dart';
+import '../../features/home/presentation/member_home.dart';
 import '../../features/login/presentation/login.dart';
 import '../utility/app_loader.dart';
 import '../widget/bottom_nav_bar.dart';
@@ -27,6 +28,7 @@ class _ParentScreenState extends State<ParentScreen> {
   late final EdgeInsets safePadding = MediaQuery.paddingOf(context);
   final List<Widget> _pages = [Home(), ServiceView(), CalenderReport(), Home()];
   final List<Widget> _trainerPages = [HomeTrainer(), ServiceView(), Attendance(), HomeTrainer()];
+  final List<Widget> _memberPages = [HomeMember(), ServiceView(), HomeTrainer()];
 
   @override
   void initState() {
@@ -51,6 +53,9 @@ class _ParentScreenState extends State<ParentScreen> {
   List<Widget> getPages() {
     if (userRef.state?.userType == UserType.trainer) {
       return _trainerPages;
+    }
+    if (userRef.state?.userType == UserType.member) {
+      return _memberPages;
     }
     return _pages;
   }

@@ -2,6 +2,8 @@ import 'package:healthandwellness/core/utility/helper.dart';
 
 enum UserType { cwAdmin, admin, branchManager, receptionist, trainer, accountant, member }
 
+enum MemberType { paid, trial }
+
 final Map<String, UserType> userTypeMap = {
   'eVfqVJWwHnLnKZPQr4tC': UserType.cwAdmin,
   'Fj3WvG9DjgG6ve0Xw3SF': UserType.admin,
@@ -35,6 +37,7 @@ class UserG {
   String companyId;
   String mobile;
   String profileImage;
+  MemberType memberType;
   UserType userType;
 
   // 🔹 New fields
@@ -73,6 +76,7 @@ class UserG {
     required this.companyId,
     required this.mobile,
     required this.userType,
+    required this.memberType,
 
     // new
     required this.dob,
@@ -110,6 +114,7 @@ class UserG {
     companyId: parseString(data: data["companyId"], defaultValue: ""),
     mobile: parseString(data: data["mobile"], defaultValue: ""),
     userType: userTypeMap[parseString(data: data["userType"], defaultValue: "")] ?? UserType.member,
+    memberType: parseString(data: data["memberType"], defaultValue: "") == "paid" ? MemberType.paid : MemberType.trial,
 
     activeFrom: parseStringToEmptyDate(data: data["activeFrom"], predefinedDateFormat: "yyyy-MM-dd", defaultValue: null),
     activeTill: parseStringToEmptyDate(data: data["activeTill"], predefinedDateFormat: "yyyy-MM-dd", defaultValue: null),
@@ -153,6 +158,7 @@ class UserG {
     String? companyId,
     String? mobile,
     UserType? userType,
+    MemberType? memberType,
     String? dob,
     String? age,
     String? genderId,
@@ -189,6 +195,7 @@ class UserG {
       companyId: companyId ?? this.companyId,
       mobile: mobile ?? this.mobile,
       userType: userType ?? this.userType,
+      memberType: memberType ?? this.memberType,
       dob: dob ?? this.dob,
       age: age ?? this.age,
       genderId: genderId ?? this.genderId,

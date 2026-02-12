@@ -125,7 +125,7 @@ class _HomeState extends State<Home> {
                               ],
                             ),
                             const SizedBox(height: 30),
-                            TextHelper(text: "Upcoming bookings,", fontweight: FontWeight.w600, fontsize: 14),
+                            TextHelper(text: "Upcoming slots,", fontweight: FontWeight.w600, fontsize: 14),
                             SizedBox(
                               height: 100,
                               child: ListView.builder(

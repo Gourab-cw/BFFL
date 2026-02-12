@@ -7,6 +7,8 @@ class ServiceModel {
   final bool isTrial;
   final String image;
   final int maxBooking;
+  final int amount;
+  final int totalDays;
   final List<String> trainerId;
 
   ServiceModel({
@@ -17,6 +19,8 @@ class ServiceModel {
     required this.image,
     required this.maxBooking,
     required this.trainerId,
+    required this.totalDays,
+    required this.amount,
   });
 
   /// Create from Firestore / JSON
@@ -29,6 +33,8 @@ class ServiceModel {
       image: parseString(data: json['image'], defaultValue: ""),
       maxBooking: parseInt(data: json['maxBooking'], defaultInt: 0),
       trainerId: List<String>.from(json['trainerId'] ?? []),
+      amount: parseInt(data: json['amount'], defaultInt: 0),
+      totalDays: parseInt(data: json['totalDays'], defaultInt: 0),
     );
   }
 
@@ -38,7 +44,17 @@ class ServiceModel {
   }
 
   /// Optional: copyWith (very useful)
-  ServiceModel copyWith({String? id, String? name, String? description, bool? isTrial, String? image, int? maxBooking, List<String>? trainerId}) {
+  ServiceModel copyWith({
+    String? id,
+    String? name,
+    String? description,
+    bool? isTrial,
+    String? image,
+    int? maxBooking,
+    List<String>? trainerId,
+    int? totalDays,
+    int? amount,
+  }) {
     return ServiceModel(
       id: id ?? this.id,
       name: name ?? this.name,
@@ -47,6 +63,8 @@ class ServiceModel {
       image: image ?? this.image,
       maxBooking: maxBooking ?? this.maxBooking,
       trainerId: trainerId ?? this.trainerId,
+      totalDays: totalDays ?? this.totalDays,
+      amount: amount ?? this.amount,
     );
   }
 }

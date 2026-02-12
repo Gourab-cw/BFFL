@@ -140,6 +140,7 @@ class _CalenderReportState extends State<CalenderReport> {
                               columnList: [
                                 DataGridColumnModel3(dataField: "slot", dataType: CellDataType3.string, title: "Slot"),
                                 DataGridColumnModel3(dataField: "booked", dataType: CellDataType3.int, title: "Booking"),
+                                DataGridColumnModel3(dataField: 'totalAttendance', dataType: CellDataType3.int, title: "Attend"),
                               ],
                               uniqueKey: UniqueKey().toString(),
                               width: MediaQuery.sizeOf(context).width - 48,

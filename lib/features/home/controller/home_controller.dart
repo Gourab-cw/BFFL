@@ -134,7 +134,7 @@ class HomeController extends GetxController {
             .limit(4)
             .get();
       }
-
+      logG(resp.docs.length);
       final sessions = resp.docs.map((m) => SlotModel.fromFirestore(m)).toList();
       sessions.sort((a, b) => parseInt(data: a.date.replaceAll("-", ""), defaultInt: 0).compareTo(parseInt(data: b.date.replaceAll("-", ""), defaultInt: 0)));
       // sessions.sort(
@@ -161,7 +161,16 @@ class HomeController extends GetxController {
           id: i,
           serviceName: subscriptionController.list.firstWhereOrNull((s) => s.id == f)?.name ?? "",
           totalBooked: slots.map((m) => m.bookingCount).fold(0, (a, b) => a + b),
-          slots: slots.map((s) => CalendarSlotDetails(slot: "${s.startTime} - ${s.endTime}", booked: s.bookingCount)).toList(),
+          slots: slots
+              .map(
+                (s) => CalendarSlotDetails(
+                  slot: "${s.startTime} - ${s.endTime}",
+                  booked: s.bookingCount,
+                  totalBooked: s.bookingCount,
+                  totalAttendance: s.totalAttend,
+                ),
+              )
+              .toList(),
         ),
       );
       i++;
@@ -183,85 +192,19 @@ class HomeController extends GetxController {
     return list;
   }
 
-  // Trainer =======
-
-  // Future<void> fetchTodayBooking() async {
-  //   final db = await fb.getDB();
-  //   if (ss == null) {
-  //     ss = db.collection('slots').where('date', isEqualTo: DateFormat('yyyy-MM-dd').format(DateTime.now())).snapshots().listen((d) {
-  //       for (var f in d.docChanges) {
-  //         final slot = SlotModel.fromFirestore(f.doc);
-  //         switch (f.type) {
-  //           case DocumentChangeType.added:
-  //             todayBooking.add(slot);
-  //             break;
-  //
-  //           case DocumentChangeType.modified:
-  //             final index = todayBooking.indexWhere((e) => e.id == slot.id);
-  //             if (index != -1) {
-  //               todayBooking[index] = slot;
-  //             }
-  //             break;
-  //
-  //           case DocumentChangeType.removed:
-  //             todayBooking.removeWhere((e) => e.id == slot.id);
-  //             break;
-  //         }
-  //       }
-  //       update();
-  //     });
-  //   } else if (ss != null && ss!.isPaused) {
-  //     ss!.resume();
-  //   }
-  // }
-
-  // Future<List<TodayBookings>> getTodaysBookingTrainer() async {
-  //   final db = await fb.getDB();
-  //   final id = auth.state?.name;
-  //   final resp = await db.collection('slots').where('trainerId', isEqualTo: id).get();
-  //   todayBooking = resp.docs.map((m) => SlotModel.fromFirestore(m)).toList();
-  //   List<String> services = todayBooking.map((m) => m.serviceId).toSet().toList();
-  //   List<TodayBookings> list = [];
-  //   int i = 0;
-  //   for (final f in services) {
-  //     final slots = todayBooking.where((w) => w.serviceId == f).toList();
-  //     slots.sort(
-  //       (a, b) => parseInt(data: a.endTime.replaceAll(":", ""), defaultInt: 0).compareTo(parseInt(data: b.endTime.replaceAll(":", ""), defaultInt: 0)),
-  //     );
-  //     list.add(
-  //       TodayBookings(
-  //         id: i,
-  //         serviceName: subscriptionController.list.firstWhereOrNull((s) => s.id == f)?.name ?? "",
-  //         totalBooked: slots.map((m) => m.bookingCount).fold(0, (a, b) => a + b),
-  //         slots: slots.map((s) => CalendarSlotDetails(slot: "${s.startTime} - ${s.endTime}", booked: s.bookingCount)).toList(),
-  //       ),
-  //     );
-  //     i++;
-  //   }
-  //   return list;
-  // }
-
-  // this is for session time date update
-  // Future<void> init() async {
-  //   final db = await fb.getDB();
-  //   final r1 = await db.collection('Subscription').get();
-  //   final services = r1.docs.map((m) => ServiceModel.fromJson(makeMapSerialize(m.data()))).toList();
-  //   final slotIds = services.map((s) => s.id).toSet().toList();
-  //   final r2 = await db.collection('slots').where('serviceId', whereIn: slotIds).get();
-  //   List<SessionModel> slots = r2.docs.map((m) => SessionModel.fromFirestore(m)).toList();
-  //   logG(slots);
-  //   final batch = db.batch();
-  //   for (var m in slots) {
-  //     batch.update(db.collection('slots').doc(m.id), {'trainerId': services.firstWhereOrNull((w) => w.id == m.serviceId)?.trainerId?[0] ?? ""});
-  //   }
-  //   //
-  //   // for (var s in services) {
-  //   //   batch.update(db.collection('session').doc(s.id), {
-  //   //     'trainerId': s
-  //   //   });
-  //   // }
-  //   await batch.commit();
-  // }
+  Future<void> init() async {
+    final sc = Get.find<SubscriptionController>();
+    final db = await fb.getDB();
+    final batch = db.batch();
+    List<SlotModel> sm = (await db.collection('slots').get()).docs.map((m) => SlotModel.fromFirestore(m)).toList();
+    List<String> ids = sm.map((m) => m.serviceId).toList();
+    for (final f in sm) {
+      print(sc.list.firstWhereOrNull((s) => s.id == f.serviceId)?.trainerIds);
+      db.collection('slots').doc(f.id).update({'trainerId': sc.list.firstWhereOrNull((s) => s.id == f.serviceId)?.trainerIds[0] ?? 0});
+      // batch.update(db.collection('slots').doc(f.id), {'trainerId': sc.list.firstWhereOrNull((s) => s.id == f.serviceId)?.trainerIds[0] ?? 0});
+    }
+    // await batch.commit();
+  }
 
   @override
   void dispose() {

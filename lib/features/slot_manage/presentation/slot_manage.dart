@@ -174,8 +174,16 @@ class _SlotManageState extends State<SlotManage> {
                         ),
                       ),
                       ButtonHelperG(
-                        onTap: () {
-                          slotController.slotDataFeel();
+                        onTap: () async {
+                          try {
+                            loader.startLoading();
+                            await slotController.slotDataFeel();
+                          }catch(e){
+                            showAlert("$e", AlertType.error);
+                          }finally{
+                            loader.stopLoading();
+                          }
+
                         },
                         height: 35,
                         icon: Icon(Icons.calendar_month, color: Colors.white, size: 16),

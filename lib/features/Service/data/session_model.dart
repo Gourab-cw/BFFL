@@ -6,7 +6,10 @@ class SessionModel {
   final String memberId;
   final String? memberName;
   final String serviceId;
+  final String? serviceName;
+  final String? serviceDetails;
   final String trainerId;
+  final String? trainerName;
   final String slotId;
 
   final String date; // yyyy-MM-dd
@@ -20,6 +23,7 @@ class SessionModel {
   final bool isTrail;
 
   final DateTime createdAt;
+  final Timestamp? completeAt;
   final DateTime? attendedAt;
 
   SessionModel({
@@ -27,8 +31,11 @@ class SessionModel {
     required this.memberId,
     this.memberName,
     required this.serviceId,
+    this.serviceName,
+    this.serviceDetails,
     required this.slotId,
     required this.trainerId,
+    this.trainerName,
     required this.date,
     required this.hasAttend,
     required this.isActive,
@@ -39,6 +46,7 @@ class SessionModel {
     required this.endTime,
     required this.isTrail,
     this.attendedAt,
+    this.completeAt,
   });
 
   /// 🔹 From Firestore
@@ -61,6 +69,7 @@ class SessionModel {
       trainerFeedback: data['trainerFeedback'] ?? '',
       createdAt: (data['createdAt'] as Timestamp).toDate(),
       attendedAt: data['attendedAt'] != null ? (data['attendedAt'] as Timestamp).toDate() : null,
+      completeAt: data['completeAt'],
     );
   }
 
@@ -83,6 +92,7 @@ class SessionModel {
       'trainerFeedback': trainerFeedback,
       'createdAt': Timestamp.fromDate(createdAt),
       'attendedAt': attendedAt != null ? Timestamp.fromDate(attendedAt!) : null,
+      'completeAt': completeAt,
     };
   }
 
@@ -92,8 +102,11 @@ class SessionModel {
     String? memberId,
     String? memberName,
     String? serviceId,
+    String? serviceName,
+    String? serviceDetails,
     String? slotId,
     String? trainerId,
+    String? trainerName,
     String? date,
     bool? hasAttend,
     bool? isActive,
@@ -104,14 +117,18 @@ class SessionModel {
     bool? isTrail,
     DateTime? createdAt,
     DateTime? attendedAt,
+    Timestamp? completeAt,
   }) {
     return SessionModel(
       id: id ?? this.id,
       memberId: memberId ?? this.memberId,
       memberName: memberName ?? this.memberName,
       serviceId: serviceId ?? this.serviceId,
+      serviceName: serviceName ?? this.serviceName,
+      serviceDetails: serviceDetails ?? this.serviceDetails,
       slotId: slotId ?? this.slotId,
       trainerId: trainerId ?? this.trainerId,
+      trainerName: trainerName ?? this.trainerName,
       date: date ?? this.date,
       startTime: startTime ?? this.startTime,
       endTime: endTime ?? this.endTime,
@@ -122,6 +139,7 @@ class SessionModel {
       trainerFeedback: trainerFeedback ?? this.trainerFeedback,
       createdAt: createdAt ?? this.createdAt,
       attendedAt: attendedAt ?? this.attendedAt,
+      completeAt: completeAt ?? this.completeAt,
     );
   }
 }

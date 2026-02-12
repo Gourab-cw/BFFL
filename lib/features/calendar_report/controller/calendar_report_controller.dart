@@ -30,10 +30,12 @@ class CalenderDayResult {
 class CalendarSlotDetails {
   String slot;
   int booked;
-  CalendarSlotDetails({required this.slot, required this.booked});
+  int totalAttendance;
+  int totalBooked;
+  CalendarSlotDetails({required this.slot, required this.booked, required this.totalAttendance, required this.totalBooked});
 
   Map<String, dynamic> toJSON() {
-    return {"slot": slot, "booked": booked};
+    return {"slot": slot, "booked": booked, "totalAttendance": totalAttendance, "totalBooked": totalBooked};
   }
 }
 
@@ -111,7 +113,14 @@ class CalenderReportController extends GetxController {
           serviceName: s.name,
           slots: sList
               .where((w) => w.serviceId == s.id)
-              .map((m) => CalendarSlotDetails(slot: "${m.startTime} - ${m.endTime}", booked: m.bookingCount))
+              .map(
+                (m) => CalendarSlotDetails(
+                  slot: "${m.startTime} - ${m.endTime}",
+                  booked: m.bookingCount,
+                  totalAttendance: m.totalAttend,
+                  totalBooked: m.bookingCount,
+                ),
+              )
               .toList(),
         ),
       );

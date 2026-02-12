@@ -4,6 +4,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
+import 'package:healthandwellness/features/login/data/user.dart';
+import 'package:healthandwellness/features/login/repository/authenticator.dart';
 import 'package:moon_design/moon_design.dart';
 
 import '../../../app/mainstore.dart';
@@ -19,6 +21,7 @@ class ServiceView extends StatefulWidget {
 
 class _ServiceViewState extends State<ServiceView> {
   final MainStore mainStore = Get.find<MainStore>();
+  final Authenticator auth = Get.find<Authenticator>();
   final ServiceController service = Get.find<ServiceController>();
   final AppLoaderController loaderController = Get.find<AppLoaderController>();
   late final EdgeInsets safePadding = MediaQuery.paddingOf(context);
@@ -69,9 +72,25 @@ class _ServiceViewState extends State<ServiceView> {
                         ...service.services.map(
                           (m) => GestureDetector(
                             onTap: () {
-                              service.selectedService = m;
-                              Get.toNamed('/servicedetailsview');
-                              service.update();
+                              if (auth.state!.userType == UserType.member) {
+                                if (m.isTrial) {
+                                  service.selectedService = m;
+                                  Get.toNamed('/servicedetailsview');
+                                  service.update();
+                                } else {
+                                  if (auth.state!.memberType == MemberType.paid) {
+                                    service.selectedService = m;
+                                    Get.toNamed('/servicedetailsview');
+                                    service.update();
+                                  } else {
+                                    showAlert("Can't access paid service", AlertType.error);
+                                  }
+                                }
+                              } else {
+                                service.selectedService = m;
+                                Get.toNamed('/servicedetailsview');
+                                service.update();
+                              }
                             },
                             child: Container(
                               decoration: BoxDecoration(
@@ -143,13 +162,30 @@ class _ServiceViewState extends State<ServiceView> {
                                           filter: ImageFilter.blur(sigmaY: 5, sigmaX: 5),
                                           child: ButtonHelperG(
                                             onTap: () {
-                                              service.selectedService = m;
-                                              Get.toNamed('/servicedetailsview');
-                                              service.update();
+                                              if (auth.state!.userType == UserType.member) {
+                                                if (m.isTrial) {
+                                                  service.selectedService = m;
+                                                  Get.toNamed('/servicedetailsview');
+                                                  service.update();
+                                                } else {
+                                                  if (auth.state!.memberType == MemberType.paid) {
+                                                    service.selectedService = m;
+                                                    Get.toNamed('/servicedetailsview');
+                                                    service.update();
+                                                  } else {
+                                                    showAlert("Can't access paid service", AlertType.error);
+                                                  }
+                                                }
+                                              } else {
+                                                service.selectedService = m;
+                                                Get.toNamed('/servicedetailsview');
+                                                service.update();
+                                              }
                                             },
                                             margin: 0,
                                             borderRadius: 20,
-                                            background: Colors.grey.withAlpha(50),
+                                            // background: Colors.grey.withAlpha(50),
+                                            background: m.isTrial ? Colors.grey.withAlpha(50) : Colors.blue.withAlpha(50),
                                             shadow: [],
                                             withBorder: true,
                                             width: 150,

@@ -90,7 +90,11 @@ Future<void> slotAddPopup(
                         int i = 0;
                         while (i < selectedCourses.length) {
                           int index = slotController.slots.indexWhere(
-                            (s) => s.date == DateFormat('yyyy-MM-dd').format(data.date) && s.serviceId == selectedCourses[i],
+                            (s) =>
+                                s.date == DateFormat('yyyy-MM-dd').format(data.date) &&
+                                s.startTime == data.startTime &&
+                                s.endTime == data.endTime &&
+                                s.serviceId == selectedCourses[i].id,
                           );
                           if (index == -1) {
                             SlotModel s = SlotModel.fromJSON(

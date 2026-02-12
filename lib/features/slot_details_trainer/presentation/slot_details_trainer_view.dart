@@ -94,6 +94,16 @@ class _SlotDetailsTrainerViewState extends State<SlotDetailsTrainerView> {
                         ),
                         const SizedBox(height: 10),
                         ButtonHelperG(
+                          onTap: () async {
+                            try {
+                              loader.startLoading();
+                              await slotController.endSessionAndSlot();
+                            } catch (e) {
+                              showAlert("$e", AlertType.error);
+                            } finally {
+                              loader.stopLoading();
+                            }
+                          },
                           label: TextHelper(text: "End Session", color: Colors.white),
                           width: MediaQuery.sizeOf(context).width * 0.9 > 400 ? 400 : MediaQuery.sizeOf(context).width * 0.9,
                         ),

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:healthandwellness/core/utility/firebase_service.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
 import 'package:healthandwellness/features/subscriptions/controller/subscription_controller.dart';
 import 'package:healthandwellness/features/subscriptions/data/Subscription.dart';
@@ -32,7 +33,7 @@ class SlotController extends GetxController {
     final List<String> newL = [];
     final l = slots
         .where((s) {
-          if (s.id == "") {
+          if (s.id == "" && s.date == date && s.startTime == startTime && s.endTime == endTime) {
             newL.add(s.serviceId);
           }
           return s.date == date && s.startTime == startTime && s.endTime == endTime;
@@ -47,7 +48,7 @@ class SlotController extends GetxController {
     }).toList();
   }
 
-  void slotDataFeel() {
+  Future<void> slotDataFeel() async {
     if (month == null) {
       showAlert("Select a month to continue!", AlertType.error);
       return;
@@ -60,7 +61,7 @@ class SlotController extends GetxController {
       showAlert("Select end time to continue!", AlertType.error);
       return;
     }
-    List<Map<String, dynamic>> slots = generateOneHourSlots(
+    List<Map<String, dynamic>> slotsFeelData = generateOneHourSlots(
       DateFormat("HH:mm").format(dailyStart!),
       DateFormat("HH:mm").format(dailyEnd!),
       parseInt(data: period.text, defaultInt: 60),
@@ -70,12 +71,20 @@ class SlotController extends GetxController {
     final firstDayNextMonth = DateTime(month!.year, month!.month + 1, 1);
     int days = firstDayNextMonth.difference(firstDayThisMonth).inDays;
 
-    for (int i = 0; i < slots.length; i++) {
+    for (int i = 0; i < slotsFeelData.length; i++) {
       for (int j = 0; j < days; j++) {
-        slots[i] = makeMapSerialize({...slots[i], (j + 1).toString(): []});
+        slotsFeelData[i] = makeMapSerialize({...slotsFeelData[i], (j + 1).toString(): []});
       }
     }
-    slotData = slots;
+    slotData = slotsFeelData;
+
+    String startDate = DateFormat('yyyy-MM-dd').format(DateTime(month!.year, month!.month, 1));
+    String endDate = DateFormat('yyyy-MM-dd').format(DateTime(month!.year, month!.month + 1, 1));
+    final fb = Get.find<FB>();
+    final db = await fb.getDB();
+    slots = (await db.collection('slots').where('date', isGreaterThanOrEqualTo: startDate).where('date', isLessThan: endDate).get()).docs
+        .map((m) => SlotModel.fromFirestore(m))
+        .toList();
     update();
   }
 

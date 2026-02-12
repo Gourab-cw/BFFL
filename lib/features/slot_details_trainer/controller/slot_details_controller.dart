@@ -106,6 +106,33 @@ class SlotDetailsController extends GetxController {
     final db = await fb.getDB();
     try {
       await db.collection('session').doc(sm.id).update({'attendedAt': Timestamp.now(), 'hasAttend': true, 'attendanceGivenBy': auth.state!.id});
+      await db.collection('slots').doc(sm.slotId).update({'totalAttend': FieldValue.increment(1)});
+    } on FirebaseException catch (e) {
+      throw Exception(e.message);
+    } catch (e) {
+      throw Exception("$e");
+    }
+  }
+
+  Future<void> endSessionAndSlot() async {
+    if (slot == null) {
+      throw Exception("Slot not found!");
+    }
+    final fb = Get.find<FB>();
+    final auth = Get.find<Authenticator>();
+    if (auth.state == null) {
+      throw Exception("User not found!");
+    }
+    final db = await fb.getDB();
+    final batch = db.batch();
+    try {
+      final resp1 = await db.collection('session').where('slotId', isEqualTo: slot!.id).get();
+      List<String> slotIds = resp1.docs.map((m) => parseString(data: makeMapSerialize(m.data())["id"], defaultValue: "")).toList();
+      for (final s in slotIds) {
+        batch.update(db.collection('session').doc(s), {'completeAt': Timestamp.now()});
+      }
+      batch.update(db.collection('slots').doc(slot!.id), {'completeAt': Timestamp.now()});
+      await batch.commit();
     } on FirebaseException catch (e) {
       throw Exception(e.message);
     } catch (e) {

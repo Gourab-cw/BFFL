@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
 import 'package:healthandwellness/features/Service/data/service.dart';
+import 'package:healthandwellness/features/login/data/user.dart';
 import 'package:healthandwellness/features/slot_manage/data/slot_making_model.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
@@ -17,6 +18,7 @@ class ServiceControllerBinding extends Bindings {
 }
 
 class ServiceController extends GetxController {
+  List<UserG> trainers = [];
   List<ServiceModel> services = [];
   List<SlotModel> slots = [];
   ServiceModel? selectedService;
@@ -49,6 +51,7 @@ class ServiceController extends GetxController {
     try {
       final resp = await db
           .collection("User")
+          .where('userType', isEqualTo: userTypeMap2[UserType.member])
           .where("searchTerm", isGreaterThanOrEqualTo: q.replaceAll(" ", "").toLowerCase().trim())
           .where("searchTerm", isLessThanOrEqualTo: '${q.replaceAll(" ", "").toLowerCase().trim()}\uf8ff')
           .limit(20)
@@ -98,7 +101,7 @@ class ServiceController extends GetxController {
         "endTime": selectedSlot?.endTime,
         "date": selectedSlot?.date,
         "memberId": memberId,
-        "trainerId": "",
+        "trainerId": selectedService!.trainerId,
         "hasAttend": false,
         "attendedAt": null,
         "feedback": "",
@@ -141,6 +144,15 @@ class ServiceController extends GetxController {
       }).toList();
       update();
     }
+    List<String> trainerIds = [];
+    for (final s in services) {
+      for (var s in s.trainerId) {
+        trainerIds.add(s);
+      }
+    }
+    final resp1 = await db.collection("User").where('id', whereIn: trainerIds).get();
+    trainers = resp1.docs.map((m) => UserG.fromJSON(makeMapSerialize(m.data()))).toList();
+    update();
   }
 
   Future<void> getServiceDetails(String serviceId, String branchId) async {
