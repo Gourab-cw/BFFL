@@ -4,10 +4,10 @@ import 'package:get/get.dart';
 import 'package:healthandwellness/core/utility/firebase_service.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
 import 'package:healthandwellness/features/subscriptions/controller/subscription_controller.dart';
-import 'package:healthandwellness/features/subscriptions/data/Subscription.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../Service/data/service.dart';
 import '../../login/data/user.dart';
 import '../data/slot_making_model.dart';
 
@@ -29,7 +29,7 @@ class SlotController extends GetxController {
 
   TextEditingController period = TextEditingController(text: '60');
 
-  List<Subscription> getSelectedService(String date, String startTime, String endTime, SubscriptionController sc) {
+  List<ServiceModel> getSelectedService(String date, String startTime, String endTime, SubscriptionController sc) {
     final List<String> newL = [];
     final l = slots
         .where((s) {

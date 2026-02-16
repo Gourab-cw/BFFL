@@ -4,10 +4,10 @@ import 'package:get/get.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
 import 'package:healthandwellness/features/login/repository/authenticator.dart';
 import 'package:healthandwellness/features/slot_manage/data/slot_making_model.dart';
-import 'package:healthandwellness/features/subscriptions/data/Subscription.dart';
 import 'package:intl/intl.dart';
 import 'package:moon_design/moon_design.dart';
 
+import '../../Service/data/service.dart';
 import '../../subscriptions/controller/subscription_controller.dart';
 import '../controller/slot_manage_controller.dart';
 
@@ -36,7 +36,7 @@ Future<void> slotAddPopup(
           .map((m) => m.serviceId)
           .toList();
 
-      List<Subscription> selectedCourses = subscriptionController.list.where((w) => sc.contains(w.id)).toList();
+      List<ServiceModel> selectedCourses = subscriptionController.list.where((w) => sc.contains(w.id)).toList();
       return StatefulBuilder(
         builder: (context, setState) {
           return Dialog(

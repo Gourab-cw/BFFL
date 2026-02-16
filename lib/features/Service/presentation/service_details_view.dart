@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:healthandwellness/app/mainstore.dart';
 import 'package:healthandwellness/core/utility/async_select.dart';
 import 'package:healthandwellness/features/Service/controller/service_controller.dart';
+import 'package:healthandwellness/features/home/controller/member_home_controller.dart';
 import 'package:healthandwellness/features/login/data/user.dart';
 import 'package:healthandwellness/features/login/repository/authenticator.dart';
 import 'package:intl/intl.dart';
@@ -24,17 +25,43 @@ class ServiceDetailsView extends StatefulWidget {
 
 class _ServiceDetailsViewState extends State<ServiceDetailsView> {
   final mainStore = Get.find<MainStore>();
+  final memberHomeController = Get.find<MemberHomeController>();
   final loader = Get.find<AppLoaderController>();
   final auth = Get.find<Authenticator>();
   final service = Get.find<ServiceController>();
 
   bool makingBooking = false;
+  bool isReschedule = parseBool(data: Get.parameters['isReschedule'], defaultValue: false);
   double? height = 30;
+
+  Future<void> bookingFetching() async {
+    try {
+      loader.startLoading();
+      if (service.selectedService != null && auth.state != null) {
+        await service.getServiceDetails(service.selectedService!.id, auth.state!.branchId);
+      }
+      if (auth.state != null) {
+        service.selectedMember = {"id": auth.state!.id, "name": auth.state!.name, "value": auth.state!.name};
+        service.update();
+        setState(() {
+          makingBooking = true;
+        });
+      }
+    } catch (e) {
+      showAlert("$e", AlertType.error);
+    } finally {
+      loader.stopLoading();
+    }
+  }
 
   @override
   void initState() {
     // TODO: implement initState
-
+    Future(() {
+      if (isReschedule) {
+        bookingFetching();
+      }
+    });
     super.initState();
   }
 
@@ -152,13 +179,23 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView> {
                     ),
                     const SizedBox(height: 4),
                     Row(
+                      spacing: 5,
                       children: [
-                        TextHelper(text: "Price:", width: 80, fontweight: FontWeight.w600),
+                        TextHelper(text: "Per Session :", width: 80, fontweight: FontWeight.w600),
                         TextHelper(text: currenyFormater(value: s.amount, withDrCr: false), width: 200),
                       ],
                     ),
                     const SizedBox(height: 4),
                     Row(
+                      spacing: 5,
+                      children: [
+                        TextHelper(text: "Package :", width: 80, fontweight: FontWeight.w600),
+                        TextHelper(text: currenyFormater(value: s.totalAmount, withDrCr: false), width: 200),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      spacing: 5,
                       children: [
                         TextHelper(text: "Period:", width: 80, fontweight: FontWeight.w600),
                         TextHelper(text: "${s.totalDays} Days", width: 180),
@@ -169,26 +206,8 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView> {
                       ButtonHelperG(
                         margin: 40,
                         width: 120,
-                        onTap: () {
-                          setState(() {
-                            makingBooking = true;
-                          });
-                          Future(() async {
-                            try {
-                              loader.startLoading();
-                              if (service.selectedService != null && auth.state != null) {
-                                await service.getServiceDetails(service.selectedService!.id, auth.state!.branchId);
-                              }
-                              if (auth.state != null) {
-                                service.selectedMember = {"id": auth.state!.id, "name": auth.state!.name, "value": auth.state!.name};
-                                service.update();
-                              }
-                            } catch (e) {
-                              showAlert("$e", AlertType.error);
-                            } finally {
-                              loader.stopLoading();
-                            }
-                          });
+                        onTap: () async {
+                          await bookingFetching();
                         },
                         label: TextHelper(text: "Make Booking", color: Colors.white),
                       ),
@@ -278,10 +297,10 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView> {
                                   TextHelper(text: "Morning slots", fontweight: FontWeight.w600, fontsize: 14),
                                   ...service.getSelectedDaySlots(DateFormat('yyyy-MM-dd').format(service.selectedDate!)).map((m) {
                                     return Opacity(
-                                      opacity: service.availableSlot(m) ? 1 : 0.4,
+                                      opacity: service.availableSlot(m, withRescheduleData: service.selectedReschedule) == true ? 1 : 0.4,
                                       child: GestureDetector(
                                         onTap: () {
-                                          if (!service.availableSlot(m)) {
+                                          if (service.availableSlot(m, withRescheduleData: service.selectedReschedule) != true) {
                                             return;
                                           }
                                           service.selectedSlot = m;
@@ -292,7 +311,11 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView> {
                                           height: 30,
                                           decoration: BoxDecoration(
                                             color: service.selectedSlot?.id == m.id ? Colors.green.shade100 : Colors.white,
-                                            border: Border.all(color: Colors.black45),
+                                            border: Border.all(
+                                              color: service.availableSlot(m, withRescheduleData: service.selectedReschedule) == null
+                                                  ? Colors.red
+                                                  : Colors.black45,
+                                            ),
                                           ),
                                           child: TextHelper(text: "${m.startTime} - ${m.endTime}", width: 100, textalign: TextAlign.center),
                                         ),
@@ -312,10 +335,10 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView> {
                                   TextHelper(text: "Afternoon slots", fontweight: FontWeight.w600, fontsize: 14),
                                   ...service.getSelectedAfterNoonSlots(DateFormat('yyyy-MM-dd').format(service.selectedDate!)).map((m) {
                                     return Opacity(
-                                      opacity: service.availableSlot(m) ? 1 : 0.4,
+                                      opacity: service.availableSlot(m, withRescheduleData: service.selectedReschedule) == true ? 1 : 0.4,
                                       child: GestureDetector(
                                         onTap: () {
-                                          if (!service.availableSlot(m)) return;
+                                          if (service.availableSlot(m, withRescheduleData: service.selectedReschedule) != true) return;
                                           service.selectedSlot = m;
                                           service.update();
                                         },
@@ -324,7 +347,11 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView> {
                                           height: 30,
                                           decoration: BoxDecoration(
                                             color: service.selectedSlot?.id == m.id ? Colors.green.shade100 : Colors.white,
-                                            border: Border.all(color: Colors.black45),
+                                            border: Border.all(
+                                              color: service.availableSlot(m, withRescheduleData: service.selectedReschedule) == null
+                                                  ? Colors.red
+                                                  : Colors.black45,
+                                            ),
                                           ),
                                           child: TextHelper(text: "${m.startTime} - ${m.endTime}", width: 100, textalign: TextAlign.center),
                                         ),
@@ -344,10 +371,10 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView> {
                                   TextHelper(text: "Evening slots", fontweight: FontWeight.w600, fontsize: 14),
                                   ...service.getSelectedEveSlots(DateFormat('yyyy-MM-dd').format(service.selectedDate!)).map((m) {
                                     return Opacity(
-                                      opacity: service.availableSlot(m) ? 1 : 0.4,
+                                      opacity: service.availableSlot(m, withRescheduleData: service.selectedReschedule) == true ? 1 : 0.4,
                                       child: GestureDetector(
                                         onTap: () {
-                                          if (!service.availableSlot(m)) return;
+                                          if (service.availableSlot(m, withRescheduleData: service.selectedReschedule) != true) return;
                                           service.selectedSlot = m;
                                           service.update();
                                         },
@@ -356,7 +383,11 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView> {
                                           height: 30,
                                           decoration: BoxDecoration(
                                             color: service.selectedSlot?.id == m.id ? Colors.green.shade100 : Colors.white,
-                                            border: Border.all(color: Colors.black45),
+                                            border: Border.all(
+                                              color: service.availableSlot(m, withRescheduleData: service.selectedReschedule) == null
+                                                  ? Colors.red
+                                                  : Colors.black45,
+                                            ),
                                           ),
                                           child: TextHelper(text: "${m.startTime} - ${m.endTime}", width: 100, textalign: TextAlign.center),
                                         ),
@@ -367,7 +398,7 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView> {
                               ),
                             ),
                           const SizedBox(height: 30),
-                          if (service.selectedDate != null)
+                          if (service.selectedDate != null && auth.state!.userType != UserType.member)
                             Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Row(
@@ -428,11 +459,20 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView> {
                               }
                               try {
                                 loader.startLoading();
-                                await service.bookSlot();
+                                await service.bookSlot(reschedule: service.selectedReschedule);
                                 service.selectedDate = null;
                                 service.selectedSlot = null;
-                                service.selectedMember = {};
+                                if (auth.state!.userType == UserType.member) {
+                                  service.selectedMember = {'id': auth.state!.id, 'name': auth.state!.name, 'value': auth.state!.name};
+                                } else {
+                                  service.selectedMember = {};
+                                }
                                 service.update();
+                                await memberHomeController.getBookings();
+                                if (isReschedule) {
+                                  goBack(context);
+                                  goBack(context);
+                                }
                               } catch (e) {
                                 showAlert("$e", AlertType.error);
                               } finally {

@@ -4,7 +4,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
-import 'package:healthandwellness/features/login/data/user.dart';
 import 'package:healthandwellness/features/login/repository/authenticator.dart';
 import 'package:moon_design/moon_design.dart';
 
@@ -72,25 +71,8 @@ class _ServiceViewState extends State<ServiceView> {
                         ...service.services.map(
                           (m) => GestureDetector(
                             onTap: () {
-                              if (auth.state!.userType == UserType.member) {
-                                if (m.isTrial) {
-                                  service.selectedService = m;
-                                  Get.toNamed('/servicedetailsview');
-                                  service.update();
-                                } else {
-                                  if (auth.state!.memberType == MemberType.paid) {
-                                    service.selectedService = m;
-                                    Get.toNamed('/servicedetailsview');
-                                    service.update();
-                                  } else {
-                                    showAlert("Can't access paid service", AlertType.error);
-                                  }
-                                }
-                              } else {
-                                service.selectedService = m;
-                                Get.toNamed('/servicedetailsview');
-                                service.update();
-                              }
+                              service.selectedService = m;
+                              Get.toNamed('/servicedetailsview');
                             },
                             child: Container(
                               decoration: BoxDecoration(
@@ -162,30 +144,13 @@ class _ServiceViewState extends State<ServiceView> {
                                           filter: ImageFilter.blur(sigmaY: 5, sigmaX: 5),
                                           child: ButtonHelperG(
                                             onTap: () {
-                                              if (auth.state!.userType == UserType.member) {
-                                                if (m.isTrial) {
-                                                  service.selectedService = m;
-                                                  Get.toNamed('/servicedetailsview');
-                                                  service.update();
-                                                } else {
-                                                  if (auth.state!.memberType == MemberType.paid) {
-                                                    service.selectedService = m;
-                                                    Get.toNamed('/servicedetailsview');
-                                                    service.update();
-                                                  } else {
-                                                    showAlert("Can't access paid service", AlertType.error);
-                                                  }
-                                                }
-                                              } else {
-                                                service.selectedService = m;
-                                                Get.toNamed('/servicedetailsview');
-                                                service.update();
-                                              }
+                                              service.selectedService = m;
+                                              Get.toNamed('/servicedetailsview');
                                             },
                                             margin: 0,
                                             borderRadius: 20,
                                             // background: Colors.grey.withAlpha(50),
-                                            background: m.isTrial ? Colors.grey.withAlpha(50) : Colors.blue.withAlpha(50),
+                                            background: Colors.grey.withAlpha(50),
                                             shadow: [],
                                             withBorder: true,
                                             width: 150,

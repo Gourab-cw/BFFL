@@ -134,7 +134,6 @@ class HomeController extends GetxController {
             .limit(4)
             .get();
       }
-      logG(resp.docs.length);
       final sessions = resp.docs.map((m) => SlotModel.fromFirestore(m)).toList();
       sessions.sort((a, b) => parseInt(data: a.date.replaceAll("-", ""), defaultInt: 0).compareTo(parseInt(data: b.date.replaceAll("-", ""), defaultInt: 0)));
       // sessions.sort(
@@ -199,9 +198,7 @@ class HomeController extends GetxController {
     List<SlotModel> sm = (await db.collection('slots').get()).docs.map((m) => SlotModel.fromFirestore(m)).toList();
     List<String> ids = sm.map((m) => m.serviceId).toList();
     for (final f in sm) {
-      print(sc.list.firstWhereOrNull((s) => s.id == f.serviceId)?.trainerIds);
-      db.collection('slots').doc(f.id).update({'trainerId': sc.list.firstWhereOrNull((s) => s.id == f.serviceId)?.trainerIds[0] ?? 0});
-      // batch.update(db.collection('slots').doc(f.id), {'trainerId': sc.list.firstWhereOrNull((s) => s.id == f.serviceId)?.trainerIds[0] ?? 0});
+      db.collection('slots').doc(f.id).update({'trainerId': sc.list.firstWhereOrNull((s) => s.id == f.serviceId)?.trainerId[0] ?? 0});
     }
     // await batch.commit();
   }

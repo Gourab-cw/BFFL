@@ -2,8 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:healthandwellness/core/utility/firebase_service.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
-
-import '../data/Subscription.dart';
+import 'package:healthandwellness/features/Service/data/service.dart';
 
 class SubscriptionControllerBinding extends Bindings {
   @override
@@ -14,11 +13,11 @@ class SubscriptionControllerBinding extends Bindings {
 }
 
 class SubscriptionController extends GetxController {
-  List<Subscription> list = [];
+  List<ServiceModel> list = [];
 
   Future<void> fetchSubscription(FirebaseFirestore db) async {
     final resp = await db.collection("Subscription").get();
-    list = resp.docs.map((m) => Subscription.fromJSON(makeMapSerialize(m.data()))).toList();
+    list = resp.docs.map((m) => ServiceModel.fromJson(makeMapSerialize(m.data()))).toList();
     update();
   }
 

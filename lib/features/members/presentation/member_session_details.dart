@@ -3,10 +3,15 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:healthandwellness/app/mainstore.dart';
 import 'package:healthandwellness/core/utility/app_loader.dart';
+import 'package:healthandwellness/core/utility/firebase_service.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
+import 'package:healthandwellness/features/Service/data/service.dart';
 import 'package:healthandwellness/features/home/controller/member_home_controller.dart';
 import 'package:healthandwellness/features/login/repository/authenticator.dart';
 import 'package:intl/intl.dart';
+
+import '../../Service/controller/service_controller.dart';
+import '../../login/data/user.dart';
 
 class MemberSessionDetails extends StatefulWidget {
   const MemberSessionDetails({super.key});
@@ -19,6 +24,9 @@ class _MemberSessionDetailsState extends State<MemberSessionDetails> {
   final loader = Get.find<AppLoaderController>();
   final mainStore = Get.find<MainStore>();
   final auth = Get.find<Authenticator>();
+
+  final serviceController = Get.find<ServiceController>();
+
   final mhc = Get.find<MemberHomeController>();
 
   final TextEditingController feedback = TextEditingController();
@@ -43,7 +51,46 @@ class _MemberSessionDetailsState extends State<MemberSessionDetails> {
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
                     children: [
-                      TextHelper(text: booking.serviceName ?? "", fontweight: FontWeight.w600, fontsize: 16),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextHelper(text: booking.serviceName ?? "", fontweight: FontWeight.w600, fontsize: 16),
+                          ),
+                          ButtonHelperG(
+                            width: 100,
+                            onTap: () async {
+                              try {
+                                loader.startLoading();
+                                serviceController.selectedReschedule = booking;
+                                final fb = Get.find<FB>();
+                                final db = await fb.getDB();
+                                await serviceController.getServiceDetails(booking.serviceId, auth.state!.branchId, isReschedule: true);
+                                ServiceModel sv = ServiceModel.fromJson(
+                                  makeMapSerialize((await db.collection('Subscription').doc(booking.serviceId).get()).data()),
+                                );
+                                serviceController.selectedService = sv;
+                                if (!serviceController.services.any((s) => s.id == sv.id)) {
+                                  serviceController.services.add(sv);
+                                }
+                                List<String> trainers = serviceController.selectedService!.trainerId;
+                                final resp1 = await db.collection("User").where('id', whereIn: trainers).get();
+                                List<UserG> trainser_users = resp1.docs.map((m) => UserG.fromJSON(makeMapSerialize(m.data()))).toList();
+                                for (var f in trainser_users) {
+                                  if (!serviceController.trainers.any((a) => a.id == f.id)) {
+                                    serviceController.trainers.add(f);
+                                  }
+                                }
+                                Get.toNamed('/servicedetailsview?isReschedule=1');
+                              } catch (e) {
+                                showAlert("$e", AlertType.error);
+                              } finally {
+                                loader.stopLoading();
+                              }
+                            },
+                            label: TextHelper(text: "Reschedule", color: Colors.white),
+                          ),
+                        ],
+                      ),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Column(
@@ -127,21 +174,22 @@ class _MemberSessionDetailsState extends State<MemberSessionDetails> {
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                 ),
-                                ButtonHelperG(
-                                  onTap: () async {
-                                    try {
-                                      loader.startLoading();
-                                      await mhc.submitFeedback(booking, feedback.text);
-                                    } catch (e) {
-                                      showAlert("$e", AlertType.error);
-                                    } finally {
-                                      loader.stopLoading();
-                                    }
-                                  },
-                                  background: Colors.green.shade100,
-                                  margin: 0,
-                                  icon: Icon(Icons.send, color: Colors.green),
-                                ),
+                                if (booking.hasAttend)
+                                  ButtonHelperG(
+                                    onTap: () async {
+                                      try {
+                                        loader.startLoading();
+                                        await mhc.submitFeedback(booking, feedback.text);
+                                      } catch (e) {
+                                        showAlert("$e", AlertType.error);
+                                      } finally {
+                                        loader.stopLoading();
+                                      }
+                                    },
+                                    background: Colors.green.shade100,
+                                    margin: 0,
+                                    icon: Icon(Icons.send, color: Colors.green),
+                                  ),
                               ],
                             )
                           : TextAreaBox(
@@ -153,7 +201,7 @@ class _MemberSessionDetailsState extends State<MemberSessionDetails> {
                               borderRadius: BorderRadius.circular(10),
                             ),
                       const SizedBox(height: 20),
-                      if (!booking.hasAttend)
+                      if (!booking.hasAttend && DateFormat('yyyy-MM-dd').format(DateTime.now()) == booking.date)
                         ButtonHelperG(
                           onTap: () async {
                             try {

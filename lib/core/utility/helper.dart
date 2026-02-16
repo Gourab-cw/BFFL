@@ -2195,7 +2195,7 @@ showAlert(String content, AlertType alertType, [BuildContext? context, Duration?
         : alertType == AlertType.error
         ? "Error"
         : "Info",
-    content,
+    content.replaceAll('Exception:', '').trim(),
     mainButton: withUndoBtn == null
         ? null
         : TextButton(
@@ -2207,7 +2207,13 @@ showAlert(String content, AlertType alertType, [BuildContext? context, Duration?
             },
             child: const Text("Undo", style: TextStyle(fontWeight: FontWeight.w600)),
           ),
-    messageText: TextHelper(text: content, fontsize: 12, isWrap: true, fontweight: FontWeight.w600, color: getSubTextColor(alertType)),
+    messageText: TextHelper(
+      text: content.replaceAll('Exception:', '').trim(),
+      fontsize: 12,
+      isWrap: true,
+      fontweight: FontWeight.w600,
+      color: getSubTextColor(alertType),
+    ),
     titleText: TextHelper(
       text: alertType == AlertType.success
           ? "Success"

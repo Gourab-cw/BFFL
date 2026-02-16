@@ -2,8 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
 import 'package:healthandwellness/features/Service/data/service.dart';
+import 'package:healthandwellness/features/Service/data/session_model.dart';
 import 'package:healthandwellness/features/login/data/user.dart';
+import 'package:healthandwellness/features/login/repository/authenticator.dart';
 import 'package:healthandwellness/features/slot_manage/data/slot_making_model.dart';
+import 'package:healthandwellness/features/user_subscription/data/user_subscription.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
@@ -18,14 +21,18 @@ class ServiceControllerBinding extends Bindings {
 }
 
 class ServiceController extends GetxController {
+  SessionModel? selectedReschedule;
   List<UserG> trainers = [];
   List<ServiceModel> services = [];
   List<SlotModel> slots = [];
   ServiceModel? selectedService;
+  UserSubscription? userSubscription;
   SlotModel? selectedSlot;
   Map<String, dynamic> selectedMember = {};
   DateTime? selectedDate;
   late FirebaseFirestore db;
+
+  final auth = Get.find<Authenticator>();
   @override
   Future<void> onInit() async {
     // TODO: implement onInit
@@ -41,7 +48,19 @@ class ServiceController extends GetxController {
     return count < parseInt(data: selectedService?.maxBooking, defaultInt: 0) * s.length;
   }
 
-  bool availableSlot(SlotModel s) {
+  bool? availableSlot(SlotModel s, {SessionModel? withRescheduleData}) {
+    if (withRescheduleData != null) {
+      if (s.date == withRescheduleData.date && s.startTime == withRescheduleData.startTime && s.endTime == withRescheduleData.endTime) {
+        return null;
+      }
+    }
+    int now = parseInt(data: DateFormat('yyyy-MM-dd').format(DateTime.now()).replaceAll('-', ''), defaultInt: 0);
+    int slotDate = parseInt(data: s.date.replaceAll('-', ''), defaultInt: 0);
+    if (slotDate == now) {
+      int currentTime = parseInt(data: DateFormat('HH:mm').format(DateTime.now()).replaceAll(':', ''), defaultInt: 0);
+      int endTime = parseInt(data: s.endTime.replaceAll(':', ''), defaultInt: 0);
+      return endTime > currentTime;
+    }
     int sIndex = services.indexWhere((sv) => sv.id == s.serviceId);
     if (sIndex == -1) return false;
     return s.bookingCount < services[sIndex].maxBooking;
@@ -71,8 +90,12 @@ class ServiceController extends GetxController {
     }
   }
 
-  Future<void> bookSlot() async {
+  Future<void> bookSlot({SessionModel? reschedule}) async {
     try {
+      if (userSubscription == null) {
+        showAlert("Subscription not found!", AlertType.error);
+        return;
+      }
       if (selectedService == null) {
         showAlert("Select a service to continue!", AlertType.error);
         return;
@@ -89,6 +112,10 @@ class ServiceController extends GetxController {
         showAlert("Select a member to continue!", AlertType.error);
         return;
       }
+      if (selectedService!.trainerId.isEmpty) {
+        showAlert("No trainer found!", AlertType.error);
+        return;
+      }
 
       final sUid = const Uuid().v4();
 
@@ -101,7 +128,8 @@ class ServiceController extends GetxController {
         "endTime": selectedSlot?.endTime,
         "date": selectedSlot?.date,
         "memberId": memberId,
-        "trainerId": selectedService!.trainerId,
+        "subscriptionId": userSubscription!.id,
+        "trainerId": selectedService!.trainerId[0],
         "hasAttend": false,
         "attendedAt": null,
         "feedback": "",
@@ -121,13 +149,33 @@ class ServiceController extends GetxController {
         return;
       }
       if (booked >= selectedService!.maxBooking) {
-        showAlert("Fully booked for the slot!", AlertType.error);
-        return;
+        throw Exception("Fully booked for the slot!");
+      }
+      final sessionResp = await db
+          .collection('session')
+          .where('slotId', isEqualTo: selectedSlot?.id)
+          .where('memberId', isEqualTo: memberId)
+          .where('isActive', isEqualTo: true)
+          .get();
+      if (sessionResp.docs.isNotEmpty) {
+        throw Exception("You already have booking on this slot!");
       }
       final batch = db.batch();
       batch.set(db.collection("session").doc(sUid), data);
       batch.update(db.collection("slots").doc(selectedSlot!.id), {"bookingCount": FieldValue.increment(1)});
+      if (reschedule != null) {
+        batch.update(db.collection("slots").doc(reschedule.slotId), {"bookingCount": FieldValue.increment(-1)});
+        batch.delete(db.collection("session").doc(reschedule.id));
+        batch.set(db.collection("history").doc(reschedule.memberId).collection('session').doc(reschedule.id), {
+          'updateAt': Timestamp.now(),
+          ...reschedule.toFirestore(),
+        });
+      } else {
+        batch.update(db.collection("userSubscription").doc(userSubscription!.id), {"remainingSessions": FieldValue.increment(-1)});
+      }
+      userSubscription = userSubscription!.copyWith(remainingSessions: (userSubscription!.remainingSessions - 1));
       await batch.commit();
+      update();
       showAlert("Session booked successfully", AlertType.success);
     } on FirebaseException catch (e) {
       showAlert(e.message ?? "Firestore error occurred", AlertType.error);
@@ -155,7 +203,32 @@ class ServiceController extends GetxController {
     update();
   }
 
-  Future<void> getServiceDetails(String serviceId, String branchId) async {
+  Future<void> getServiceDetails(String serviceId, String branchId, {isReschedule = false}) async {
+    if (auth.state == null) {
+      return showAlert("No user found", AlertType.error);
+    }
+    final query = db
+        .collection('userSubscription')
+        .where('paidAt', isNull: false)
+        .where('subscriptionId', isEqualTo: serviceId)
+        .where('isActive', isEqualTo: true)
+        .where('endDate', isGreaterThanOrEqualTo: DateFormat('yyyy-MM-dd').format(DateTime.now()));
+    if (!isReschedule) {
+      query.where('remainingSessions', isGreaterThan: 0);
+    }
+    final availableSubscription = await query.get();
+    List<UserSubscription> userSubs = availableSubscription.docs.map((m) => UserSubscription.fromJSON(makeMapSerialize(m.data()))).toList();
+    List<UserSubscription> userSubs1 = userSubs.where((w) {
+      if (w.endDate == '') {
+        return true;
+      }
+      return !DateFormat('yyyy-MM-dd').parse(w.endDate).difference(DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day)).isNegative;
+    }).toList();
+    if (userSubs1.isEmpty) {
+      throw Exception("You have no subscription for this service");
+    }
+    userSubscription = null;
+    userSubscription = userSubs1[0];
     final String currentMonth = DateFormat('yyyy-MM').format(DateTime.now());
     final resp = await db
         .collection('slots')

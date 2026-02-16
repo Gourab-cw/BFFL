@@ -16,7 +16,7 @@ class MemberHomeController extends GetxController {
   List<SessionModel> bookings = [];
   SessionModel? selectedBooking;
 
-  late StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? ss;
+  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? ss;
   final fb = Get.find<FB>();
   final auth = Get.find<Authenticator>();
 
@@ -53,48 +53,48 @@ class MemberHomeController extends GetxController {
       return showAlert("No user found", AlertType.error);
     }
     final db = await fb.getDB();
-    ss = db
+    // if (ss != null) {
+    //   await ss?.cancel();
+    // }
+    final resp = await db
         .collection('session')
         .where('memberId', isEqualTo: auth.state!.id)
         .where('date', isGreaterThanOrEqualTo: DateFormat('yyyy-MM-dd').format(DateTime.now()))
-        .snapshots()
-        .listen((data) async {
-          for (var f in data.docChanges) {
-            switch (f.type) {
-              case DocumentChangeType.added:
-                final s = await _modifyData(f.doc, db);
-                int index = bookings.indexWhere((b) => b.id == s.id);
-                if (index == -1) {
-                  bookings.add(s);
-                } else {
-                  bookings.replaceRange(index, index + 1, [s]);
-                }
-                if (selectedBooking != null && selectedBooking!.id == s.id) {
-                  selectedBooking = s;
-                }
-                EasyDebounce.debounce("updateBookings", const Duration(milliseconds: 600), () {
-                  update();
-                });
-                break;
-              case DocumentChangeType.modified:
-                final s = await _modifyData(f.doc, db);
-                int index = bookings.indexWhere((b) => b.id == s.id);
-                if (index == -1) {
-                  bookings.add(s);
-                } else {
-                  bookings.replaceRange(index, index + 1, [s]);
-                }
-                if (selectedBooking != null && selectedBooking!.id == s.id) {
-                  selectedBooking = s;
-                }
-                EasyDebounce.debounce("updateBookings", const Duration(milliseconds: 600), () {
-                  update();
-                });
-                break;
-              default:
-            }
-          }
-        });
+        .get();
+    bookings = [];
+    for (var f in resp.docs) {
+      final s = await _modifyData(f, db);
+      bookings.add(s);
+      if (selectedBooking != null && selectedBooking!.id == s.id) {
+        selectedBooking = s;
+      }
+      EasyDebounce.debounce("updateBookings", const Duration(milliseconds: 600), () {
+        update();
+      });
+    }
+    update();
+    // ss = db
+    //     .collection('session')
+    //     .where('memberId', isEqualTo: auth.state!.id)
+    //     .where('date', isGreaterThanOrEqualTo: DateFormat('yyyy-MM-dd').format(DateTime.now()))
+    //     .snapshots()
+    //     .listen((data) async {
+    //       for (var f in data.docs) {
+    //         final s = await _modifyData(f, db);
+    //         int index = bookings.indexWhere((b) => b.id == s.id);
+    //         if (index == -1) {
+    //           bookings.add(s);
+    //         } else {
+    //           bookings.replaceRange(index, index + 1, [s]);
+    //         }
+    //         if (selectedBooking != null && selectedBooking!.id == s.id) {
+    //           selectedBooking = s;
+    //         }
+    //         EasyDebounce.debounce("updateBookings", const Duration(milliseconds: 600), () {
+    //           update();
+    //         });
+    //       }
+    //     });
   }
 
   Future<void> markAttendance(SessionModel sm) async {

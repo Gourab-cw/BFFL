@@ -7,7 +7,7 @@ import 'package:healthandwellness/features/slot_manage/data/slot_making_model.da
 import 'package:healthandwellness/features/subscriptions/controller/subscription_controller.dart';
 import 'package:intl/intl.dart';
 
-import '../../subscriptions/data/Subscription.dart';
+import '../../Service/data/service.dart';
 
 class CalenderDayResult {
   int booked;
@@ -100,7 +100,7 @@ class CalenderReportController extends GetxController {
     String date = DateFormat("yyyy-MM-dd").format(selectedDate);
     List<SlotModel> sList = slots.where((s) => s.date == date).toList();
     List<String> serviceIds = slots.where((s) => s.date == date).map((m) => m.serviceId).toList();
-    List<Subscription> serviceList = sc.list.where((w) => serviceIds.contains(w.id)).toList();
+    List<ServiceModel> serviceList = sc.list.where((w) => serviceIds.contains(w.id)).toList();
     int bCount = sList.map((m) => m.bookingCount).fold(0, (a, b) => a + b);
     int maxCount = sc.list.where((w) => serviceIds.contains(w.id)).map((sc) => sc.maxBooking).fold(0, (a, b) => a + b);
     List<CalenderDayDetails> details = [];

@@ -57,6 +57,11 @@ class Authenticator extends GetxController {
           if (_firebase.token != null) {
             await db.collection("User").doc(user.uid).update({"token": _firebase.token});
           }
+          UserG user0 = UserG.fromJSON(makeMapSerialize(resp.data()));
+          if (user0.userType == UserType.member && (!user0.isActive || !user0.isApproved)) {
+            showAlert("Approval in process – we’ll notify you soon.", AlertType.error);
+            return false;
+          }
           state = UserG.fromJSON(makeMapSerialize(resp.data()));
           update();
           return true;

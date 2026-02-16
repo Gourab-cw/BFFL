@@ -8,14 +8,14 @@ import 'package:moon_design/moon_design.dart';
 import '../utility/app_loader.dart';
 import '../utility/helper.dart';
 
-class BottomNavbar extends StatefulWidget {
-  const BottomNavbar({super.key});
+class BottomNavbarAdmin extends StatefulWidget {
+  const BottomNavbarAdmin({super.key});
 
   @override
-  State<BottomNavbar> createState() => _BottomnavbarState();
+  State<BottomNavbarAdmin> createState() => _BottomNavbarAdminState();
 }
 
-class _BottomnavbarState extends State<BottomNavbar> {
+class _BottomNavbarAdminState extends State<BottomNavbarAdmin> {
   final MainStore mainStore = Get.find<MainStore>();
   final AppLoaderController loaderController = Get.find<AppLoaderController>();
   final Authenticator user = Get.find<Authenticator>();
@@ -34,6 +34,7 @@ class _BottomnavbarState extends State<BottomNavbar> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
+            // HOME ==================
             GestureDetector(
               onTap: () {
                 SystemSound.play(SystemSoundType.click);
@@ -68,6 +69,7 @@ class _BottomnavbarState extends State<BottomNavbar> {
                 ],
               ),
             ),
+            // Approval Member ==================
             GestureDetector(
               onTap: () {
                 SystemSound.play(SystemSoundType.click);
@@ -86,13 +88,13 @@ class _BottomnavbarState extends State<BottomNavbar> {
                       borderRadius: BorderRadius.circular(100),
                     ),
                     child: Icon(
-                      MoonIcons.generic_ticket_24_regular,
-                      size: 23,
+                      MoonIcons.generic_users_24_regular,
+                      size: 27,
                       color: mainStore.bottomNavBarIndex.value == 1 ? Colors.green.shade900 : Colors.black,
                     ),
                   ),
                   TextHelper(
-                    text: parseString(data: 'Service', defaultValue: ''),
+                    text: parseString(data: 'Members', defaultValue: ''),
                     fontweight: FontWeight.w600,
                     fontsize: 11,
                     width: calcWidth,
@@ -102,71 +104,39 @@ class _BottomnavbarState extends State<BottomNavbar> {
                 ],
               ),
             ),
-            // GestureDetector(
-            //   onTap: () {
-            //     SystemSound.play(SystemSoundType.click);
-            //     mainStore.bottomNavBarIndex.value = 2;
-            //   },
-            //   child: Column(
-            //     crossAxisAlignment: CrossAxisAlignment.center,
-            //     mainAxisAlignment: MainAxisAlignment.center,
-            //     children: [
-            //       Container(
-            //         height: 28,
-            //         width: calcWidth > 40 ? 40 : calcWidth,
-            //         decoration: BoxDecoration(
-            //           color: mainStore.bottomNavBarIndex.value == 2 ? Colors.white.withAlpha(160) : Colors.transparent,
-            //           borderRadius: BorderRadius.circular(100),
-            //         ),
-            //         child: Icon(
-            //           MoonIcons.time_calendar_24_regular,
-            //           size: 23,
-            //           color: mainStore.bottomNavBarIndex.value == 2 ? Colors.green.shade900 : Colors.black,
-            //         ),
-            //       ),
-            //       TextHelper(
-            //         text: parseString(data: 'Calender', defaultValue: ''),
-            //         fontweight: FontWeight.w600,
-            //         fontsize: 11,
-            //         width: calcWidth,
-            //         isWrap: true,
-            //         textalign: TextAlign.center,
-            //       ),
-            //     ],
-            //   ),
-            // ), // GestureDetector(
-            //   onTap: () {
-            //     SystemSound.play(SystemSoundType.click);
-            //     mainStore.bottomNavBarIndex.value = 2;
-            //   },
-            //   child: Column(
-            //     crossAxisAlignment: CrossAxisAlignment.center,
-            //     mainAxisAlignment: MainAxisAlignment.center,
-            //     children: [
-            //       Container(
-            //         height: 28,
-            //         width: calcWidth > 40 ? 40 : calcWidth,
-            //         decoration: BoxDecoration(
-            //           color: mainStore.bottomNavBarIndex.value == 2 ? Colors.white.withAlpha(160) : Colors.transparent,
-            //           borderRadius: BorderRadius.circular(100),
-            //         ),
-            //         child: Icon(
-            //           MoonIcons.time_calendar_24_regular,
-            //           size: 23,
-            //           color: mainStore.bottomNavBarIndex.value == 2 ? Colors.green.shade900 : Colors.black,
-            //         ),
-            //       ),
-            //       TextHelper(
-            //         text: parseString(data: 'Calender', defaultValue: ''),
-            //         fontweight: FontWeight.w600,
-            //         fontsize: 11,
-            //         width: calcWidth,
-            //         isWrap: true,
-            //         textalign: TextAlign.center,
-            //       ),
-            //     ],
-            //   ),
-            // ),
+            GestureDetector(
+              onTap: () {
+                SystemSound.play(SystemSoundType.click);
+                mainStore.bottomNavBarIndex.value = 2;
+              },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    height: 28,
+                    width: calcWidth > 40 ? 40 : calcWidth,
+                    decoration: BoxDecoration(
+                      color: mainStore.bottomNavBarIndex.value == 2 ? Colors.white.withAlpha(160) : Colors.transparent,
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                    child: Icon(
+                      MoonIcons.generic_user_24_regular,
+                      size: 23,
+                      color: mainStore.bottomNavBarIndex.value == 2 ? Colors.green.shade900 : Colors.black,
+                    ),
+                  ),
+                  TextHelper(
+                    text: parseString(data: 'Attendance', defaultValue: ''),
+                    fontweight: FontWeight.w600,
+                    fontsize: 11,
+                    width: calcWidth,
+                    isWrap: true,
+                    textalign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
             GestureDetector(
               onTap: () async {
                 SystemSound.play(SystemSoundType.click);

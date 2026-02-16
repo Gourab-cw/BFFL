@@ -53,6 +53,6 @@ class MemberController extends GetxController {
   }
 
   Future<void> makeApprove(UserG user, FirebaseFirestore db) async {
-    await db.collection('User').doc(user.id).update({"isApproved": true});
+    await db.collection('User').doc(user.id).update({"isApproved": true, 'activeFrom': Timestamp.now()});
   }
 }

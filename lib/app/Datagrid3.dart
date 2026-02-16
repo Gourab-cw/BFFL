@@ -198,7 +198,7 @@ class _DataGridHelper2State extends State<DataGridHelper3> {
               ? '0'
               : data.toString()
         : data == null
-        ? '0'
+        ? ''
         : data.toString();
   }
 

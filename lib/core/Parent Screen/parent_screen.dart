@@ -8,12 +8,16 @@ import 'package:healthandwellness/features/home/presentation/trainer_home.dart';
 import 'package:healthandwellness/features/login/data/user.dart';
 import 'package:healthandwellness/features/login/repository/authenticator.dart';
 
+import '../../features/accountant/subscription/presentation/acc_subscription_list.dart';
 import '../../features/attendance/attendance.dart';
 import '../../features/calendar_report/presentation/calender_report.dart';
 import '../../features/home/presentation/member_home.dart';
 import '../../features/login/presentation/login.dart';
+import '../../features/member_approve/presentation/member_approve_register.dart';
 import '../utility/app_loader.dart';
 import '../widget/bottom_nav_bar.dart';
+import '../widget/bottom_navbar_accountant.dart';
+import '../widget/bottom_navbar_admin.dart';
 
 class ParentScreen extends StatefulWidget {
   const ParentScreen({super.key});
@@ -29,6 +33,8 @@ class _ParentScreenState extends State<ParentScreen> {
   final List<Widget> _pages = [Home(), ServiceView(), CalenderReport(), Home()];
   final List<Widget> _trainerPages = [HomeTrainer(), ServiceView(), Attendance(), HomeTrainer()];
   final List<Widget> _memberPages = [HomeMember(), ServiceView(), HomeTrainer()];
+  final List<Widget> _adminPages = [HomeMember(), MemberApproveRegister(), HomeTrainer()];
+  final List<Widget> _accPages = [AccSubscriptionList(), HomeTrainer()];
 
   @override
   void initState() {
@@ -47,6 +53,12 @@ class _ParentScreenState extends State<ParentScreen> {
     if (userRef.state?.userType == UserType.trainer) {
       return BottomNavbarTrainer();
     }
+    if (userRef.state?.userType == UserType.admin) {
+      return BottomNavbarAdmin();
+    }
+    if (userRef.state?.userType == UserType.accountant) {
+      return BottomNavbarAccountant();
+    }
     return BottomNavbar();
   }
 
@@ -56,6 +68,12 @@ class _ParentScreenState extends State<ParentScreen> {
     }
     if (userRef.state?.userType == UserType.member) {
       return _memberPages;
+    }
+    if (userRef.state?.userType == UserType.admin) {
+      return _adminPages;
+    }
+    if (userRef.state?.userType == UserType.accountant) {
+      return _accPages;
     }
     return _pages;
   }

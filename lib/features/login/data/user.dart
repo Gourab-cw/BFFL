@@ -1,4 +1,5 @@
 import 'package:healthandwellness/core/utility/helper.dart';
+import 'package:intl/intl.dart';
 
 enum UserType { cwAdmin, admin, branchManager, receptionist, trainer, accountant, member }
 
@@ -104,46 +105,89 @@ class UserG {
     required this.profileImage,
   });
 
-  factory UserG.fromJSON(Map<String, dynamic> data) => UserG(
-    id: parseString(data: data["id"], defaultValue: ""),
-    isApproved: parseBool(data: data["isApproved"], defaultValue: false),
-    isActive: parseBool(data: data["isActive"], defaultValue: false),
-    name: parseString(data: data["name"], defaultValue: ""),
-    mail: parseString(data: data["mail"], defaultValue: ""),
-    branchId: parseString(data: data["branchId"], defaultValue: ""),
-    companyId: parseString(data: data["companyId"], defaultValue: ""),
-    mobile: parseString(data: data["mobile"], defaultValue: ""),
-    userType: userTypeMap[parseString(data: data["userType"], defaultValue: "")] ?? UserType.member,
-    memberType: parseString(data: data["memberType"], defaultValue: "") == "paid" ? MemberType.paid : MemberType.trial,
+  factory UserG.fromJSON(Map<String, dynamic> data) {
+    return UserG(
+      id: parseString(data: data["id"], defaultValue: ""),
+      isApproved: parseBool(data: data["isApproved"], defaultValue: false),
+      isActive: parseBool(data: data["isActive"], defaultValue: false),
+      name: parseString(data: data["name"], defaultValue: ""),
+      mail: parseString(data: data["mail"], defaultValue: ""),
+      branchId: parseString(data: data["branchId"], defaultValue: ""),
+      companyId: parseString(data: data["companyId"], defaultValue: ""),
+      mobile: parseString(data: data["mobile"], defaultValue: ""),
+      userType: userTypeMap[parseString(data: data["userType"], defaultValue: "")] ?? UserType.member,
+      memberType: parseString(data: data["memberType"], defaultValue: "") == "paid" ? MemberType.paid : MemberType.trial,
 
-    activeFrom: parseStringToEmptyDate(data: data["activeFrom"], predefinedDateFormat: "yyyy-MM-dd", defaultValue: null),
-    activeTill: parseStringToEmptyDate(data: data["activeTill"], predefinedDateFormat: "yyyy-MM-dd", defaultValue: null),
+      activeFrom: parseStringToEmptyDate(data: data["activeFrom"], predefinedDateFormat: "yyyy-MM-dd", defaultValue: null),
+      activeTill: parseStringToEmptyDate(data: data["activeTill"], predefinedDateFormat: "yyyy-MM-dd", defaultValue: null),
+
+      // 🔹 new mappings
+      dob: parseString(data: data["dob"], defaultValue: ""),
+      age: parseString(data: data["age"], defaultValue: ""),
+      genderId: parseString(data: data["genderId"], defaultValue: ""),
+      bgId: parseString(data: data["bgId"], defaultValue: ""),
+      height: parseString(data: data["height"], defaultValue: ""),
+      bodyWeight: parseString(data: data["bodyWeight"], defaultValue: ""),
+      mobile1: parseString(data: data["mobile1"], defaultValue: ""),
+      address: parseString(data: data["address"], defaultValue: ""),
+      pincode: parseString(data: data["pincode"], defaultValue: ""),
+      city: parseString(data: data["city"], defaultValue: ""),
+      state: parseString(data: data["state"], defaultValue: ""),
+      nationality: parseString(data: data["nationality"], defaultValue: ""),
+      country: parseString(data: data["country"], defaultValue: ""),
+      profession: parseString(data: data["profession"], defaultValue: ""),
+      maritalStatusId: parseString(data: data["maritialStatus"], defaultValue: ""),
+      services: (data["services"] as List?)?.map((e) => e.toString()).toList() ?? [],
+      medicalCondition: parseString(data: data["medicalCondition"], defaultValue: ""),
+      medication: parseString(data: data["medication"], defaultValue: ""),
+      physicalExercise: parseString(data: data["physicalExercise"], defaultValue: ""),
+      diet: parseString(data: data["diet"], defaultValue: ""),
+      referredById: parseString(data: data["referredBy"], defaultValue: ""),
+      referredByName: parseString(data: data["referredByname"], defaultValue: ""),
+      profileImage: parseString(data: data["profileImage"], defaultValue: ""),
+    );
+  }
+
+  Map<String, dynamic> toJSON() => {
+    "id": id,
+    "isApproved": isApproved,
+    "isActive": isActive,
+    "name": name,
+    "mail": mail,
+    "branchId": branchId,
+    "companyId": companyId,
+    "mobile": mobile,
+    "userType": userTypeMap2[userType], // enum → string
+    "memberType": memberType == MemberType.paid ? "paid" : "trial",
+
+    "activeFrom": activeFrom != null ? DateFormat("yyyy-MM-dd").format(activeFrom!) : null,
+    "activeTill": activeTill != null ? DateFormat("yyyy-MM-dd").format(activeTill!) : null,
 
     // 🔹 new mappings
-    dob: parseString(data: data["dob"], defaultValue: ""),
-    age: parseString(data: data["age"], defaultValue: ""),
-    genderId: parseString(data: data["gender"], defaultValue: ""),
-    bgId: parseString(data: data["bg"], defaultValue: ""),
-    height: parseString(data: data["height"], defaultValue: ""),
-    bodyWeight: parseString(data: data["bodyWeight"], defaultValue: ""),
-    mobile1: parseString(data: data["mobile1"], defaultValue: ""),
-    address: parseString(data: data["address"], defaultValue: ""),
-    pincode: parseString(data: data["pincode"], defaultValue: ""),
-    city: parseString(data: data["city"], defaultValue: ""),
-    state: parseString(data: data["state"], defaultValue: ""),
-    nationality: parseString(data: data["nationality"], defaultValue: ""),
-    country: parseString(data: data["country"], defaultValue: ""),
-    profession: parseString(data: data["profession"], defaultValue: ""),
-    maritalStatusId: parseString(data: data["maritialStatus"], defaultValue: ""),
-    services: (data["services"] as List?)?.map((e) => e.toString()).toList() ?? [],
-    medicalCondition: parseString(data: data["medicalCondition"], defaultValue: ""),
-    medication: parseString(data: data["medication"], defaultValue: ""),
-    physicalExercise: parseString(data: data["physicalExercise"], defaultValue: ""),
-    diet: parseString(data: data["diet"], defaultValue: ""),
-    referredById: parseString(data: data["referredBy"], defaultValue: ""),
-    referredByName: parseString(data: data["referredByname"], defaultValue: ""),
-    profileImage: parseString(data: data["profileImage"], defaultValue: ""),
-  );
+    "dob": dob,
+    "age": age,
+    "gender": genderId,
+    "bg": bgId,
+    "height": height,
+    "bodyWeight": bodyWeight,
+    "mobile1": mobile1,
+    "address": address,
+    "pincode": pincode,
+    "city": city,
+    "state": state,
+    "nationality": nationality,
+    "country": country,
+    "profession": profession,
+    "maritialStatus": maritalStatusId,
+    "services": services,
+    "medicalCondition": medicalCondition,
+    "medication": medication,
+    "physicalExercise": physicalExercise,
+    "diet": diet,
+    "referredBy": referredById,
+    "referredByname": referredByName,
+    "profileImage": profileImage,
+  };
 
   // ✅ copyWith
   UserG copyWith({

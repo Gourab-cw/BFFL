@@ -93,6 +93,20 @@ class _HomeMemberState extends State<HomeMember> {
                           //     background: Colors.transparent,
                           //     icon: Icon(Icons.refresh),
                           //   ),
+                          ButtonHelperG(
+                            onTap: () async {
+                              try {
+                                loader.startLoading();
+                                await homeController.getBookings();
+                              } catch (e) {
+                                showAlert("$e", AlertType.error);
+                              } finally {
+                                loader.stopLoading();
+                              }
+                            },
+                            background: Colors.transparent,
+                            icon: Icon(Icons.refresh),
+                          ),
                           ButtonHelperG(background: Colors.transparent, icon: Icon(Icons.notifications)),
                         ],
                       ),
@@ -255,7 +269,17 @@ class _HomeMemberState extends State<HomeMember> {
                                               spacing: 5,
                                               children: [
                                                 Icon(Icons.calendar_month_rounded, size: 17, color: Colors.blueGrey.shade500),
-                                                TextHelper(text: "${m.date}", width: 80, fontsize: 12, color: Colors.blueGrey.shade400),
+                                                TextHelper(
+                                                  text: parseDateToString(
+                                                    data: m.date,
+                                                    formatDate: 'dd-MM-yyyy',
+                                                    predefinedDateFormat: 'yyyy-MM-dd',
+                                                    defaultValue: '',
+                                                  ),
+                                                  width: 80,
+                                                  fontsize: 12,
+                                                  color: Colors.blueGrey.shade400,
+                                                ),
                                               ],
                                             ),
                                           ],

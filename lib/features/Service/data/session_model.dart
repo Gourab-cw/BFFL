@@ -6,6 +6,7 @@ class SessionModel {
   final String memberId;
   final String? memberName;
   final String serviceId;
+  final String subscriptionId;
   final String? serviceName;
   final String? serviceDetails;
   final String trainerId;
@@ -35,6 +36,7 @@ class SessionModel {
     this.serviceDetails,
     required this.slotId,
     required this.trainerId,
+    required this.subscriptionId,
     this.trainerName,
     required this.date,
     required this.hasAttend,
@@ -58,7 +60,8 @@ class SessionModel {
       memberName: data['memberName'] ?? '',
       serviceId: data['serviceId'] ?? '',
       slotId: data['slotId'] ?? '',
-      trainerId: data['trainerId'] ?? "",
+      subscriptionId: data['subscriptionId'] ?? '',
+      trainerId: data['trainerId'] is List ? data['trainerId'][0] ?? "" : data['trainerId'] ?? "",
       date: data['date'] ?? '',
       hasAttend: data['hasAttend'] ?? false,
       isActive: data['isActive'] ?? true,
@@ -82,6 +85,7 @@ class SessionModel {
       'serviceId': serviceId,
       'slotId': slotId,
       'trainerId': trainerId,
+      'subscriptionId': subscriptionId,
       'date': date,
       'hasAttend': hasAttend,
       'isActive': isActive,
@@ -102,6 +106,7 @@ class SessionModel {
     String? memberId,
     String? memberName,
     String? serviceId,
+    String? subscriptionId,
     String? serviceName,
     String? serviceDetails,
     String? slotId,
@@ -127,6 +132,7 @@ class SessionModel {
       serviceName: serviceName ?? this.serviceName,
       serviceDetails: serviceDetails ?? this.serviceDetails,
       slotId: slotId ?? this.slotId,
+      subscriptionId: subscriptionId ?? this.subscriptionId,
       trainerId: trainerId ?? this.trainerId,
       trainerName: trainerName ?? this.trainerName,
       date: date ?? this.date,

@@ -8,9 +8,11 @@ class ServiceModel {
   final String image;
   final int maxBooking;
   final int amount;
+  final double totalAmount;
   final int totalDays;
   final List<String> trainerId;
 
+  final bool? isNewSlot;
   ServiceModel({
     required this.id,
     required this.name,
@@ -21,6 +23,8 @@ class ServiceModel {
     required this.trainerId,
     required this.totalDays,
     required this.amount,
+    this.isNewSlot,
+    required this.totalAmount,
   });
 
   /// Create from Firestore / JSON
@@ -35,12 +39,23 @@ class ServiceModel {
       trainerId: List<String>.from(json['trainerId'] ?? []),
       amount: parseInt(data: json['amount'], defaultInt: 0),
       totalDays: parseInt(data: json['totalDays'], defaultInt: 0),
+      totalAmount: parseDouble(data: json['totalAmount'], defaultValue: 0),
     );
   }
 
   /// Convert to Firestore / JSON
   Map<String, dynamic> toJson() {
-    return {'name': name, 'description': description, 'isTrial': isTrial, 'image': image};
+    return {
+      'name': name,
+      'description': description,
+      'isTrial': isTrial,
+      'image': image,
+      'maxBooking': maxBooking,
+      'trainerId': trainerId,
+      'amount': amount,
+      'totalDays': totalDays,
+      'totalAmount': totalAmount,
+    };
   }
 
   /// Optional: copyWith (very useful)
@@ -54,6 +69,8 @@ class ServiceModel {
     List<String>? trainerId,
     int? totalDays,
     int? amount,
+    double? totalAmount,
+    bool? isNewSlot,
   }) {
     return ServiceModel(
       id: id ?? this.id,
@@ -65,6 +82,8 @@ class ServiceModel {
       trainerId: trainerId ?? this.trainerId,
       totalDays: totalDays ?? this.totalDays,
       amount: amount ?? this.amount,
+      totalAmount: totalAmount ?? this.totalAmount,
+      isNewSlot: isNewSlot ?? this.isNewSlot,
     );
   }
 }

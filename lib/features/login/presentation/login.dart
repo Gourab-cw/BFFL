@@ -24,9 +24,7 @@ class _LoginState extends State<Login> {
   final TextEditingController passwordController = TextEditingController();
   late final EdgeInsets safePadding = MediaQuery.paddingOf(context);
   bool showPassword = false;
-
   bool isCreateAccount = false;
-
   void changeLoginMode() {
     setState(() {
       isCreateAccount = !isCreateAccount;
@@ -180,22 +178,33 @@ class _LoginState extends State<Login> {
                             await mainStore.firebaseG.makeProviderLogin(AuthType.google);
                           },
                           borderRadius: 60,
+                          width: 350,
                           background: Colors.grey.shade100,
                           shadow: [],
-                          icon: Icon(FontAwesomeIcons.google, size: 18, color: Colors.orange),
+                          label: TextHelper(
+                            text: 'Continue with Google',
+                            fontweight: FontWeight.w600,
+                            color: Colors.blueGrey.shade600,
+                            fontsize: 14,
+                            padding: EdgeInsets.symmetric(horizontal: 10),
+                          ),
+                          icon: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 5),
+                            child: Icon(FontAwesomeIcons.google, size: 18, color: Colors.blueGrey),
+                          ),
                         ),
-                        ButtonHelperG(
-                          borderRadius: 60,
-                          background: Colors.grey.shade100,
-                          shadow: [],
-                          icon: Icon(FontAwesomeIcons.facebook, size: 18, color: Colors.blue),
-                        ),
-                        ButtonHelperG(
-                          borderRadius: 60,
-                          background: Colors.grey.shade100,
-                          shadow: [],
-                          icon: Icon(FontAwesomeIcons.twitter, size: 18, color: Colors.black),
-                        ),
+                        // ButtonHelperG(
+                        //   borderRadius: 60,
+                        //   background: Colors.grey.shade100,
+                        //   shadow: [],
+                        //   icon: Icon(FontAwesomeIcons.facebook, size: 18, color: Colors.blue),
+                        // ),
+                        // ButtonHelperG(
+                        //   borderRadius: 60,
+                        //   background: Colors.grey.shade100,
+                        //   shadow: [],
+                        //   icon: Icon(FontAwesomeIcons.twitter, size: 18, color: Colors.black),
+                        // ),
                       ],
                     ),
                     Row(

@@ -35,6 +35,19 @@ class Subscription {
     trainerIds: (data['trainerId'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
   );
 
+  Map<String, dynamic> toJSON() {
+    return {
+      'id': id,
+      'name': name,
+      'image': image,
+      'description': description,
+      'isActive': isActive,
+      'isTrail': isTrail,
+      'maxBooking': maxBooking,
+      'trainerId': trainerIds,
+    };
+  }
+
   Subscription copyWith({
     String? id,
     String? name,
