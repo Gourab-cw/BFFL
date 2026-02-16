@@ -11,7 +11,7 @@ android {
         multiDexEnabled = true
     }
     namespace = "com.example.healthandwellness"
-    compileSdk = 35
+    compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
