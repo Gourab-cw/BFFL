@@ -29,7 +29,7 @@ class _BottomnavbarState extends State<BottomNavbar> {
         height: 60,
         notchMargin: 3,
         padding: const EdgeInsets.all(0),
-        color: const Color.fromARGB(255, 151, 239, 160),
+        color: getMainStore().theme.value.BottomNavColor,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           crossAxisAlignment: CrossAxisAlignment.end,
@@ -54,12 +54,13 @@ class _BottomnavbarState extends State<BottomNavbar> {
                     child: Icon(
                       MoonIcons.generic_home_24_regular,
                       size: 23,
-                      color: mainStore.bottomNavBarIndex.value == 0 ? Colors.green.shade900 : Colors.black,
+                      color: mainStore.bottomNavBarIndex.value == 0 ? getMainStore().theme.value.HeadColor : Colors.black,
                     ),
                   ),
                   TextHelper(
                     text: parseString(data: 'Home', defaultValue: ''),
                     fontweight: FontWeight.w600,
+                    color: mainStore.bottomNavBarIndex.value == 0 ? getMainStore().theme.value.lowShadeColor : getMainStore().theme.value.LightTextColor,
                     fontsize: 11,
                     width: calcWidth,
                     isWrap: true,
@@ -88,7 +89,7 @@ class _BottomnavbarState extends State<BottomNavbar> {
                     child: Icon(
                       MoonIcons.generic_ticket_24_regular,
                       size: 23,
-                      color: mainStore.bottomNavBarIndex.value == 1 ? Colors.green.shade900 : Colors.black,
+                      color: mainStore.bottomNavBarIndex.value == 1 ? getMainStore().theme.value.HeadColor : Colors.black,
                     ),
                   ),
                   TextHelper(
@@ -96,6 +97,7 @@ class _BottomnavbarState extends State<BottomNavbar> {
                     fontweight: FontWeight.w600,
                     fontsize: 11,
                     width: calcWidth,
+                    color: mainStore.bottomNavBarIndex.value == 1 ? getMainStore().theme.value.lowShadeColor : getMainStore().theme.value.LightTextColor,
                     isWrap: true,
                     textalign: TextAlign.center,
                   ),
@@ -187,7 +189,7 @@ class _BottomnavbarState extends State<BottomNavbar> {
                     height: 28,
                     width: calcWidth > 40 ? 40 : calcWidth,
                     decoration: BoxDecoration(
-                      color: mainStore.bottomNavBarIndex.value == 4 ? Colors.white.withAlpha(100) : Colors.transparent,
+                      color: mainStore.bottomNavBarIndex.value == 2 ? getMainStore().theme.value.HeadColor : Colors.transparent,
                       borderRadius: BorderRadius.circular(100),
                     ),
                     child: Icon(Icons.logout, size: 20),
@@ -196,6 +198,7 @@ class _BottomnavbarState extends State<BottomNavbar> {
                     text: parseString(data: 'Logout', defaultValue: ''),
                     fontweight: FontWeight.w600,
                     fontsize: 11,
+                    color: mainStore.bottomNavBarIndex.value == 2 ? getMainStore().theme.value.lowShadeColor : getMainStore().theme.value.LightTextColor,
                     width: calcWidth,
                     isWrap: true,
                     textalign: TextAlign.center,

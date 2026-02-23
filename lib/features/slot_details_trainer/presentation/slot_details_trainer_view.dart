@@ -4,6 +4,7 @@ import 'package:healthandwellness/app/mainstore.dart';
 import 'package:healthandwellness/core/utility/app_loader.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
 import 'package:healthandwellness/features/slot_details_trainer/controller/slot_details_controller.dart';
+import 'package:healthandwellness/features/slot_manage/data/slot_making_model.dart';
 import 'package:healthandwellness/features/subscriptions/controller/subscription_controller.dart';
 import 'package:intl/intl.dart';
 import 'package:moon_design/moon_design.dart';
@@ -20,6 +21,17 @@ class _SlotDetailsTrainerViewState extends State<SlotDetailsTrainerView> {
   final loader = Get.find<AppLoaderController>();
   final sc = Get.find<SubscriptionController>();
   final slotController = Get.find<SlotDetailsController>();
+
+  bool enableEndSession(SlotModel s) {
+    final now = DateTime.now();
+    if (s.date == DateFormat('yyyy-MM-dd').format(now)) {
+      int nowTime = parseInt(data: DateFormat('HH:mm').format(now).replaceAll(':', ''), defaultInt: 0);
+      int startTime = parseInt(data: s.startTime.replaceAll(':', ''), defaultInt: 0);
+      int endTime = parseInt(data: s.endTime.replaceAll(':', ''), defaultInt: 0);
+      return nowTime >= startTime;
+    }
+    return false;
+  }
 
   @override
   void dispose() {
@@ -44,12 +56,10 @@ class _SlotDetailsTrainerViewState extends State<SlotDetailsTrainerView> {
         builder: (slotController) {
           final slot = slotController.slot;
           if (slot == null) {
-            return Center(child: TextHelper(text: "Slot not found!"));
+            return Center(child: Text("Slot not found!"));
           }
           return Scaffold(
-            appBar: AppBar(
-              title: TextHelper(text: 'Session', fontsize: 16, fontweight: FontWeight.w600),
-            ),
+            appBar: AppBar(title: Text('Session')),
             body: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Column(
@@ -85,27 +95,58 @@ class _SlotDetailsTrainerViewState extends State<SlotDetailsTrainerView> {
                           ],
                         ),
                         const SizedBox(height: 10),
-                        TextAreaBox(
-                          labelText: "Remarks",
-                          controller: slotController.remarks,
-                          height: 60,
-                          borderRadius: BorderRadius.circular(10),
-                          withBorder: false,
+                        Row(
+                          spacing: 5,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: TextAreaBox(
+                                labelText: "Remarks",
+                                controller: slotController.remarks,
+                                height: 60,
+                                borderRadius: BorderRadius.circular(10),
+                                withBorder: false,
+                              ),
+                            ),
+                            Opacity(
+                              opacity: enableEndSession(slot) ? 1 : 0.25,
+                              child: ButtonHelperG(
+                                margin: 0,
+                                onTap: () async {
+                                  try {
+                                    loader.startLoading();
+                                  } catch (e) {
+                                    showAlert("$e", AlertType.error);
+                                  } finally {
+                                    loader.stopLoading();
+                                  }
+                                },
+                                background: getMainStore().theme.value.lowShadeColor,
+                                icon: Icon(Icons.send_rounded, color: getMainStore().theme.value.HeadColor, size: 18),
+                              ),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 10),
-                        ButtonHelperG(
-                          onTap: () async {
-                            try {
-                              loader.startLoading();
-                              await slotController.endSessionAndSlot();
-                            } catch (e) {
-                              showAlert("$e", AlertType.error);
-                            } finally {
-                              loader.stopLoading();
-                            }
-                          },
-                          label: TextHelper(text: "End Session", color: Colors.white),
-                          width: MediaQuery.sizeOf(context).width * 0.9 > 400 ? 400 : MediaQuery.sizeOf(context).width * 0.9,
+                        Opacity(
+                          opacity: enableEndSession(slot) ? 1 : 0.3,
+                          child: ButtonHelperG(
+                            onTap: () async {
+                              if (!enableEndSession(slot)) {
+                                return;
+                              }
+                              try {
+                                loader.startLoading();
+                                await slotController.endSessionAndSlot();
+                              } catch (e) {
+                                showAlert("$e", AlertType.error);
+                              } finally {
+                                loader.stopLoading();
+                              }
+                            },
+                            label: TextHelper(text: "End Session", color: Colors.white),
+                            width: MediaQuery.sizeOf(context).width * 0.9 > 400 ? 400 : MediaQuery.sizeOf(context).width * 0.9,
+                          ),
                         ),
                       ],
                     ),
@@ -150,27 +191,33 @@ class _SlotDetailsTrainerViewState extends State<SlotDetailsTrainerView> {
                                         children: [
                                           (s.hasAttend && s.attendedAt != null)
                                               ? TextHelper(text: DateFormat('hh:mm a').format(s.attendedAt!))
-                                              : ButtonHelperG(
-                                                  onTap: () async {
-                                                    try {
-                                                      loader.startLoading();
-                                                      await slotController.markAttendance(s);
-                                                    } catch (e) {
-                                                      showAlert("$e", AlertType.error);
-                                                    } finally {
-                                                      loader.stopLoading();
-                                                    }
-                                                  },
-                                                  margin: 0,
-                                                  height: 30,
-                                                  width: 140,
-                                                  label: TextHelper(text: "Mark attendance", fontsize: 11, color: Colors.white),
+                                              : Opacity(
+                                                  opacity: enableEndSession(slot) ? 1 : 0.25,
+                                                  child: ButtonHelperG(
+                                                    onTap: () async {
+                                                      if (!enableEndSession(slot)) {
+                                                        return;
+                                                      }
+                                                      try {
+                                                        loader.startLoading();
+                                                        await slotController.markAttendance(s);
+                                                      } catch (e) {
+                                                        showAlert("$e", AlertType.error);
+                                                      } finally {
+                                                        loader.stopLoading();
+                                                      }
+                                                    },
+                                                    margin: 0,
+                                                    height: 30,
+                                                    width: 140,
+                                                    label: TextHelper(text: "Mark attendance", fontsize: 11, color: Colors.white),
+                                                  ),
                                                 ),
                                           ButtonHelperG(
                                             margin: 0,
                                             height: 30,
                                             background: Colors.white,
-                                            icon: Icon(Icons.info, size: 18, color: Colors.blueGrey),
+                                            icon: Icon(Icons.info, size: 18, color: getMainStore().theme.value.secondaryColor.withAlpha(100)),
                                           ),
                                         ],
                                       ),
@@ -195,20 +242,26 @@ class _SlotDetailsTrainerViewState extends State<SlotDetailsTrainerView> {
                                                   withBorder: false,
                                                   autofocus: true,
                                                   labelText: "Feedback ",
-                                                  trailing: ButtonHelperG(
-                                                    onTap: () async {
-                                                      try {
-                                                        loader.startLoading();
-                                                        await slotController.giveFeedback(s);
-                                                      } catch (e) {
-                                                        showAlert("$e", AlertType.error);
-                                                      } finally {
-                                                        loader.stopLoading();
-                                                      }
-                                                    },
-                                                    margin: 4,
-                                                    background: Colors.green.shade50,
-                                                    icon: Icon(Icons.send_rounded, color: Colors.green, size: 18),
+                                                  trailing: Opacity(
+                                                    opacity: enableEndSession(slot) ? 1 : 0.25,
+                                                    child: ButtonHelperG(
+                                                      onTap: () async {
+                                                        if(!enableEndSession(slot)){
+                                                          return;
+                                                        }
+                                                        try {
+                                                          loader.startLoading();
+                                                          await slotController.giveFeedback(s);
+                                                        } catch (e) {
+                                                          showAlert("$e", AlertType.error);
+                                                        } finally {
+                                                          loader.stopLoading();
+                                                        }
+                                                      },
+                                                      margin: 4,
+                                                      background: getMainStore().theme.value.lowShadeColor,
+                                                      icon: Icon(Icons.send_rounded, color: getMainStore().theme.value.HeadColor, size: 18),
+                                                    ),
                                                   ),
                                                 ),
                                         ),

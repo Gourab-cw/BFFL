@@ -21,6 +21,10 @@ class SubscriptionController extends GetxController {
     update();
   }
 
+  ServiceModel? getServiceById(String id) {
+    return list.firstWhereOrNull((f) => f.id == id);
+  }
+
   @override
   Future<void> onInit() async {
     // TODO: implement onInit

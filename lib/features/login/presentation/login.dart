@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:healthandwellness/app/mainstore.dart';
 import 'package:healthandwellness/core/utility/app_loader.dart';
@@ -37,16 +36,16 @@ class _LoginState extends State<Login> {
   @override
   void initState() {
     // TODO: implement initState
-    Future(() {
-      try {
-        loaderController.startLoading();
-        user.checkIfUserLogin().whenComplete(() {
-          loaderController.stopLoading();
-        });
-      } catch (e) {
-        showAlert("$e", AlertType.error);
-      }
-    });
+    // Future(() {
+    //   try {
+    //     loaderController.startLoading();
+    //     user.checkIfUserLogin().whenComplete(() {
+    //       loaderController.stopLoading();
+    //     });
+    //   } catch (e) {
+    //     showAlert("$e", AlertType.error);
+    //   }
+    // });
 
     super.initState();
   }
@@ -71,12 +70,12 @@ class _LoginState extends State<Login> {
               child: Container(
                 margin: EdgeInsets.all(12),
                 padding: EdgeInsets.all(22),
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(30)),
+                decoration: BoxDecoration(color: getMainStore().theme.value.lowShadeColor.withAlpha(30), borderRadius: BorderRadius.circular(30)),
                 child: Column(
                   spacing: 10,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    TextHelper(text: isCreateAccount ? "Create an Account?" : "Login", textalign: TextAlign.center, fontweight: FontWeight.w600, fontsize: 19),
+                    TextHelper(text: isCreateAccount ? "Create an Account?" : "Login", textalign: TextAlign.center, fontweight: FontWeight.w600, fontsize: 21),
                     Column(
                       spacing: 10,
                       mainAxisSize: MainAxisSize.min,
@@ -91,8 +90,7 @@ class _LoginState extends State<Login> {
                                 controller: nameController,
                                 leading: Icon(Icons.account_circle_rounded, size: 20, color: Colors.blueGrey.shade400),
                                 borderRadius: 30,
-                                withBorder: false,
-                                backgroundColor: Colors.blueGrey.shade200.withAlpha(50),
+                                backgroundColor: getMainStore().theme.value.BackgroundColor,
                               ),
                             ],
                           ),
@@ -103,10 +101,9 @@ class _LoginState extends State<Login> {
                             TextHelper(text: "Email", fontweight: FontWeight.w600),
                             TextBox(
                               controller: emailController,
-                              leading: Icon(Icons.mail, size: 20, color: Colors.blueGrey.shade400),
+                              leading: Icon(Icons.mail, size: 20, color: getMainStore().theme.value.mediumShadeColor),
                               borderRadius: 30,
-                              withBorder: false,
-                              backgroundColor: Colors.blueGrey.shade200.withAlpha(50),
+                              backgroundColor: getMainStore().theme.value.BackgroundColor,
                             ),
                           ],
                         ),
@@ -117,11 +114,10 @@ class _LoginState extends State<Login> {
                             TextHelper(text: "Password", fontweight: FontWeight.w600),
                             TextBox(
                               controller: passwordController,
-                              leading: Icon(Icons.password, size: 20, color: Colors.blueGrey.shade400),
+                              leading: Icon(Icons.password, size: 20, color: getMainStore().theme.value.mediumShadeColor),
                               borderRadius: 30,
-                              withBorder: false,
                               obscureText: !showPassword,
-                              backgroundColor: Colors.blueGrey.shade200.withAlpha(50),
+                              backgroundColor: getMainStore().theme.value.BackgroundColor,
                               trailing: ButtonHelperG(
                                 onTap: () {
                                   setState(() {
@@ -164,7 +160,7 @@ class _LoginState extends State<Login> {
                           }
                         }
                       },
-                      width: 350,
+                      width: MediaQuery.sizeOf(context).width * 0.8 > 300 ? 300 : MediaQuery.sizeOf(context).width * 0.8,
                       borderRadius: 20,
                       label: TextHelper(text: isCreateAccount ? "Create Account" : "Submit", fontweight: FontWeight.w600, fontsize: 12, color: Colors.white),
                     ),
@@ -178,9 +174,11 @@ class _LoginState extends State<Login> {
                             await mainStore.firebaseG.makeProviderLogin(AuthType.google);
                           },
                           borderRadius: 60,
-                          width: 350,
-                          background: Colors.grey.shade100,
+                          width: MediaQuery.sizeOf(context).width * 0.8 > 300 ? 300 : MediaQuery.sizeOf(context).width * 0.8,
+                          background: Colors.white,
+                          withBorder: true,
                           shadow: [],
+                          borderColor: Colors.blueGrey.shade400,
                           label: TextHelper(
                             text: 'Continue with Google',
                             fontweight: FontWeight.w600,
@@ -188,10 +186,7 @@ class _LoginState extends State<Login> {
                             fontsize: 14,
                             padding: EdgeInsets.symmetric(horizontal: 10),
                           ),
-                          icon: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 5),
-                            child: Icon(FontAwesomeIcons.google, size: 18, color: Colors.blueGrey),
-                          ),
+                          icon: Padding(padding: EdgeInsets.symmetric(horizontal: 5), child: Image.asset('assets/google.png', width: 20)),
                         ),
                         // ButtonHelperG(
                         //   borderRadius: 60,
@@ -207,24 +202,24 @@ class _LoginState extends State<Login> {
                         // ),
                       ],
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        TextHelper(
-                          text: isCreateAccount ? "Already have an account?" : "Want to create an account?",
-                          color: Colors.blueGrey.shade400,
-                          textalign: TextAlign.center,
-                        ),
-                        ButtonHelperG(
-                          onTap: changeLoginMode,
-                          label: TextHelper(text: "Click here"),
-                          height: 25,
-                          background: Colors.transparent,
-                          padding: EdgeInsets.zero,
-                          width: 70,
-                        ),
-                      ],
-                    ),
+                    // Row(
+                    //   mainAxisAlignment: MainAxisAlignment.center,
+                    //   children: [
+                    //     TextHelper(
+                    //       text: isCreateAccount ? "Already have an account?" : "Want to create an account?",
+                    //       color: Colors.blueGrey.shade400,
+                    //       textalign: TextAlign.center,
+                    //     ),
+                    //     ButtonHelperG(
+                    //       onTap: changeLoginMode,
+                    //       label: TextHelper(text: "Click here"),
+                    //       height: 25,
+                    //       background: Colors.transparent,
+                    //       padding: EdgeInsets.zero,
+                    //       width: 70,
+                    //     ),
+                    //   ],
+                    // ),
                   ],
                 ),
               ),

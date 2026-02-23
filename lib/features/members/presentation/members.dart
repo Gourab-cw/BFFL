@@ -42,9 +42,7 @@ class _MembersState extends State<Members> {
       autoRemove: false,
       builder: (memberController) {
         return Scaffold(
-          appBar: AppBar(
-            title: TextHelper(text: "Member List", fontsize: 15, fontweight: FontWeight.w600),
-          ),
+          appBar: AppBar(title: Text("Member List")),
           body: Padding(
             padding: EdgeInsets.only(left: safePadding.left + 10, top: safePadding.top, bottom: safePadding.bottom, right: safePadding.right + 10),
             child: Column(
@@ -60,11 +58,11 @@ class _MembersState extends State<Members> {
                     leading: Icon(MoonIcons.generic_search_24_regular, color: Colors.grey),
                     controller: memberController.search,
                     onValueChange: (v) async {
-                     try{
-                       await memberController.searchMembers(await fb.getDB());
-                     }catch(e){
-                       showAlert("$e", AlertType.error);
-                     }
+                      try {
+                        await memberController.searchMembers(await fb.getDB());
+                      } catch (e) {
+                        showAlert("$e", AlertType.error);
+                      }
                     },
                     trailing: !memberController.isSearching.value
                         ? null

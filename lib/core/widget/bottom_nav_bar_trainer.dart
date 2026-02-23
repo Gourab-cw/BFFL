@@ -3,13 +3,13 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:healthandwellness/app/mainstore.dart';
 import 'package:healthandwellness/features/login/repository/authenticator.dart';
-import 'package:moon_design/moon_design.dart';
 
 import '../utility/app_loader.dart';
 import '../utility/helper.dart';
 
 class BottomNavbarTrainer extends StatefulWidget {
-  const BottomNavbarTrainer({super.key});
+  final List<Map<String, Icon>> menus;
+  const BottomNavbarTrainer({super.key, required this.menus});
 
   @override
   State<BottomNavbarTrainer> createState() => _BottomNavbarTrainerState();
@@ -19,8 +19,75 @@ class _BottomNavbarTrainerState extends State<BottomNavbarTrainer> {
   final MainStore mainStore = Get.find<MainStore>();
   final AppLoaderController loaderController = Get.find<AppLoaderController>();
   final Authenticator user = Get.find<Authenticator>();
+
+  Future<void> showLogoutPopup() async {
+    await showDialog(
+      context: context,
+      builder: (ctx) {
+        return Dialog(
+          child: SizedBox(
+            height: 160,
+            width: 150,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                spacing: 12,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.warning_rounded, color: Colors.redAccent, size: 30),
+                      TextHelper(text: "Logout", textalign: TextAlign.center, fontsize: 18, fontweight: FontWeight.w600),
+                    ],
+                  ),
+                  TextHelper(text: "Do you really want to exit the app?", textalign: TextAlign.center, fontsize: 14, fontweight: FontWeight.w500),
+                  Spacer(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    spacing: 10,
+                    children: [
+                      ButtonHelperG(
+                        onTap: () async {
+                          loaderController.startLoading();
+                          try {
+                            await user.logOut();
+                            if (context.mounted) {
+                              goBack(context);
+                            }
+                          } catch (e) {
+                            showAlert("$e", AlertType.error);
+                          } finally {
+                            loaderController.stopLoading();
+                          }
+                        },
+                        label: TextHelper(text: "Yes", fontweight: FontWeight.w600, color: mainStore.theme.value.BackgroundColor),
+                        width: 70,
+                        height: 38,
+                      ),
+                      ButtonHelperG(
+                        onTap: () {
+                          goBack(context);
+                        },
+                        label: TextHelper(text: "Cancel", fontweight: FontWeight.w600, color: mainStore.theme.value.HeadColor),
+                        shadow: [],
+                        background: mainStore.theme.value.lowShadeColor,
+                        width: 70,
+                        height: 38,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final menus = widget.menus;
     final calcWidth = MediaQuery.sizeOf(context).width / (4 + 1);
     return Obx(
       () => BottomAppBar(
@@ -29,123 +96,52 @@ class _BottomNavbarTrainerState extends State<BottomNavbarTrainer> {
         height: 60,
         notchMargin: 3,
         padding: const EdgeInsets.all(0),
-        color: const Color.fromARGB(255, 151, 239, 160),
+        // color: const Color.fromARGB(255, 151, 239, 160),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            GestureDetector(
-              onTap: () {
-                SystemSound.play(SystemSoundType.click);
-                mainStore.bottomNavBarIndex.value = 0;
-                // Get.toNamed("/home");
-              },
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    height: 28,
-                    width: calcWidth > 40 ? 40 : calcWidth,
-                    decoration: BoxDecoration(
-                      color: mainStore.bottomNavBarIndex.value == 0 ? Colors.white.withAlpha(160) : Colors.transparent,
-                      borderRadius: BorderRadius.circular(100),
+            ...List.generate(menus.length, (i) {
+              final m = menus[i];
+              return GestureDetector(
+                onTap: () {
+                  SystemSound.play(SystemSoundType.click);
+                  mainStore.bottomNavBarIndex.value = i;
+                  // Get.toNamed("/home");
+                },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      height: 28,
+                      width: calcWidth > 40 ? 40 : calcWidth,
+                      decoration: BoxDecoration(
+                        color: mainStore.bottomNavBarIndex.value == i ? mainStore.theme.value.BackgroundShadeColor.withAlpha(100) : Colors.transparent,
+                        borderRadius: BorderRadius.circular(100),
+                      ),
+                      child: Icon(
+                        m.values.toList()[0].icon,
+                        size: m.values.toList()[0].size,
+                        color: mainStore.bottomNavBarIndex.value == i ? mainStore.theme.value.DarkTextColor : mainStore.theme.value.DarkTextColor,
+                      ),
                     ),
-                    child: Icon(
-                      MoonIcons.generic_home_24_regular,
-                      size: 23,
-                      color: mainStore.bottomNavBarIndex.value == 0 ? Colors.green.shade900 : Colors.black,
+                    TextHelper(
+                      text: parseString(data: m.keys.toList()[0], defaultValue: ''),
+                      fontweight: FontWeight.w600,
+                      fontsize: mainStore.bottomNavBarIndex.value == i ? 11.5 : 11,
+                      width: calcWidth,
+                      isWrap: true,
+                      color: mainStore.theme.value.DarkTextColor,
+                      textalign: TextAlign.center,
                     ),
-                  ),
-                  TextHelper(
-                    text: parseString(data: 'Home', defaultValue: ''),
-                    fontweight: FontWeight.w600,
-                    fontsize: 11,
-                    width: calcWidth,
-                    isWrap: true,
-                    textalign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
-                SystemSound.play(SystemSoundType.click);
-                mainStore.bottomNavBarIndex.value = 1;
-                // Get.toNamed("/serviceview");
-              },
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    height: 28,
-                    width: calcWidth > 40 ? 40 : calcWidth,
-                    decoration: BoxDecoration(
-                      color: mainStore.bottomNavBarIndex.value == 1 ? Colors.white.withAlpha(160) : Colors.transparent,
-                      borderRadius: BorderRadius.circular(100),
-                    ),
-                    child: Icon(
-                      MoonIcons.generic_users_24_regular,
-                      size: 27,
-                      color: mainStore.bottomNavBarIndex.value == 1 ? Colors.green.shade900 : Colors.black,
-                    ),
-                  ),
-                  TextHelper(
-                    text: parseString(data: 'Members', defaultValue: ''),
-                    fontweight: FontWeight.w600,
-                    fontsize: 11,
-                    width: calcWidth,
-                    isWrap: true,
-                    textalign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
-                SystemSound.play(SystemSoundType.click);
-                mainStore.bottomNavBarIndex.value = 2;
-              },
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    height: 28,
-                    width: calcWidth > 40 ? 40 : calcWidth,
-                    decoration: BoxDecoration(
-                      color: mainStore.bottomNavBarIndex.value == 2 ? Colors.white.withAlpha(160) : Colors.transparent,
-                      borderRadius: BorderRadius.circular(100),
-                    ),
-                    child: Icon(
-                      MoonIcons.generic_user_24_regular,
-                      size: 23,
-                      color: mainStore.bottomNavBarIndex.value == 2 ? Colors.green.shade900 : Colors.black,
-                    ),
-                  ),
-                  TextHelper(
-                    text: parseString(data: 'Attendance', defaultValue: ''),
-                    fontweight: FontWeight.w600,
-                    fontsize: 11,
-                    width: calcWidth,
-                    isWrap: true,
-                    textalign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
+                  ],
+                ),
+              );
+            }),
             GestureDetector(
               onTap: () async {
-                SystemSound.play(SystemSoundType.click);
-                loaderController.startLoading();
-                try {
-                  await user.logOut();
-                } catch (e) {
-                  showAlert("$e", AlertType.error);
-                } finally {
-                  loaderController.stopLoading();
-                }
+                await showLogoutPopup();
               },
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -155,15 +151,20 @@ class _BottomNavbarTrainerState extends State<BottomNavbarTrainer> {
                     height: 28,
                     width: calcWidth > 40 ? 40 : calcWidth,
                     decoration: BoxDecoration(
-                      color: mainStore.bottomNavBarIndex.value == 4 ? Colors.white.withAlpha(100) : Colors.transparent,
+                      color: mainStore.bottomNavBarIndex.value == 10 ? Colors.white.withAlpha(160) : Colors.transparent,
                       borderRadius: BorderRadius.circular(100),
                     ),
-                    child: Icon(Icons.logout, size: 20),
+                    child: Icon(
+                      Icons.logout,
+                      size: 18,
+                      color: mainStore.bottomNavBarIndex.value == 10 ? mainStore.theme.value.HeadColor : mainStore.theme.value.BackgroundColor,
+                    ),
                   ),
                   TextHelper(
                     text: parseString(data: 'Logout', defaultValue: ''),
                     fontweight: FontWeight.w600,
                     fontsize: 11,
+                    color: mainStore.bottomNavBarIndex.value == 10 ? mainStore.theme.value.HeadColor : mainStore.theme.value.BackgroundColor,
                     width: calcWidth,
                     isWrap: true,
                     textalign: TextAlign.center,

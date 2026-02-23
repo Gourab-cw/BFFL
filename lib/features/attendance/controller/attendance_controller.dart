@@ -92,11 +92,12 @@ class AttendanceController extends GetxController {
         .get();
 
     list = resp.docs.map<AttendanceModel>((r) => AttendanceModel.fromJson(makeMapSerialize(r.data()))).toList();
-
-    final branches = list.map((l) => l.branchId).toSet().toList();
-    final branchResp = (await db.collection('Branch').where('isActive', isEqualTo: true).where('id', whereIn: branches).get());
-    final branchData = branchResp.docs.map(((m) => makeMapSerialize(m.data()))).toList();
-    list = list.map((m) => m.copyWith(branchName: branchData.firstWhereOrNull((b) => b['id'] == m.branchId)?['name'] ?? "")).toList();
+    if (list.isNotEmpty) {
+      final branches = list.map((l) => l.branchId).toSet().toList();
+      final branchResp = (await db.collection('Branch').where('isActive', isEqualTo: true).where('id', whereIn: branches).get());
+      final branchData = branchResp.docs.map(((m) => makeMapSerialize(m.data()))).toList();
+      list = list.map((m) => m.copyWith(branchName: branchData.firstWhereOrNull((b) => b['id'] == m.branchId)?['name'] ?? "")).toList();
+    }
     update();
   }
 }

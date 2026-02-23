@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:healthandwellness/app/mainstore.dart';
 import 'package:healthandwellness/core/utility/firebase_service.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
 import 'package:healthandwellness/features/login/repository/authenticator.dart';
@@ -28,14 +29,15 @@ class CalenderDayResult {
 }
 
 class CalendarSlotDetails {
+  String slotId;
   String slot;
   int booked;
   int totalAttendance;
   int totalBooked;
-  CalendarSlotDetails({required this.slot, required this.booked, required this.totalAttendance, required this.totalBooked});
+  CalendarSlotDetails({required this.slotId, required this.slot, required this.booked, required this.totalAttendance, required this.totalBooked});
 
   Map<String, dynamic> toJSON() {
-    return {"slot": slot, "booked": booked, "totalAttendance": totalAttendance, "totalBooked": totalBooked};
+    return {"slot": slot, 'slotId': slotId, "booked": booked, "totalAttendance": totalAttendance, "totalBooked": totalBooked};
   }
 }
 
@@ -51,6 +53,8 @@ class CalenderDayDetails {
 
 class CalenderReportController extends GetxController {
   List<SlotModel> slots = [];
+
+  final mainStore = Get.find<MainStore>();
   DateTime selectedDate = DateTime.now();
   final SubscriptionController sc = Get.find<SubscriptionController>();
   final FB fb = Get.find<FB>();
@@ -69,14 +73,23 @@ class CalenderReportController extends GetxController {
   }
 
   Color _getGreenBg(double percentage) {
+    // if (percentage == 0) return Colors.transparent;
+    // if (percentage <= 10) return Colors.green.shade50;
+    // if (percentage <= 20) return Colors.green.shade100;
+    // if (percentage <= 30) return Colors.green.shade200;
+    // if (percentage <= 40) return Colors.green.shade300;
+    // if (percentage <= 60) return Colors.green.shade400;
+    // if (percentage <= 80) return Colors.green.shade600;
+    // if (percentage <= 90) return Colors.green.shade700;
+
     if (percentage == 0) return Colors.transparent;
-    if (percentage <= 10) return Colors.green.shade50;
-    if (percentage <= 20) return Colors.green.shade100;
-    if (percentage <= 30) return Colors.green.shade200;
-    if (percentage <= 40) return Colors.green.shade300;
-    if (percentage <= 60) return Colors.green.shade400;
-    if (percentage <= 80) return Colors.green.shade600;
-    if (percentage <= 90) return Colors.green.shade700;
+    if (percentage <= 10) return mainStore.theme.value.HeadColor.withAlpha(20);
+    if (percentage <= 20) return mainStore.theme.value.HeadColor.withAlpha(50);
+    if (percentage <= 30) return mainStore.theme.value.HeadColor.withAlpha(80);
+    if (percentage <= 40) return mainStore.theme.value.HeadColor.withAlpha(120);
+    if (percentage <= 60) return mainStore.theme.value.HeadColor.withAlpha(160);
+    if (percentage <= 80) return mainStore.theme.value.HeadColor.withAlpha(200);
+    if (percentage <= 90) return mainStore.theme.value.HeadColor.withAlpha(250);
     return Colors.transparent;
   }
 
@@ -115,6 +128,7 @@ class CalenderReportController extends GetxController {
               .where((w) => w.serviceId == s.id)
               .map(
                 (m) => CalendarSlotDetails(
+                  slotId: m.id,
                   slot: "${m.startTime} - ${m.endTime}",
                   booked: m.bookingCount,
                   totalAttendance: m.totalAttend,

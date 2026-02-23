@@ -3,14 +3,19 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
+import 'package:healthandwellness/app/mainstore.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
 import 'package:healthandwellness/features/home/controller/home_controller.dart';
 import 'package:healthandwellness/features/login/data/user.dart';
 
 import '../../../core/utility/firebase_service.dart';
+import '../../Master/branch/branch_model.dart';
 
 class Authenticator extends GetxController {
   UserG? state;
+
+  BranchModel? branch;
+  Stream<User?>? authCheck;
   late FB _firebase;
   @override
   void onInit() async {
@@ -33,6 +38,8 @@ class Authenticator extends GetxController {
           await db.collection("User").doc(user.uid).update({"token": _firebase.token});
         }
         state = UserG.fromJSON(makeMapSerialize(querySnapshot.data()));
+        final branchResp = await db.collection('Branch').doc(state!.branchId).get();
+        branch = BranchModel.fromJSON(makeMapSerialize(branchResp.data()));
         update();
         return true;
       } else {
@@ -63,6 +70,8 @@ class Authenticator extends GetxController {
             return false;
           }
           state = UserG.fromJSON(makeMapSerialize(resp.data()));
+          final branchResp = await db.collection('Branch').doc(state!.branchId).get();
+          branch = BranchModel.fromJSON(makeMapSerialize(branchResp.data()));
           update();
           return true;
         } else {
@@ -88,7 +97,10 @@ class Authenticator extends GetxController {
         Get.delete<HomeController>();
       }
       await auth.signOut();
+      final mainStore = Get.find<MainStore>();
+      mainStore.bottomNavBarIndex.value = 0;
       state = null;
+      branch = null;
       update();
       // Get.offAllNamed("/login");
     } catch (e) {

@@ -135,7 +135,12 @@ class HomeController extends GetxController {
             .get();
       }
       final sessions = resp.docs.map((m) => SlotModel.fromFirestore(m)).toList();
-      sessions.sort((a, b) => parseInt(data: a.date.replaceAll("-", ""), defaultInt: 0).compareTo(parseInt(data: b.date.replaceAll("-", ""), defaultInt: 0)));
+      sessions.sort(
+        (a, b) => parseInt(
+          data: (a.date + a.endTime).replaceAll("-", "").replaceAll(":", ""),
+          defaultInt: 0,
+        ).compareTo(parseInt(data: (b.date + b.endTime).replaceAll("-", "").replaceAll(":", ""), defaultInt: 0)),
+      );
       // sessions.sort(
       //   (a, b) => (parseInt(data: a.date.replaceAll("-", ""), defaultInt: 0)+parseInt(data: a.endTime.replaceAll(":", ""), defaultInt: 0)).compareTo(parseInt(data: a.date.replaceAll("-", ""), defaultInt: 0) + parseInt(data: b.endTime.replaceAll(":", ""), defaultInt: 0)),
       // );
@@ -163,6 +168,7 @@ class HomeController extends GetxController {
           slots: slots
               .map(
                 (s) => CalendarSlotDetails(
+                  slotId: s.id,
                   slot: "${s.startTime} - ${s.endTime}",
                   booked: s.bookingCount,
                   totalBooked: s.bookingCount,

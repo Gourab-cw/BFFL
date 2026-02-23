@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:healthandwellness/app/mainstore.dart';
 import 'package:healthandwellness/core/Picklist/picklist_provider.dart';
 import 'package:healthandwellness/core/utility/app_loader.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
@@ -43,8 +44,7 @@ class _UserAddState extends State<UserAdd> {
     return AppLoader(
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.green.shade300,
-          title: TextHelper(text: "Add Member", fontsize: 18),
+          title: Text("Add Member"),
           actions: [
             ButtonHelperG(
               onTap: () async {
@@ -131,7 +131,7 @@ class _UserAddState extends State<UserAdd> {
                           autofocus: false,
                           hasContentOutside: true,
                           propagateGesturesToChild: true,
-                          expandedBackgroundColor: Colors.green.shade100,
+                          expandedBackgroundColor: getMainStore().theme.value.lowShadeColor,
                           backgroundColor: Colors.blueGrey.shade50,
                           borderRadius: BorderRadius.circular(0),
                           showBorder: false,
@@ -283,7 +283,7 @@ class _UserAddState extends State<UserAdd> {
                         MoonAccordion(
                           hasContentOutside: true,
                           propagateGesturesToChild: true,
-                          expandedBackgroundColor: Colors.green.shade100,
+                          expandedBackgroundColor: getMainStore().theme.value.lowShadeColor,
                           backgroundColor: Colors.blueGrey.shade50,
                           borderRadius: BorderRadius.circular(0),
                           showBorder: false,
@@ -381,7 +381,7 @@ class _UserAddState extends State<UserAdd> {
                         ),
                         MoonAccordion(
                           hasContentOutside: true,
-                          expandedBackgroundColor: Colors.green.shade100,
+                          expandedBackgroundColor: getMainStore().theme.value.lowShadeColor,
                           backgroundColor: Colors.blueGrey.shade50,
                           propagateGesturesToChild: true,
                           borderRadius: BorderRadius.circular(0),

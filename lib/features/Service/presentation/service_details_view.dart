@@ -41,7 +41,9 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView> {
         await service.getServiceDetails(service.selectedService!.id, auth.state!.branchId);
       }
       if (auth.state != null) {
-        service.selectedMember = {"id": auth.state!.id, "name": auth.state!.name, "value": auth.state!.name};
+        if (auth.state!.userType == UserType.member) {
+          service.selectedMember = {"id": auth.state!.id, "name": auth.state!.name, "value": auth.state!.name};
+        }
         service.update();
         setState(() {
           makingBooking = true;
@@ -87,7 +89,7 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView> {
         if (s == null) {
           return Scaffold(
             appBar: AppBar(
-              title: TextHelper(text: "Details", fontsize: 15, fontweight: FontWeight.w600),
+              title: TextHelper(text: "Details", fontsize: 15, fontweight: FontWeight.w600, color: getMainStore().theme.value.BackgroundColor),
             ),
             body: Center(
               child: TextHelper(text: "No service found!", fontsize: 20, textalign: TextAlign.center),
@@ -97,7 +99,7 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView> {
         return AppLoader(
           child: Scaffold(
             appBar: AppBar(
-              title: TextHelper(text: "Details", fontsize: 15, fontweight: FontWeight.w600),
+              title: TextHelper(text: "Details", fontsize: 15, fontweight: FontWeight.w600, color: getMainStore().theme.value.BackgroundShadeColor),
             ),
             body: SingleChildScrollView(
               child: Padding(
@@ -216,7 +218,7 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           const SizedBox(height: 15),
-                          TextHelper(text: "Slot Booking", color: Colors.green, fontweight: FontWeight.w600, fontsize: 14),
+                          TextHelper(text: "Slot Booking", color: getMainStore().theme.value.HeadColor, fontweight: FontWeight.w600, fontsize: 14),
                           Divider(),
                           TextHelper(
                             text: "Select Date",
@@ -235,8 +237,8 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView> {
                                 animateToDisplayedMonthDate: true,
                                 calendarType: CalendarDatePicker2Type.single,
                                 calendarViewMode: CalendarDatePicker2Mode.day,
-                                daySplashColor: Colors.green.shade50,
-                                selectedDayHighlightColor: Colors.green.shade300,
+                                daySplashColor: getMainStore().theme.value.lowShadeColor,
+                                selectedDayHighlightColor: getMainStore().theme.value.mediumShadeColor.withAlpha(10),
                                 firstDate: DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day),
                                 lastDate: DateTime(2090),
                                 dayBuilder:
@@ -254,7 +256,9 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView> {
                                           height: 42,
                                           decoration: BoxDecoration(
                                             borderRadius: BorderRadius.circular(30),
-                                            color: parseBool(data: isSelected, defaultValue: false) ? Colors.green.shade50 : Colors.transparent,
+                                            color: parseBool(data: isSelected, defaultValue: false)
+                                                ? getMainStore().theme.value.lowShadeColor
+                                                : Colors.transparent,
                                           ),
                                           child: Center(
                                             child: TextHelper(
@@ -263,9 +267,9 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView> {
                                               color: isDisabled == true
                                                   ? Colors.blueGrey.shade200
                                                   : isSelected == true
-                                                  ? Colors.green.shade700
+                                                  ? getMainStore().theme.value.HeadColor
                                                   : service.haveSlot(DateFormat('yyyy-MM-dd').format(date)) == true
-                                                  ? Colors.blue
+                                                  ? getMainStore().theme.value.secondaryColor
                                                   : service.haveSlot(DateFormat('yyyy-MM-dd').format(date)) == null
                                                   ? Colors.blueGrey.shade600
                                                   : Colors.red.shade600,
@@ -274,7 +278,7 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView> {
                                         ),
                                       );
                                     },
-                                selectedDayTextStyle: TextStyle(color: Colors.green),
+                                selectedDayTextStyle: TextStyle(color: getMainStore().theme.value.HeadColor),
                                 firstDayOfWeek: 1,
                               ),
                               value: [service.selectedDate],
@@ -310,7 +314,7 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView> {
                                           width: 100,
                                           height: 30,
                                           decoration: BoxDecoration(
-                                            color: service.selectedSlot?.id == m.id ? Colors.green.shade100 : Colors.white,
+                                            color: service.selectedSlot?.id == m.id ? getMainStore().theme.value.lowShadeColor : Colors.white,
                                             border: Border.all(
                                               color: service.availableSlot(m, withRescheduleData: service.selectedReschedule) == null
                                                   ? Colors.red
@@ -346,7 +350,7 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView> {
                                           width: 100,
                                           height: 30,
                                           decoration: BoxDecoration(
-                                            color: service.selectedSlot?.id == m.id ? Colors.green.shade100 : Colors.white,
+                                            color: service.selectedSlot?.id == m.id ? getMainStore().theme.value.lowShadeColor : Colors.white,
                                             border: Border.all(
                                               color: service.availableSlot(m, withRescheduleData: service.selectedReschedule) == null
                                                   ? Colors.red
@@ -382,7 +386,7 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView> {
                                           width: 100,
                                           height: 30,
                                           decoration: BoxDecoration(
-                                            color: service.selectedSlot?.id == m.id ? Colors.green.shade100 : Colors.white,
+                                            color: service.selectedSlot?.id == m.id ? getMainStore().theme.value.lowShadeColor : Colors.white,
                                             border: Border.all(
                                               color: service.availableSlot(m, withRescheduleData: service.selectedReschedule) == null
                                                   ? Colors.red
@@ -408,7 +412,8 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView> {
                                   SizedBox(
                                     width: MediaQuery.sizeOf(context).width - 120 > 300 ? 300 : MediaQuery.sizeOf(context).width - 120,
                                     child: AsyncSelect(
-                                      backgroundColor: Colors.green.shade50,
+                                      backgroundColor: mainStore.theme.value.lowShadeColor,
+                                      withBorder: true,
                                       disabled: auth.state?.userType == UserType.member,
                                       parentHeight: 40,
                                       onValueChange: (v) {
@@ -470,6 +475,10 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView> {
                                 service.update();
                                 await memberHomeController.getBookings();
                                 if (isReschedule) {
+                                  final arg = Get.arguments;
+                                  if (arg != null && arg is Function) {
+                                    await arg();
+                                  }
                                   goBack(context);
                                   goBack(context);
                                 }

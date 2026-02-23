@@ -1,0 +1,40 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:healthandwellness/core/utility/firebase_service.dart';
+import 'package:healthandwellness/core/utility/helper.dart';
+import 'package:healthandwellness/features/login/repository/authenticator.dart';
+import 'package:healthandwellness/features/slot_manage/data/slot_making_model.dart';
+import 'package:intl/intl.dart';
+
+class SlotDetailsTrainerController extends GetxController {
+  final fb = Get.find<FB>();
+  final auth = Get.find<Authenticator>();
+  List<SlotModel> slots = [];
+  DateTimeRange date = DateTimeRange(start: DateTime.now(), end: DateTime.now().add(Duration(days: 7)));
+
+  Future<void> getSlots() async {
+    final db = await fb.getDB();
+    final resp = await db
+        .collection('slots')
+        .where('date', isGreaterThanOrEqualTo: DateFormat('yyyy-MM-dd').format(date.start))
+        .where('date', isLessThanOrEqualTo: DateFormat('yyyy-MM-dd').format(date.end))
+        .where('trainerId', isEqualTo: auth.state!.id)
+        .get();
+    slots = resp.docs.map((m) => SlotModel.fromFirestore(m)).toList();
+    slots.sort(
+      (a, b) => parseInt(
+        data: (a.date + a.endTime).replaceAll('-', '').replaceAll(':', ''),
+        defaultInt: 0,
+      ).compareTo(parseInt(data: (b.date + b.endTime).replaceAll('-', '').replaceAll(':', ''), defaultInt: 0)),
+    );
+    // Map<String, List<SlotModel>> max = {};
+    // for (final s in slots) {
+    //   if (max[s.date] == null) {
+    //     max[s.date] = [s];
+    //   } else {
+    //     max[s.date]?.add(s);
+    //   }
+    // }
+    update();
+  }
+}

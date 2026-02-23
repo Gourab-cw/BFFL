@@ -98,7 +98,6 @@ class _CalenderReportState extends State<CalenderReport> {
                     ),
                     value: [calenderReportController.selectedDate],
                     onValueChanged: (v) {
-                      logG(v);
                       if (v.isNotEmpty) {
                         calenderReportController.selectedDate = v[0];
                         calenderReportController.update();
@@ -134,7 +133,7 @@ class _CalenderReportState extends State<CalenderReport> {
                           SizedBox(
                             height: 200,
                             child: DataGridHelper3(
-                              headerColor: Colors.green.shade100,
+                              headerColor: mainStore.theme.value.mediumShadeColor,
                               dataSource: m.slots.map((m) => m.toJSON()).toList(),
                               fontSize: 12,
                               columnList: [

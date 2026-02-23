@@ -1,10 +1,20 @@
 import 'package:get/get.dart';
+import 'package:healthandwellness/core/Theme/theme.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
 import 'package:healthandwellness/features/user_type/data/user_type.dart';
 
 import '../core/utility/firebase_service.dart';
 
+MainStore getMainStore() {
+  if (!Get.isRegistered<MainStore>()) {
+    Get.lazyPut(() => MainStore(), fenix: true);
+  }
+  return Get.find<MainStore>();
+}
+
 class MainStore extends GetxController {
+  Rx<BTheme> theme = BergerTheme.themes[7].obs;
+  bool appInit = false;
   late FirebaseG firebaseG;
   Rx<bool> giveCallLogRequiredPermission = false.obs;
   List<UserTypeModel> userTypes = [];

@@ -2,6 +2,7 @@ import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:healthandwellness/app/mainstore.dart';
 import 'package:intl/intl.dart';
 import 'package:moon_design/moon_design.dart';
 
@@ -210,6 +211,7 @@ class DateRangePicker extends StatefulHookWidget {
   final bool autofocus;
   final bool withSingleSelect;
   final Color backgroundColor;
+  Color? fontColor;
   Widget? leading;
   bool withClear;
   final Widget? leadingIcon;
@@ -222,6 +224,7 @@ class DateRangePicker extends StatefulHookWidget {
     this.height = 50,
     this.leading,
     this.backgroundColor = Colors.white,
+    this.fontColor,
     this.withBorder = false,
     this.disable = false,
     this.withClear = false,
@@ -285,7 +288,7 @@ class _DateRangePickerState extends State<DateRangePicker> {
                     allowSameValueSelection: true,
                     dynamicCalendarRows: true,
                     daySplashColor: Colors.blue.shade100,
-                    selectedDayHighlightColor: Colors.blueAccent.shade200,
+                    selectedDayHighlightColor: getMainStore().theme.value.secondaryColor,
                     selectedRangeHighlightColor: Colors.blueAccent.shade100.withAlpha(40),
                     rangeBidirectional: true,
                     animateToDisplayedMonthDate: true,
@@ -389,6 +392,7 @@ class _DateRangePickerState extends State<DateRangePicker> {
             onTap: () {
               if (!widget.disable) showDatePicker(context);
             },
+            fontColor: widget.fontColor,
             autofocus: widget.autofocus,
             readonly: true,
             fontWeight: FontWeight.w600,

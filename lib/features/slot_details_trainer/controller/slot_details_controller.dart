@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:healthandwellness/core/utility/firebase_service.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
 import 'package:healthandwellness/features/Service/data/session_model.dart';
+import 'package:healthandwellness/features/login/data/user.dart';
 import 'package:healthandwellness/features/login/repository/authenticator.dart';
 import 'package:healthandwellness/features/slot_manage/data/slot_making_model.dart';
 
@@ -38,12 +39,21 @@ class SlotDetailsController extends GetxController {
     }
   }
 
-  Future<void> getSlotDetails() async {
+  Future<void> getSlotDetails({SlotModel? selectedSlot}) async {
     if (slot == null) {
-      throw Exception("Slot not found!");
+      if (selectedSlot == null) {
+        throw Exception("Slot not found!");
+      } else {
+        slot = selectedSlot;
+      }
     }
     final fb = Get.find<FB>();
     final db = await fb.getDB();
+    if (slot!.trainerName == null || slot!.trainerName == "") {
+      final trainerResp = await db.collection('User').doc(slot!.trainerId).get();
+      UserG trainer = UserG.fromJSON(makeMapSerialize(trainerResp.data()));
+      slot = slot!.copyWith(trainerName: trainer.name);
+    }
     sessionListener = db.collection('session').where('slotId', isEqualTo: slot!.id).where('isActive', isEqualTo: true).snapshots().listen((data) async {
       for (var f in data.docChanges) {
         final ss = SessionModel.fromFirestore(f.doc);

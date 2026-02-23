@@ -6,7 +6,10 @@ import '../../features/calendar_report/controller/calendar_report_controller.dar
 import '../../features/home/controller/member_home_controller.dart';
 import '../../features/member_approve/controller/member_approve_controller.dart';
 import '../../features/members/controller/member_controller.dart';
+import '../../features/receptionist/schedule/controller/daily_schedule_controller.dart';
 import '../../features/slot_details_trainer/controller/slot_details_controller.dart';
+import '../../features/slot_details_trainer/controller/slot_details_register_controller.dart';
+import '../../features/slot_register/controller/slot_register_controller.dart';
 import '../../features/subscriptions/controller/subscription_controller.dart';
 import '../../features/user_subscription/controller/user_subscription_controller.dart';
 
@@ -23,5 +26,8 @@ class InitBindings extends Bindings {
     Get.lazyPut(() => CalenderReportController(), fenix: true);
     Get.lazyPut(() => SlotDetailsController(), fenix: true);
     Get.lazyPut(() => UserSubscriptionController(), fenix: true);
+    Get.lazyPut(() => SlotDetailsTrainerController(), fenix: true);
+    Get.lazyPut(() => DailyScheduleController(), fenix: true);
+    Get.lazyPut(() => SlotRegisterController(), fenix: true);
   }
 }

@@ -68,9 +68,9 @@ class _HomeTrainerState extends State<HomeTrainer> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Container(
-                              decoration: BoxDecoration(color: Colors.green.shade300, borderRadius: BorderRadius.circular(40)),
+                              decoration: BoxDecoration(color: getMainStore().theme.value.HeadColor, borderRadius: BorderRadius.circular(40)),
                               padding: EdgeInsets.all(4),
-                              child: Icon(Icons.person_rounded, color: Colors.green.shade900, size: 24),
+                              child: Icon(Icons.person_rounded, color: getMainStore().theme.value.lowShadeColor.withAlpha(200), size: 24),
                             ),
                             TextHelper(text: "Hello, ${user.state?.name ?? ""}", fontsize: 15, fontweight: FontWeight.w600),
                           ],
@@ -158,47 +158,53 @@ class _HomeTrainerState extends State<HomeTrainer> {
                                       }
                                     },
                                     child: Container(
-                                      alignment: Alignment.center,
-                                      margin: EdgeInsets.symmetric(horizontal: 5),
-                                      child: Badge(
-                                        backgroundColor: Colors.blueGrey,
-                                        isLabelVisible: m.bookingCount > 0,
-                                        label: Text(m.bookingCount.toString()),
-                                        child: Container(
-                                          // margin: EdgeInsets.all(10),
-                                          padding: EdgeInsets.all(10),
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            border: Border.all(color: Colors.green.shade50),
-                                            borderRadius: BorderRadius.circular(10),
+                                      margin: EdgeInsets.all(10),
+                                      padding: EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
+                                        color: getMainStore().theme.value.mediumShadeColor.withAlpha(50),
+                                        border: Border.all(color: Colors.green.shade50),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          TextHelper(
+                                            text: subscriptionController.list.firstWhereOrNull((s) => s.id == m.serviceId)?.name ?? "",
+                                            isWrap: true,
+                                            color: Colors.blueGrey.shade800,
+                                            fontweight: FontWeight.w600,
                                           ),
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                          Row(
+                                            spacing: 5,
                                             children: [
+                                              Icon(Icons.watch_later_outlined, size: 17, color: getMainStore().theme.value.LightTextColor.withAlpha(150)),
                                               TextHelper(
-                                                text: subscriptionController.list.firstWhereOrNull((s) => s.id == m.serviceId)?.name ?? "",
-                                                isWrap: true,
-                                                color: Colors.blueGrey.shade800,
-                                                fontweight: FontWeight.w600,
-                                              ),
-                                              Row(
-                                                spacing: 5,
-                                                children: [
-                                                  Icon(Icons.watch_later_outlined, size: 17, color: Colors.blueGrey.shade500),
-                                                  TextHelper(text: "${m.startTime} - ${m.endTime}", width: 80, fontsize: 12, color: Colors.blueGrey.shade400),
-                                                ],
-                                              ),
-                                              Row(
-                                                spacing: 5,
-                                                children: [
-                                                  Icon(Icons.calendar_month_rounded, size: 17, color: Colors.blueGrey.shade500),
-                                                  TextHelper(text: "${m.date}", width: 80, fontsize: 12, color: Colors.blueGrey.shade400),
-                                                ],
+                                                text: "${m.startTime} - ${m.endTime}",
+                                                width: 80,
+                                                fontsize: 12,
+                                                color: getMainStore().theme.value.LightTextColor,
                                               ),
                                             ],
                                           ),
-                                        ),
+                                          Row(
+                                            spacing: 5,
+                                            children: [
+                                              Icon(Icons.calendar_month_rounded, size: 17, color: getMainStore().theme.value.LightTextColor.withAlpha(150)),
+                                              TextHelper(
+                                                text: parseDateToString(
+                                                  data: m.date,
+                                                  formatDate: 'dd-MM-yyyy',
+                                                  predefinedDateFormat: 'yyyy-MM-dd',
+                                                  defaultValue: '',
+                                                ),
+                                                width: 80,
+                                                fontsize: 12,
+                                                color: getMainStore().theme.value.LightTextColor,
+                                              ),
+                                            ],
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   );
@@ -223,7 +229,7 @@ class _HomeTrainerState extends State<HomeTrainer> {
                                         Row(
                                           spacing: 5,
                                           children: [
-                                            Image(image: AssetImage("assets/booking.png"), color: Colors.blueGrey.shade700, width: 20, height: 20),
+                                            Image(image: AssetImage("assets/booking.png"), color: getMainStore().theme.value.HeadColor, width: 20, height: 20),
                                             TextHelper(text: "Today's Booking", fontweight: FontWeight.w600),
                                           ],
                                         ),
@@ -267,11 +273,11 @@ class _HomeTrainerState extends State<HomeTrainer> {
                                               );
                                             },
                                             // isHorizontal: false,
-                                            tooltipColor: Colors.green.shade300,
-                                            borderColor: Colors.green.shade300,
+                                            tooltipColor: getMainStore().theme.value.mediumShadeColor,
+                                            borderColor: getMainStore().theme.value.mediumShadeColor,
                                             gradient: LinearGradient(
                                               begin: AlignmentGeometry.bottomCenter,
-                                              colors: [Colors.green.shade50, Colors.green.shade50],
+                                              colors: [getMainStore().theme.value.lowShadeColor, getMainStore().theme.value.lowShadeColor],
                                             ),
                                             showBorder: false,
                                             showYAxis: true,
@@ -297,13 +303,17 @@ class _HomeTrainerState extends State<HomeTrainer> {
                                                             children: [
                                                               Icon(
                                                                 MoonIcons.generic_ticket_24_regular,
-                                                                color: homeController.selectedIndex.value == m.id ? Colors.green : Colors.grey.shade700,
+                                                                color: homeController.selectedIndex.value == m.id
+                                                                    ? getMainStore().theme.value.HeadColor
+                                                                    : Colors.grey.shade700,
                                                               ),
                                                               Expanded(
                                                                 child: TextHelper(
                                                                   text: m.serviceName,
                                                                   fontweight: FontWeight.w500,
-                                                                  color: homeController.selectedIndex.value == m.id ? Colors.green : Colors.grey.shade900,
+                                                                  color: homeController.selectedIndex.value == m.id
+                                                                      ? getMainStore().theme.value.HeadColor
+                                                                      : Colors.grey.shade700,
                                                                 ),
                                                               ),
                                                             ],
@@ -313,7 +323,9 @@ class _HomeTrainerState extends State<HomeTrainer> {
                                                           text: m.totalBooked.toString(),
                                                           fontsize: 14,
                                                           fontweight: FontWeight.w500,
-                                                          color: homeController.selectedIndex.value == m.id ? Colors.green : Colors.grey.shade900,
+                                                          color: homeController.selectedIndex.value == m.id
+                                                              ? getMainStore().theme.value.HeadColor
+                                                              : Colors.grey.shade900,
                                                         ),
                                                         ButtonHelperG(
                                                           onTap: () {

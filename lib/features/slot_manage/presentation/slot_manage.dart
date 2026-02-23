@@ -53,7 +53,7 @@ class _SlotManageState extends State<SlotManage> {
         return AppLoader(
           child: Scaffold(
             appBar: AppBar(
-              title: TextHelper(text: "Slot Manage", fontsize: 15, fontweight: FontWeight.w600),
+              title: Text("Slot Manage"),
               actions: [
                 ButtonHelperG(
                   onTap: () async {
@@ -70,7 +70,7 @@ class _SlotManageState extends State<SlotManage> {
                     }
                   },
                   label: TextHelper(text: "Save"),
-                  background: Colors.white,
+                  background: getMainStore().theme.value.lowShadeColor,
                   shadow: [],
                   width: 80,
                 ),
@@ -178,12 +178,11 @@ class _SlotManageState extends State<SlotManage> {
                           try {
                             loader.startLoading();
                             await slotController.slotDataFeel();
-                          }catch(e){
+                          } catch (e) {
                             showAlert("$e", AlertType.error);
-                          }finally{
+                          } finally {
                             loader.stopLoading();
                           }
-
                         },
                         height: 35,
                         icon: Icon(Icons.calendar_month, color: Colors.white, size: 16),

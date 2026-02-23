@@ -156,7 +156,7 @@ class TextHelper extends StatelessWidget {
             !camalToLabel ? text : makeCamalToLabel(text),
             softWrap: isWrap,
             style: TextStyle(
-              color: color ?? (mainStore.isDarkEnable.value ? Colors.blueGrey.shade200 : Colors.grey.shade900),
+              color: color ?? (mainStore.isDarkEnable.value ? Colors.blueGrey.shade200 : mainStore.theme.value.LightTextColor),
               fontSize: fontsize,
               fontWeight: fontweight,
               overflow: isWrap ? TextOverflow.visible : TextOverflow.ellipsis,
@@ -281,7 +281,7 @@ class _MultiSwitchBoxGState extends State<MultiSwitchBoxG> {
                       value: m.value,
                       groupValue: m.groupValue ?? m.value,
                       onChanged: (v) => m.onTap(v ?? false),
-                      activeColor: Colors.green,
+                      activeColor: getMainStore().theme.value.BottomNavColor,
                       tapAreaSizeValue: 30,
                     )
                   : MoonSwitch(
@@ -328,6 +328,7 @@ class TextBox extends StatefulWidget {
   final String? labelText;
   final Color? labelTextBackgroundColor;
   final Color? backgroundColor;
+  final Color? fontColor;
   final Function? onTap;
   final bool selectTextOnFocus;
   final bool autofocus;
@@ -367,6 +368,7 @@ class TextBox extends StatefulWidget {
     this.labelText,
     this.labelTextBackgroundColor,
     this.backgroundColor,
+    this.fontColor,
     this.borderRadius = 8,
     this.leading,
     this.trailing,
@@ -441,12 +443,9 @@ class _TextBoxState extends State<TextBox> {
             textAlign: widget.textAlign,
             autofillHints: widget.autofillHints,
             borderRadius: BorderRadius.circular(widget.borderRadius),
-            style: TextStyle(
-              // fontSize: 9
-              fontSize: widget.fontSize,
-              fontWeight: widget.fontWeight,
-            ),
+            style: TextStyle(color: widget.fontColor, fontSize: widget.fontSize, fontWeight: widget.fontWeight),
             padding: EdgeInsets.only(left: widget.leftPadding),
+
             inputFormatters: <TextInputFormatter>[if (widget.keyboard == TextInputType.number) FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))],
             onTap: () {
               if (widget.selectTextOnFocus && widget.controller.selection.end < widget.controller.value.text.length) {
@@ -478,7 +477,7 @@ class _TextBoxState extends State<TextBox> {
                 widget.onTapOutside!();
               }
             },
-            textColor: widget.mainStore.isDarkEnable.value ? Colors.grey[400] : Colors.grey[900],
+            textColor: widget.fontColor ?? (widget.mainStore.isDarkEnable.value ? Colors.grey[400] : Colors.grey[900]),
             backgroundColor: widget.backgroundColor ?? (widget.mainStore.isDarkEnable.value ? Colors.grey[900] : Colors.grey[50]),
             activeBorderColor: (!widget.withBorder && !isActive)
                 ? Colors.transparent
@@ -487,8 +486,8 @@ class _TextBoxState extends State<TextBox> {
                       ? Colors.grey[400]
                       : Colors.grey[400]
                 : widget.mainStore.isDarkEnable.value
-                ? Colors.green[600]
-                : Colors.green[600],
+                ? getMainStore().theme.value.HeadColor
+                : getMainStore().theme.value.HeadColor,
             inactiveBorderColor: !widget.withBorder
                 ? Colors.transparent
                 : widget.mainStore.isDarkEnable.value
@@ -519,7 +518,7 @@ class _TextBoxState extends State<TextBox> {
                   text: " ${widget.labelText} ",
                   fontsize: (widget.fontSize! - 1.6),
                   color: (isActive && !widget.readonly)
-                      ? Colors.green
+                      ? getMainStore().theme.value.HeadColor
                       : widget.mainStore.isDarkEnable.value
                       ? Colors.grey.shade400
                       : Colors.grey[700],
@@ -683,8 +682,8 @@ class _TextAreaBoxState extends State<TextAreaBox> {
           activeBorderColor: !widget.withBorder
               ? Colors.transparent
               : widget.mainStore.isDarkEnable.value
-              ? Colors.green[800]
-              : Colors.green[700],
+              ? getMainStore().theme.value.HeadColor
+              : getMainStore().theme.value.HeadColor,
           inactiveBorderColor: !widget.withBorder
               ? Colors.transparent
               : widget.mainStore.isDarkEnable.value
@@ -715,7 +714,7 @@ class _TextAreaBoxState extends State<TextAreaBox> {
                 text: " ${widget.labelText} ",
                 fontsize: (widget.fontSize! - 1.6),
                 color: (isActive && !widget.readonly)
-                    ? Colors.green
+                    ? getMainStore().theme.value.HeadColor
                     : widget.mainStore.isDarkEnable.value
                     ? Colors.grey.shade400
                     : Colors.grey[700],
@@ -793,9 +792,9 @@ class _DatePickerHelperState extends State<DatePickerHelper> {
           config: CalendarDatePicker2WithActionButtonsConfig(
             allowSameValueSelection: true,
             dynamicCalendarRows: true,
-            daySplashColor: Colors.green.shade100,
-            selectedDayHighlightColor: Colors.blueAccent.shade200,
-            selectedRangeHighlightColor: Colors.blueAccent.shade100.withAlpha(40),
+            daySplashColor: getMainStore().theme.value.lowShadeColor,
+            selectedDayHighlightColor: getMainStore().theme.value.secondaryColor,
+            selectedRangeHighlightColor: getMainStore().theme.value.lowShadeColor,
             rangeBidirectional: true,
             animateToDisplayedMonthDate: true,
             calendarType: CalendarDatePicker2Type.single,
@@ -924,10 +923,10 @@ class _SelectBoxHelperState extends State<SelectBoxHelper> {
                           decoration: BoxDecoration(
                             color: widget.isMultiValue
                                 ? widget.valueList.contains(m.id)
-                                      ? Colors.green[50]
+                                      ? getMainStore().theme.value.lowShadeColor
                                       : Colors.white
                                 : widget.value == m.id
-                                ? Colors.green[50]
+                                ? getMainStore().theme.value.lowShadeColor
                                 : Colors.white,
                             // border: Border.all(
                             //     width: 0,
@@ -943,8 +942,10 @@ class _SelectBoxHelperState extends State<SelectBoxHelper> {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              if (widget.isMultiValue && widget.valueList.contains(m.id)) Icon(FontAwesomeIcons.check, size: 11, color: Colors.green[700]),
-                              if (!widget.isMultiValue && widget.value == m.id) Icon(FontAwesomeIcons.check, size: 11, color: Colors.green[700]),
+                              if (widget.isMultiValue && widget.valueList.contains(m.id))
+                                Icon(FontAwesomeIcons.check, size: 11, color: getMainStore().theme.value.HeadColor),
+                              if (!widget.isMultiValue && widget.value == m.id)
+                                Icon(FontAwesomeIcons.check, size: 11, color: getMainStore().theme.value.HeadColor),
                               if (widget.value == m.id) const SizedBox(width: 6),
                               Text(
                                 parseString(data: m.value, defaultValue: ''),
@@ -952,10 +953,10 @@ class _SelectBoxHelperState extends State<SelectBoxHelper> {
                                   fontSize: 11,
                                   color: widget.isMultiValue
                                       ? widget.valueList.contains(m.id)
-                                            ? Colors.green[700]
+                                            ? getMainStore().theme.value.HeadColor
                                             : Colors.black
                                       : widget.value == m.id
-                                      ? Colors.green[700]
+                                      ? getMainStore().theme.value.HeadColor
                                       : Colors.black,
                                 ),
                               ),
@@ -983,7 +984,7 @@ class _SelectBoxHelperState extends State<SelectBoxHelper> {
                       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 6),
                       margin: const EdgeInsets.only(right: 10, bottom: 8),
                       decoration: BoxDecoration(
-                        color: widget.value == m.id ? Colors.green[50] : Colors.white,
+                        color: widget.value == m.id ? getMainStore().theme.value.lowShadeColor : Colors.white,
                         border: Border.all(width: 1, color: widget.value == m.id ? Color(0xFF0676FC) : Colors.blueGrey),
                         borderRadius: BorderRadius.circular(50),
                         boxShadow: [BoxShadow(color: Color(0xFF94B6C6), blurRadius: 5)],
@@ -991,11 +992,11 @@ class _SelectBoxHelperState extends State<SelectBoxHelper> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          if (widget.value == m.id) Icon(FontAwesomeIcons.check, size: 15, color: Colors.green[700]),
+                          if (widget.value == m.id) Icon(FontAwesomeIcons.check, size: 15, color: getMainStore().theme.value.HeadColor),
                           if (widget.value == m.id) const SizedBox(width: 6),
                           Text(
                             parseString(data: m.value, defaultValue: ''),
-                            style: TextStyle(color: widget.value == m.id ? Colors.green[700] : Colors.black),
+                            style: TextStyle(color: widget.value == m.id ? getMainStore().theme.value.HeadColor : Colors.black),
                           ),
                         ],
                       ),
@@ -1115,11 +1116,16 @@ class AreaChartHelper extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
-                    child: TextHelper(text: '${data.x}', color: Colors.green[100], textalign: TextAlign.center),
+                    child: TextHelper(text: '${data.x}', color: getMainStore().theme.value.lowShadeColor, textalign: TextAlign.center),
                   ),
                   Divider(),
                   Container(
-                    child: TextHelper(text: '${data.y}', color: Colors.green[100], fontweight: FontWeight.w600, textalign: TextAlign.center),
+                    child: TextHelper(
+                      text: '${data.y}',
+                      color: getMainStore().theme.value.lowShadeColor,
+                      fontweight: FontWeight.w600,
+                      textalign: TextAlign.center,
+                    ),
                   ),
                 ],
               ),
@@ -1225,11 +1231,16 @@ class BarChartHelper extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
-                    child: TextHelper(text: '${data.x}', color: Colors.green[100], textalign: TextAlign.center),
+                    child: TextHelper(text: '${data.x}', color: getMainStore().theme.value.lowShadeColor, textalign: TextAlign.center),
                   ),
                   Divider(),
                   Container(
-                    child: TextHelper(text: '${data.y}', color: Colors.green[100], fontweight: FontWeight.w600, textalign: TextAlign.center),
+                    child: TextHelper(
+                      text: '${data.y}',
+                      color: getMainStore().theme.value.lowShadeColor,
+                      fontweight: FontWeight.w600,
+                      textalign: TextAlign.center,
+                    ),
                   ),
                 ],
               ),
@@ -1312,11 +1323,16 @@ class PieChartHelper extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
-                    child: TextHelper(text: '${data.x}', color: Colors.green[100], textalign: TextAlign.center),
+                    child: TextHelper(text: '${data.x}', color: getMainStore().theme.value.lowShadeColor, textalign: TextAlign.center),
                   ),
                   Divider(),
                   Container(
-                    child: TextHelper(text: '${data.y}', color: Colors.green[100], fontweight: FontWeight.w600, textalign: TextAlign.center),
+                    child: TextHelper(
+                      text: '${data.y}',
+                      color: getMainStore().theme.value.lowShadeColor,
+                      fontweight: FontWeight.w600,
+                      textalign: TextAlign.center,
+                    ),
                   ),
                 ],
               ),
@@ -1431,8 +1447,8 @@ class _DropDownHelperGState extends State<DropDownHelperG> {
             SizedBox(
               width: 50,
               child: MoonCheckbox(
-                activeColor: Colors.green[50],
-                checkColor: Colors.green[800],
+                activeColor: getMainStore().theme.value.lowShadeColor,
+                checkColor: getMainStore().theme.value.HeadColor,
                 value: dropDownStore.selectedList.any((t) => t[widget.valueKey] == data[widget.valueKey]),
                 onChanged: (v) {
                   if (dropDownStore.selectedList.any((t) => t[widget.valueKey] == data[widget.valueKey])) {
@@ -1782,6 +1798,7 @@ enum ButtonHelperDirectionG { vertical, horizontal }
 class ButtonHelperG extends StatefulWidget {
   final Widget? label;
   final Color? background;
+  final Color? borderColor;
   final Widget? icon;
   final bool withSound;
   final bool withBorder;
@@ -1802,6 +1819,7 @@ class ButtonHelperG extends StatefulWidget {
     super.key,
     this.label,
     this.background,
+    this.borderColor,
     this.icon,
     this.shadow,
     this.width = 40,
@@ -1910,10 +1928,10 @@ class _ButtonHelperGState extends State<ButtonHelperG> {
               : widget.withBorder
               ? Border.all(
                   color: widget.type == ButtonHelperTypeG.outlined
-                      ? widget.background ?? Colors.grey.shade300
+                      ? widget.borderColor ?? widget.background ?? Colors.grey.shade300
                       : mainStore.isDarkEnable.value
                       ? Colors.black
-                      : Colors.grey.shade300,
+                      : widget.borderColor ?? Colors.grey.shade300,
                 )
               : Border.all(color: Colors.transparent),
           borderRadius: BorderRadius.circular(widget.borderRadius),
@@ -1925,7 +1943,7 @@ class _ButtonHelperGState extends State<ButtonHelperG> {
                       ? Colors.transparent
                       : mainStore.isDarkEnable.value
                       ? Colors.grey.shade700
-                      : Colors.grey.shade300,
+                      : widget.borderColor ?? mainStore.theme.value.BackgroundShadeColor,
                   offset: const Offset(0, 0),
                   spreadRadius: 0.005,
                   blurRadius: 10,
@@ -1967,7 +1985,7 @@ class _ButtonHelperGState extends State<ButtonHelperG> {
             height: widget.height,
             alignment: widget.alignment,
             decoration: BoxDecoration(
-              color: widget.type == ButtonHelperTypeG.outlined ? Colors.white : widget.background ?? Colors.green,
+              color: widget.type == ButtonHelperTypeG.outlined ? Colors.white : widget.background ?? getMainStore().theme.value.BottomNavColor,
               borderRadius: BorderRadius.circular(widget.borderRadius),
             ),
             child: widget.direction == ButtonHelperDirectionG.horizontal
@@ -2123,9 +2141,9 @@ class JsonViewerG extends StatelessWidget {
               fontweight: FontWeight.w500,
               fontsize: 13,
               color: (json.toString().toLowerCase() == 'true' || json.toString().toLowerCase() == 'false')
-                  ? Colors.green.shade600
+                  ? getMainStore().theme.value.HeadColor
                   : double.tryParse(json.toString()) != null
-                  ? Colors.green.shade600
+                  ? getMainStore().theme.value.HeadColor
                   : (json.toString().contains('#') && json.toString().length > 4 && json.toString().length < 9)
                   ? Colors.amber.shade600
                   : Colors.blueGrey.shade600,
@@ -2159,9 +2177,9 @@ showAlert(String content, AlertType alertType, [BuildContext? context, Duration?
       case AlertType.error:
         return Colors.red[50];
       case AlertType.success:
-        return Colors.green[100];
+        return getMainStore().theme.value.lowShadeColor;
       default:
-        return Colors.green[50];
+        return getMainStore().theme.value.lowShadeColor;
     }
   }
 
@@ -2444,7 +2462,7 @@ Color hexToColor(String hex) {
     }
     return Color(int.parse(hex, radix: 16));
   } catch (e) {
-    return Colors.green.shade300;
+    return getMainStore().theme.value.HeadColor;
   }
 }
 
@@ -2872,4 +2890,70 @@ Future<bool> getLocationPermission(BuildContext context) async {
 Future<Position> getCurrentLocation() async {
   Position pos = await location.getCurrentPosition(locationSettings: const LocationSettings(accuracy: LocationAccuracy.high, distanceFilter: 100));
   return pos;
+}
+
+Widget getNameIcon(String name, {Color? color, Color? borderColor, double? fontSize, double? width, double? height}) {
+  List<String> names = name.toUpperCase().split(' ').where((m) => m != '').map((m) => m.substring(0, 1)).toList();
+  String nameMod = names.length > 2 ? names.sublist(0, 2).join('') : names.join('');
+
+  return Container(
+    width: width ?? 40,
+    height: height ?? 40,
+    decoration: BoxDecoration(
+      color: color ?? Colors.blueGrey.shade50,
+      borderRadius: BorderRadius.circular(200),
+      border: Border.all(color: borderColor ?? Colors.blueGrey.shade100),
+    ),
+    child: TextHelper(fontsize: fontSize ?? 15, fontweight: FontWeight.w600, textalign: TextAlign.center, text: nameMod),
+  );
+}
+
+class CardHelper extends StatelessWidget {
+  final double height;
+  final double width;
+  final Color backgroundColor;
+  final double borderRadius;
+  final Alignment alignment;
+  final VoidCallback? onTap;
+  final Widget? child;
+  final EdgeInsetsGeometry padding;
+  final EdgeInsetsGeometry margin;
+  final List<BoxShadow>? boxShadow;
+
+  const CardHelper({
+    Key? key,
+    this.height = 120,
+    this.width = double.infinity,
+    this.backgroundColor = Colors.white,
+    this.borderRadius = 12,
+    this.alignment = Alignment.center,
+    this.onTap,
+    this.child,
+    this.padding = const EdgeInsets.all(12),
+    this.margin = const EdgeInsets.symmetric(vertical: 6),
+    this.boxShadow,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    Widget container = Container(
+      height: height,
+      width: width,
+      alignment: alignment,
+      padding: padding,
+      margin: margin,
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(borderRadius),
+        boxShadow: boxShadow ?? [BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 8, spreadRadius: 1, offset: const Offset(0, 4))],
+      ),
+      child: child,
+    );
+
+    if (onTap != null) {
+      return InkWell(borderRadius: BorderRadius.circular(borderRadius), onTap: onTap, child: container);
+    }
+
+    return container;
+  }
 }

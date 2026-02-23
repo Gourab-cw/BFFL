@@ -128,7 +128,7 @@ class _AttendanceState extends State<Attendance> {
               Expanded(
                 child: Center(
                   child: DataGridHelper3(
-                    headerColor: Colors.green.shade100,
+                    headerColor: getMainStore().theme.value.lowShadeColor,
                     withBorder: true,
                     dataSource: attendanceStore.getAttendanceDatasource(),
                     columnList: [

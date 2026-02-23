@@ -135,6 +135,7 @@ class ServiceController extends GetxController {
         "feedback": "",
         "trainerFeedback": "",
         "isTrail": false,
+        "branchId": auth.state!.branchId,
         "createdAt": Timestamp.now(),
       };
 

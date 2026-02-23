@@ -12,8 +12,12 @@ import '../features/Service/presentation/service_view.dart';
 import '../features/accountant/subscription/presentation/acc_subscription_details.dart';
 import '../features/members/controller/member_controller.dart';
 import '../features/members/presentation/member_session_details.dart';
+import '../features/slot_details_recptionist/presentation/slot_details_receptionist.dart';
+import '../features/slot_details_trainer/presentation/slot_details_register.dart';
 import '../features/slot_details_trainer/presentation/slot_details_trainer_view.dart';
 import '../features/slot_manage/presentation/slot_manage.dart';
+import '../features/slot_register/presentation/slot_register.dart';
+import '../features/staff_register/presentation/staff_register.dart';
 import '../features/subscriptions/controller/subscription_controller.dart';
 import '../features/user_add/controller/new_user_form_controller.dart';
 import '../features/user_add/presentation/user_add.dart';
@@ -33,4 +37,8 @@ final List<GetPage<dynamic>> routes = [
   GetPage(name: "/slotmanage", page: () => SlotManage(), bindings: [SlotControllerBinding(), SubscriptionControllerBinding()]),
   GetPage(name: "/usersubscriptionadd", page: () => UserSubscriptionAdd()),
   GetPage(name: "/accsubscriptiondetails", page: () => AccSubscriptionDetails()),
+  GetPage(name: "/slotdetailsregister", page: () => SlotDetailsRegister()),
+  GetPage(name: "/slotdetailsreceptionist", page: () => SlotDetailsReceptionist()),
+  GetPage(name: "/slotregister", page: () => SlotRegister()),
+  GetPage(name: "/staffregister", page: () => StaffRegister()),
 ];

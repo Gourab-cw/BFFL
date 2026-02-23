@@ -75,9 +75,7 @@ class _MemberDetailsState extends State<MemberDetails> {
       builder: (memberController) {
         if (user == null) {
           return Scaffold(
-            appBar: AppBar(
-              title: TextHelper(text: "Member Details", fontsize: 15, fontweight: FontWeight.w600),
-            ),
+            appBar: AppBar(title: Text("Member Details")),
             body: Center(
               child: TextHelper(text: "No user found!", fontsize: 20, textalign: TextAlign.center),
             ),
@@ -85,9 +83,7 @@ class _MemberDetailsState extends State<MemberDetails> {
         }
         return AppLoader(
           child: Scaffold(
-            appBar: AppBar(
-              title: TextHelper(text: "Member Details", fontsize: 15, fontweight: FontWeight.w600),
-            ),
+            appBar: AppBar(title: Text("Member Details")),
             body: Padding(
               padding: EdgeInsets.only(left: safePadding.left, top: safePadding.top, bottom: safePadding.bottom, right: safePadding.right),
               child: DefaultTabController(

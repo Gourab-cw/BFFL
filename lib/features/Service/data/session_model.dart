@@ -4,7 +4,9 @@ import 'package:healthandwellness/core/utility/helper.dart';
 class SessionModel {
   final String id;
   final String memberId;
+  final String branchId;
   final String? memberName;
+  final String? memberContact1;
   final String serviceId;
   final String subscriptionId;
   final String? serviceName;
@@ -30,7 +32,9 @@ class SessionModel {
   SessionModel({
     required this.id,
     required this.memberId,
+    required this.branchId,
     this.memberName,
+    this.memberContact1,
     required this.serviceId,
     this.serviceName,
     this.serviceDetails,
@@ -57,7 +61,9 @@ class SessionModel {
     return SessionModel(
       id: data['id'] ?? doc.id,
       memberId: data['memberId'] ?? '',
+      branchId: data['branchId'] ?? '',
       memberName: data['memberName'] ?? '',
+      memberContact1: data['memberContact1'] ?? '',
       serviceId: data['serviceId'] ?? '',
       slotId: data['slotId'] ?? '',
       subscriptionId: data['subscriptionId'] ?? '',
@@ -81,6 +87,7 @@ class SessionModel {
     return {
       'id': id,
       'memberId': memberId,
+      'branchId': branchId,
       'memberName': memberName,
       'serviceId': serviceId,
       'slotId': slotId,
@@ -104,7 +111,9 @@ class SessionModel {
   SessionModel copyWith({
     String? id,
     String? memberId,
+    String? branchId,
     String? memberName,
+    String? memberContact1,
     String? serviceId,
     String? subscriptionId,
     String? serviceName,
@@ -127,7 +136,9 @@ class SessionModel {
     return SessionModel(
       id: id ?? this.id,
       memberId: memberId ?? this.memberId,
+      branchId: branchId ?? this.branchId,
       memberName: memberName ?? this.memberName,
+      memberContact1: memberContact1 ?? this.memberContact1,
       serviceId: serviceId ?? this.serviceId,
       serviceName: serviceName ?? this.serviceName,
       serviceDetails: serviceDetails ?? this.serviceDetails,

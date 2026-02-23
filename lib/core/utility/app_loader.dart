@@ -39,7 +39,7 @@ class AppLoader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<AppLoaderController>();
+    final controller = Loader.getLoader();
 
     return Obx(() {
       return PopScope(
@@ -60,5 +60,41 @@ class AppLoader extends StatelessWidget {
         ),
       );
     });
+  }
+}
+
+class Loader {
+  Loader._internal();
+
+  static final Loader _instance = Loader._internal();
+
+  factory Loader() {
+    return _instance;
+  }
+  static AppLoaderController? loader;
+
+  static _init() {
+    if (loader == null) {
+      if (!Get.isRegistered<AppLoaderController>()) {
+        Get.put(AppLoaderController());
+      }
+      loader = Get.find<AppLoaderController>();
+    }
+  }
+
+  static AppLoaderController getLoader() {
+    _init();
+    return loader!;
+  }
+
+  static void startLoading() {
+    if (loader == null) {
+      _init();
+    }
+    loader!.startLoading();
+  }
+
+  static void stopLoading() {
+    loader!.stopLoading();
   }
 }
