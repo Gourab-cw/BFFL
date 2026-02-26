@@ -1022,6 +1022,7 @@ class AreaChartHelper extends StatelessWidget {
   final LinearGradient gradient;
   final String chartTitle;
   final bool showBorder;
+  final bool showToolTip;
   final bool showXAxis;
   final bool showYAxis;
   final bool enableTooltip;
@@ -1030,6 +1031,7 @@ class AreaChartHelper extends StatelessWidget {
   final Color gridXLineColor;
   final Color borderColor;
   final Color tooltipColor;
+  final int yAxisDecimalPlaces;
   final BorderDrawMode borderDrawMode;
   final Widget Function(ChartData data)? customTooltip;
   AreaChartHelper({
@@ -1039,9 +1041,11 @@ class AreaChartHelper extends StatelessWidget {
     required this.chartTitle,
     this.customTooltip,
     this.showBorder = false,
+    this.showToolTip = true,
     this.enableTooltip = true,
     this.showXAxis = true,
     this.showYAxis = true,
+    this.yAxisDecimalPlaces = 0,
     this.gridXLineColor = const Color(0x6ec8c8c8),
     this.gridYLineColor = const Color(0x6ec8c8c8),
     this.borderColor = const Color(0xff00e3ff),
@@ -1049,6 +1053,8 @@ class AreaChartHelper extends StatelessWidget {
     this.borderDrawMode = BorderDrawMode.excludeBottom,
     this.tooltipcircle = true,
   });
+
+  final mainStore = Get.find<MainStore>();
 
   @override
   Widget build(BuildContext context) {
@@ -1059,6 +1065,7 @@ class AreaChartHelper extends StatelessWidget {
         alignment: ChartAlignment.near,
         textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 11),
       ),
+      margin: EdgeInsets.zero,
       enableAxisAnimation: false,
       zoomPanBehavior: ZoomPanBehavior(enableMouseWheelZooming: false, enableDoubleTapZooming: false, enablePanning: false),
       primaryXAxis: CategoryAxis(
@@ -1069,6 +1076,7 @@ class AreaChartHelper extends StatelessWidget {
         rangePadding: ChartRangePadding.auto,
       ),
       primaryYAxis: NumericAxis(
+        decimalPlaces: yAxisDecimalPlaces,
         isVisible: showYAxis,
         labelStyle: const TextStyle(fontSize: 9.5),
         majorGridLines: const MajorGridLines(width: 0),
@@ -1085,7 +1093,7 @@ class AreaChartHelper extends StatelessWidget {
           }).toList(),
           markerSettings: MarkerSettings(
             color: Colors.white,
-            isVisible: true,
+            isVisible: showToolTip,
             shape: tooltipcircle ? DataMarkerType.circle : DataMarkerType.rectangle,
             borderColor: tooltipColor,
             width: 10,
@@ -1103,29 +1111,24 @@ class AreaChartHelper extends StatelessWidget {
       ],
       tooltipBehavior: TooltipBehavior(
         enable: true,
-        color: Colors.blueAccent[800],
+        color: mainStore.theme.value.HeadColor.withAlpha(200),
         builder: (dynamic data, dynamic point, dynamic series, int pointIndex, int seriesIndex) {
           if ((customTooltip != null)) {
             return customTooltip!(data);
           } else {
             return Container(
-              color: const Color(0xFF040A0E),
+              color: mainStore.theme.value.HeadColor.withAlpha(200),
               width: 110,
               height: 70,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
-                    child: TextHelper(text: '${data.x}', color: getMainStore().theme.value.lowShadeColor, textalign: TextAlign.center),
+                    child: TextHelper(text: '${data.x}', color: mainStore.theme.value.lowShadeColor, textalign: TextAlign.center),
                   ),
                   Divider(),
                   Container(
-                    child: TextHelper(
-                      text: '${data.y}',
-                      color: getMainStore().theme.value.lowShadeColor,
-                      fontweight: FontWeight.w600,
-                      textalign: TextAlign.center,
-                    ),
+                    child: TextHelper(text: '${data.y}', color: mainStore.theme.value.lowShadeColor, fontweight: FontWeight.w600, textalign: TextAlign.center),
                   ),
                 ],
               ),

@@ -56,8 +56,8 @@ class _SlotDetailsRegisterState extends State<SlotDetailsRegister> {
                   DateRangePicker(
                     height: 40,
                     leadingIcon: Icon(Icons.calendar_month),
-                    fontColor: getMainStore().theme.value.BackgroundColor,
-                    backgroundColor: getMainStore().theme.value.lowShadeColor.withAlpha(100),
+                    fontColor: mainStore.theme.value.BackgroundColor,
+                    backgroundColor: mainStore.theme.value.lowShadeColor.withAlpha(100),
                     selectedDateRange: slotTrainerController.date,
                     onValueChange: (v) {
                       slotTrainerController.date = v;
@@ -101,7 +101,7 @@ class _SlotDetailsRegisterState extends State<SlotDetailsRegister> {
                                       text: parseDateToString(data: s.date, formatDate: 'dd-MM-yyyy', predefinedDateFormat: 'yyyy-MM-dd', defaultValue: ''),
                                       fontweight: FontWeight.w500,
                                       fontsize: 12,
-                                      color: getMainStore().theme.value.LightTextColor,
+                                      color: mainStore.theme.value.LightTextColor,
                                     ),
                                   ],
                                 ),
@@ -123,10 +123,7 @@ class _SlotDetailsRegisterState extends State<SlotDetailsRegister> {
                               child: Container(
                                 padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                                 margin: EdgeInsets.all(5),
-                                decoration: BoxDecoration(
-                                  color: getMainStore().theme.value.secondaryColor.withAlpha(20),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
+                                decoration: BoxDecoration(color: mainStore.theme.value.secondaryColor.withAlpha(20), borderRadius: BorderRadius.circular(10)),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   mainAxisSize: MainAxisSize.min,
@@ -136,7 +133,7 @@ class _SlotDetailsRegisterState extends State<SlotDetailsRegister> {
                                         TextHelper(
                                           text: sc.getServiceById(s.serviceId)?.name ?? "",
                                           fontweight: FontWeight.w600,
-                                          color: getMainStore().theme.value.LightTextColor,
+                                          color: mainStore.theme.value.LightTextColor,
                                         ),
                                         Spacer(),
                                         Row(
@@ -146,15 +143,15 @@ class _SlotDetailsRegisterState extends State<SlotDetailsRegister> {
                                               text: s.bookingCount.toString(),
                                               fontweight: FontWeight.w600,
                                               color: s.bookingCount > 0
-                                                  ? getMainStore().theme.value.secondaryColor
-                                                  : getMainStore().theme.value.LightTextColor.withAlpha(100),
+                                                  ? mainStore.theme.value.secondaryColor
+                                                  : mainStore.theme.value.LightTextColor.withAlpha(100),
                                             ),
                                             Icon(
                                               MoonIcons.generic_users_24_regular,
                                               size: 20,
                                               color: s.bookingCount > 0
-                                                  ? getMainStore().theme.value.secondaryColor
-                                                  : getMainStore().theme.value.LightTextColor.withAlpha(100),
+                                                  ? mainStore.theme.value.secondaryColor
+                                                  : mainStore.theme.value.LightTextColor.withAlpha(100),
                                             ),
                                           ],
                                         ),
@@ -169,7 +166,7 @@ class _SlotDetailsRegisterState extends State<SlotDetailsRegister> {
                                           text: '${s.startTime} - ${s.endTime}',
                                           fontweight: FontWeight.w500,
                                           fontsize: 12,
-                                          color: getMainStore().theme.value.LightTextColor,
+                                          color: mainStore.theme.value.LightTextColor,
                                         ),
                                       ],
                                     ),

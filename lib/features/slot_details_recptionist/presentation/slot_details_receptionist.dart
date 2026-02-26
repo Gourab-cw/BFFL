@@ -6,6 +6,7 @@ import 'package:healthandwellness/app/mainstore.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
 import 'package:healthandwellness/features/Service/data/service.dart';
 import 'package:healthandwellness/features/slot_details_trainer/controller/slot_details_controller.dart';
+import 'package:healthandwellness/features/slot_manage/data/slot_making_model.dart';
 import 'package:healthandwellness/features/subscriptions/controller/subscription_controller.dart';
 import 'package:intl/intl.dart';
 import 'package:moon_design/moon_design.dart';
@@ -41,6 +42,19 @@ class _SlotDetailsReceptionistState extends State<SlotDetailsReceptionist> {
     });
 
     super.dispose();
+  }
+
+  String getStatus(SlotModel s) {
+    if (s.trainerStartTime == null) {
+      return 'Not started';
+    }
+    if (s.trainerStartTime != null && s.completeAt == null) {
+      return 'Ongoing';
+    }
+    if (s.trainerStartTime != null && s.completeAt != null) {
+      return 'Completed';
+    }
+    return 'Completed';
   }
 
   Widget getServiceLogo(String serviceId) {
@@ -82,7 +96,14 @@ class _SlotDetailsReceptionistState extends State<SlotDetailsReceptionist> {
             ),
             child: Row(
               spacing: 6,
-              children: [TextHelper(text: "Done", fontsize: 11, fontweight: FontWeight.w600, color: mainStore.theme.value.BackgroundShadeColor)],
+              children: [
+                TextHelper(
+                  text: slotDetailsController.slot == null ? '' : getStatus(slotDetailsController.slot!),
+                  fontsize: 10.5,
+                  fontweight: FontWeight.w600,
+                  color: mainStore.theme.value.BackgroundShadeColor,
+                ),
+              ],
             ),
           ),
         ),

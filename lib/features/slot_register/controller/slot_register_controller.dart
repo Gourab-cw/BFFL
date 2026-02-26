@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:healthandwellness/core/utility/firebase_service.dart';
@@ -24,17 +25,18 @@ class SlotRegisterController extends GetxController {
       throw Exception("No user found");
     }
     final UserG user = auth.state!;
-    final query = db.collection('slots');
+    CollectionReference<Map<String, dynamic>> finalQuery = db.collection('slots');
+    Query<Map<String, dynamic>> query = finalQuery;
     if (user.userType == UserType.receptionist || user.userType == UserType.branchManager) {
-      query.where('branchId', isEqualTo: user.branchId);
+      query = query.where('branchId', isEqualTo: user.branchId);
     }
     if (user.userType == UserType.trainer) {
-      query.where('trainerId', isEqualTo: user.id);
-      query.where('branchId', isEqualTo: user.branchId);
+      query = query.where('trainerId', isEqualTo: user.id);
+      query = query.where('branchId', isEqualTo: user.branchId);
     }
-    query.where('isActive', isEqualTo: true);
-    query.where('date', isGreaterThanOrEqualTo: DateFormat('yyyy-MM-dd').format(selectedDate.start));
-    query.where('date', isLessThanOrEqualTo: DateFormat('yyyy-MM-dd').format(selectedDate.end));
+    query = query.where('isActive', isEqualTo: true);
+    query = query.where('date', isGreaterThanOrEqualTo: DateFormat('yyyy-MM-dd').format(selectedDate.start));
+    query = query.where('date', isLessThanOrEqualTo: DateFormat('yyyy-MM-dd').format(selectedDate.end));
     final resp = (await query.get()).docs.map((m) => SlotModel.fromFirestore(m)).toList();
     resp.sort(
       (a, b) => parseInt(

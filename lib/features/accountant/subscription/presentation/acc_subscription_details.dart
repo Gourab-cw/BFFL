@@ -27,9 +27,7 @@ class _AccSubscriptionDetailsState extends State<AccSubscriptionDetails> {
       builder: (accSubController) {
         return AppLoader(
           child: Scaffold(
-            appBar: AppBar(
-              title: TextHelper(text: "Subscription Details", fontweight: FontWeight.w600, fontsize: 15),
-            ),
+            appBar: AppBar(title: Text("Subscription Details")),
             body: Builder(
               builder: (context) {
                 final us = accSubController.selectedUser;
@@ -117,7 +115,7 @@ class _AccSubscriptionDetailsState extends State<AccSubscriptionDetails> {
                       Spacer(),
                       TextAreaBox(
                         height: 80,
-                        labelText: 'Remarks',
+                        labelText: 'Remarks  ',
                         showAlwaysLabel: true,
                         borderRadius: BorderRadius.circular(10),
                         controller: remarksController,

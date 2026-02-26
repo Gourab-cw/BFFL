@@ -5,6 +5,7 @@ import 'package:healthandwellness/app/mainstore.dart';
 import 'package:healthandwellness/core/utility/app_loader.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
 import 'package:healthandwellness/features/slot_details_trainer/controller/slot_details_controller.dart';
+import 'package:healthandwellness/features/slot_manage/data/slot_making_model.dart';
 import 'package:healthandwellness/features/subscriptions/controller/subscription_controller.dart';
 import 'package:moon_design/moon_design.dart';
 
@@ -28,6 +29,19 @@ class _HomeTrainerState extends State<HomeTrainer> {
   late final HomeController homeController;
   final Authenticator user = Get.find<Authenticator>();
   late final EdgeInsets safePadding = MediaQuery.paddingOf(context);
+
+  String getStatus(SlotModel s) {
+    if (s.trainerStartTime == null) {
+      return 'Not started';
+    }
+    if (s.trainerStartTime != null && s.completeAt == null) {
+      return 'Ongoing';
+    }
+    if (s.trainerStartTime != null && s.completeAt != null) {
+      return 'Completed';
+    }
+    return 'Completed';
+  }
 
   @override
   void initState() {
@@ -159,50 +173,84 @@ class _HomeTrainerState extends State<HomeTrainer> {
                                     },
                                     child: Container(
                                       margin: EdgeInsets.all(10),
-                                      padding: EdgeInsets.all(10),
                                       decoration: BoxDecoration(
-                                        color: getMainStore().theme.value.mediumShadeColor.withAlpha(50),
+                                        color: mainStore.theme.value.mediumShadeColor.withAlpha(50),
                                         border: Border.all(color: Colors.green.shade50),
                                         borderRadius: BorderRadius.circular(10),
                                       ),
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                      child: Stack(
+                                        clipBehavior: Clip.antiAlias,
                                         children: [
-                                          TextHelper(
-                                            text: subscriptionController.list.firstWhereOrNull((s) => s.id == m.serviceId)?.name ?? "",
-                                            isWrap: true,
-                                            color: Colors.blueGrey.shade800,
-                                            fontweight: FontWeight.w600,
-                                          ),
-                                          Row(
-                                            spacing: 5,
-                                            children: [
-                                              Icon(Icons.watch_later_outlined, size: 17, color: getMainStore().theme.value.LightTextColor.withAlpha(150)),
-                                              TextHelper(
-                                                text: "${m.startTime} - ${m.endTime}",
-                                                width: 80,
-                                                fontsize: 12,
-                                                color: getMainStore().theme.value.LightTextColor,
-                                              ),
-                                            ],
-                                          ),
-                                          Row(
-                                            spacing: 5,
-                                            children: [
-                                              Icon(Icons.calendar_month_rounded, size: 17, color: getMainStore().theme.value.LightTextColor.withAlpha(150)),
-                                              TextHelper(
-                                                text: parseDateToString(
-                                                  data: m.date,
-                                                  formatDate: 'dd-MM-yyyy',
-                                                  predefinedDateFormat: 'yyyy-MM-dd',
-                                                  defaultValue: '',
+                                          Container(
+                                            padding: EdgeInsets.all(10),
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                TextHelper(
+                                                  text: subscriptionController.list.firstWhereOrNull((s) => s.id == m.serviceId)?.name ?? "",
+                                                  isWrap: true,
+                                                  color: Colors.blueGrey.shade800,
+                                                  fontweight: FontWeight.w600,
                                                 ),
-                                                width: 80,
-                                                fontsize: 12,
-                                                color: getMainStore().theme.value.LightTextColor,
+                                                Row(
+                                                  spacing: 5,
+                                                  children: [
+                                                    Icon(Icons.watch_later_outlined, size: 17, color: getMainStore().theme.value.LightTextColor.withAlpha(150)),
+                                                    TextHelper(
+                                                      text: "${m.startTime} - ${m.endTime}",
+                                                      width: 80,
+                                                      fontsize: 12,
+                                                      color: getMainStore().theme.value.LightTextColor,
+                                                    ),
+                                                  ],
+                                                ),
+                                                Row(
+                                                  spacing: 5,
+                                                  children: [
+                                                    Icon(
+                                                      Icons.calendar_month_rounded,
+                                                      size: 17,
+                                                      color: getMainStore().theme.value.LightTextColor.withAlpha(150),
+                                                    ),
+                                                    TextHelper(
+                                                      text: parseDateToString(
+                                                        data: m.date,
+                                                        formatDate: 'dd-MM-yyyy',
+                                                        predefinedDateFormat: 'yyyy-MM-dd',
+                                                        defaultValue: '',
+                                                      ),
+                                                      width: 80,
+                                                      fontsize: 12,
+                                                      color: getMainStore().theme.value.LightTextColor,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          Positioned(
+                                            bottom: 0,
+                                            width: double.maxFinite,
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                color: mainStore.theme.value.HeadColor.withAlpha(
+                                                  getStatus(m).toLowerCase().contains('complete')
+                                                      ? 140
+                                                      : getStatus(m).toLowerCase().contains('ongoing')
+                                                      ? 0
+                                                      : 70,
+                                                ),
                                               ),
-                                            ],
+                                              child: TextHelper(
+                                                text: getStatus(m),
+                                                fontsize: 11.5,
+                                                padding: EdgeInsets.only(left: 10),
+                                                color: getStatus(m).toLowerCase().contains('ongoing')
+                                                    ? mainStore.theme.value.HeadColor.withAlpha(200)
+                                                    : mainStore.theme.value.BackgroundColor,
+                                              ),
+                                            ),
                                           ),
                                         ],
                                       ),
@@ -347,14 +395,19 @@ class _HomeTrainerState extends State<HomeTrainer> {
                                                       ConstrainedBox(
                                                         constraints: BoxConstraints(maxHeight: 200),
                                                         child: DataGridHelper3(
-                                                          fontSize: 11,
+                                                          fontSize: 12,
                                                           rowHeight: 25,
                                                           headerColor: Colors.transparent,
                                                           // headerFontSize: 11,
                                                           dataSource: m.slots.map((m) => m.toJSON()).toList(),
                                                           columnList: [
-                                                            DataGridColumnModel3(dataField: "slot", dataType: CellDataType3.string),
-                                                            DataGridColumnModel3(dataField: "booked", dataType: CellDataType3.string),
+                                                            DataGridColumnModel3(dataField: "slot", title: 'Slot', dataType: CellDataType3.string),
+                                                            DataGridColumnModel3(dataField: "booked", title: 'Booked', dataType: CellDataType3.string),
+                                                            DataGridColumnModel3(
+                                                              dataField: "totalAttendance",
+                                                              title: 'Attended',
+                                                              dataType: CellDataType3.string,
+                                                            ),
                                                           ],
                                                           uniqueKey: UniqueKey().toString(),
                                                           width: MediaQuery.sizeOf(context).width * 0.8,

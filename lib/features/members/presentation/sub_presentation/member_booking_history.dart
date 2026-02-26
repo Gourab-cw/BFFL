@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:healthandwellness/app/mainstore.dart';
 import 'package:healthandwellness/core/utility/app_loader.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
 import 'package:healthandwellness/features/subscriptions/controller/subscription_controller.dart';
@@ -18,6 +19,7 @@ class MemberBookingHistory extends StatefulWidget {
 
 class _MemberBookingHistoryState extends State<MemberBookingHistory> {
   final userSubController = Get.find<UserSubscriptionController>();
+  final mainStore = Get.find<MainStore>();
   final subController = Get.find<SubscriptionController>();
   final loader = Get.find<AppLoaderController>();
   final MemberController memberController = Get.find<MemberController>();
@@ -66,7 +68,7 @@ class _MemberBookingHistoryState extends State<MemberBookingHistory> {
                   label: TextHelper(text: "   + Create\nsubscription", fontsize: 11.5, isWrap: true, textalign: TextAlign.justify, color: Colors.white),
                 ),
                 ButtonHelperG(
-                  background: Colors.blueGrey.shade100,
+                  background: mainStore.theme.value.lowShadeColor,
                   shadow: [],
                   onTap: () async {
                     try {
@@ -79,7 +81,7 @@ class _MemberBookingHistoryState extends State<MemberBookingHistory> {
                     }
                   },
                   width: 40,
-                  label: Icon(Icons.refresh, color: Colors.green.shade800),
+                  label: Icon(Icons.refresh, color: mainStore.theme.value.HeadColor),
                 ),
               ],
             ),
@@ -92,7 +94,7 @@ class _MemberBookingHistoryState extends State<MemberBookingHistory> {
                     padding: const EdgeInsets.all(8.0),
                     child: Container(
                       padding: EdgeInsets.all(8),
-                      decoration: BoxDecoration(color: Colors.green.shade50, borderRadius: BorderRadiusGeometry.circular(10)),
+                      decoration: BoxDecoration(color: mainStore.theme.value.lowShadeColor, borderRadius: BorderRadiusGeometry.circular(10)),
                       child: Row(
                         spacing: 4,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,

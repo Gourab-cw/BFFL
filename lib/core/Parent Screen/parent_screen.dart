@@ -13,6 +13,7 @@ import 'package:moon_design/moon_design.dart';
 import '../../features/accountant/subscription/presentation/acc_subscription_list.dart';
 import '../../features/attendance/attendance.dart';
 import '../../features/calendar_report/presentation/calender_report.dart';
+import '../../features/home/presentation/home_admin.dart';
 import '../../features/home/presentation/member_home.dart';
 import '../../features/login/presentation/login.dart';
 import '../../features/member_approve/presentation/member_approve_register.dart';
@@ -21,8 +22,6 @@ import '../../features/slot_details_trainer/presentation/slot_details_register.d
 import '../../features/staff_register/presentation/staff_register.dart';
 import '../utility/app_loader.dart';
 import '../widget/bottom_nav_bar.dart';
-import '../widget/bottom_navbar_accountant.dart';
-import '../widget/bottom_navbar_admin.dart';
 
 class ParentScreen extends StatefulWidget {
   const ParentScreen({super.key});
@@ -35,15 +34,27 @@ class _ParentScreenState extends State<ParentScreen> {
   final MainStore mainStore = Get.find<MainStore>();
   final Authenticator userRef = Get.find<Authenticator>();
   late final EdgeInsets safePadding = MediaQuery.paddingOf(context);
-  final List<Widget> _pages = [Home(), DailySchedule(), Members(), StaffRegister(), Home()];
+  final List<Widget> _pages = [Home(), DailySchedule(), Members(), Attendance(), StaffRegister(), Home()];
   final List<Widget> _branchManagerPages = [Home(), DailySchedule(), Members(), CalenderReport(), Home()];
   final List<Widget> _trainerPages = [HomeTrainer(), SlotDetailsRegister(), Attendance(), HomeTrainer()];
   final List<Widget> _memberPages = [HomeMember(), ServiceView(), HomeTrainer()];
-  final List<Widget> _adminPages = [HomeMember(), MemberApproveRegister(), HomeTrainer()];
-  final List<Widget> _accPages = [AccSubscriptionList(), HomeTrainer()];
+  final List<Widget> _adminPages = [HomeAdmin(), CalenderReport(), MemberApproveRegister(), Attendance()];
+  final List<Widget> _accPages = [AccSubscriptionList(), HomeTrainer(), Attendance()];
+
+  List<Map<String, Icon>> adminMenus = [
+    {"Home": Icon(Icons.home_filled, size: 20)},
+    {"Overview": Icon(Icons.calendar_month, size: 20)},
+    {"Master": Icon(Icons.admin_panel_settings_rounded, size: 20)},
+    {"Attendance": Icon(Icons.account_circle, size: 20)},
+  ];
   List<Map<String, Icon>> trainerMenus = [
-    {"Home": Icon(MoonIcons.generic_home_24_regular)},
-    {"Slots": Icon(MoonIcons.time_calendar_24_regular)},
+    {"Home": Icon(Icons.home_filled, size: 20)},
+    {"Home": Icon(Icons.home_filled, size: 20)},
+    {"Attendance": Icon(Icons.account_circle, size: 20)},
+  ];
+  List<Map<String, Icon>> accountantMenus = [
+    {"Bill": Icon(MoonIcons.travel_bill_24_regular)},
+    {"History": Icon(MoonIcons.generic_betslip_24_regular)},
     {"Attendance": Icon(MoonIcons.generic_user_24_regular)},
   ];
 
@@ -71,15 +82,16 @@ class _ParentScreenState extends State<ParentScreen> {
       return BottomNavbarTrainer(menus: trainerMenus);
     }
     if (userRef.state?.userType == UserType.admin) {
-      return BottomNavbarAdmin();
+      return BottomNavbarTrainer(menus: adminMenus);
     }
     if (userRef.state?.userType == UserType.accountant) {
-      return BottomNavbarAccountant();
+      return BottomNavbarTrainer(menus: accountantMenus);
     }
     if (userRef.state?.userType == UserType.receptionist) {
       // return BottomNavbarTrainer(menus: trainerMenus);
       return BottomNavbarTrainer(menus: receptionistMenus);
     }
+
     return BottomNavbar();
   }
 

@@ -88,7 +88,7 @@ class _MembersState extends State<Members> {
                           padding: EdgeInsets.all(5),
                           margin: EdgeInsets.symmetric(vertical: 5),
                           decoration: BoxDecoration(
-                            color: !user.isApproved ? Colors.blueGrey.shade100.withAlpha(100) : Colors.green.shade100.withAlpha(60),
+                            color: !user.isApproved ? Colors.blueGrey.shade100.withAlpha(100) : mainStore.theme.value.mediumShadeColor.withAlpha(80),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Row(
@@ -100,7 +100,7 @@ class _MembersState extends State<Members> {
                                 height: 40,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(10),
-                                  color: user.isApproved ? Colors.green.shade200 : Colors.blueGrey.shade200.withAlpha(100),
+                                  color: user.isApproved ? mainStore.theme.value.mediumShadeColor : Colors.blueGrey.shade200.withAlpha(100),
                                 ),
                                 child: user.profileImage.isNotEmpty
                                     ? ClipRRect(

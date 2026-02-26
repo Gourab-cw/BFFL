@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:healthandwellness/app/mainstore.dart';
 import 'package:healthandwellness/core/utility/app_loader.dart';
 import 'package:healthandwellness/core/utility/async_select.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
@@ -17,6 +18,7 @@ class UserSubscriptionAdd extends StatefulWidget {
 class _UserSubscriptionAddState extends State<UserSubscriptionAdd> {
   final UserSubscriptionController userSubscriptionController = Get.find<UserSubscriptionController>();
   final loader = Get.find<AppLoaderController>();
+  final mainStore = Get.find<MainStore>();
 
   List<SelectItem> getSubscriptions() {
     List<UserSubscriptionType> list = UserSubscriptionType.values;
@@ -34,9 +36,7 @@ class _UserSubscriptionAddState extends State<UserSubscriptionAdd> {
       autoRemove: false,
       builder: (userSubscriptionController) {
         return Scaffold(
-          appBar: AppBar(
-            title: TextHelper(text: "Create Subscription", fontsize: 15, fontweight: FontWeight.w600),
-          ),
+          appBar: AppBar(title: Text("Create Subscription")),
           body: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
@@ -77,7 +77,7 @@ class _UserSubscriptionAddState extends State<UserSubscriptionAdd> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 MoonCheckbox(
-                                  activeColor: Colors.lightGreen,
+                                  activeColor: mainStore.theme.value.HeadColor.withAlpha(200),
                                   value: userSubscriptionController.subscriptionType == m,
                                   onChanged: (v) {
                                     userSubscriptionController.subscriptionType = m;

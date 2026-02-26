@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:healthandwellness/app/mainstore.dart';
 import 'package:healthandwellness/core/utility/app_loader.dart';
+import 'package:healthandwellness/core/utility/firebase_service.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
 import 'package:healthandwellness/features/receptionist/schedule/presentation/day_scheduler_tile.dart';
+import 'package:healthandwellness/features/slot_details_trainer/controller/slot_details_controller.dart';
+import 'package:healthandwellness/features/slot_manage/data/slot_making_model.dart';
 import 'package:intl/intl.dart';
 import 'package:moon_design/moon_design.dart';
 
@@ -20,6 +23,7 @@ class _DailyScheduleState extends State<DailySchedule> {
   final mainStore = Get.find<MainStore>();
   // final loader = Get.find<AppLoaderController>();
   final dailyScheduleController = Get.find<DailyScheduleController>();
+  final slotDetailsController = Get.find<SlotDetailsController>();
 
   Widget getDayWidget(DateTime d, bool isSelected) {
     return GestureDetector(
@@ -93,10 +97,10 @@ class _DailyScheduleState extends State<DailySchedule> {
           autoRemove: false,
           builder: (mainStore) {
             return Scaffold(
+              appBar: AppBar(title: Text("Daily Status")),
               body: Column(
                 spacing: 6,
                 children: [
-                  TextHelper(text: "Daily Status", fontweight: FontWeight.w600, fontsize: 15),
                   Row(
                     children: [
                       ButtonHelperG(
@@ -254,6 +258,27 @@ class _DailyScheduleState extends State<DailySchedule> {
                                       ],
                                     ),
                                     ButtonHelperG(
+                                      onTap: () async {
+                                        try {
+                                          if (dailyScheduleController.daysSessionList[s] == null || dailyScheduleController.daysSessionList[s]!.isEmpty) {
+                                            return;
+                                          }
+                                          Loader.startLoading();
+                                          final fb = Get.find<FB>();
+                                          final db = await fb.getDB();
+                                          final data = await db.collection('slots').doc(dailyScheduleController.daysSessionList[s]![0].slotId).get();
+                                          if (!data.exists) {
+                                            throw Exception('Slot data not found!');
+                                          }
+                                          final slot = SlotModel.fromFirestore(data);
+                                          await slotDetailsController.getSlotDetails(selectedSlot: slot);
+                                          Get.toNamed('/slotdetailsreceptionist');
+                                        } catch (e) {
+                                          showAlert("$e", AlertType.error);
+                                        } finally {
+                                          Loader.stopLoading();
+                                        }
+                                      },
                                       background: mainStore.theme.value.HeadColor.withAlpha(200),
                                       width: 80,
                                       height: 25,

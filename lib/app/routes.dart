@@ -12,6 +12,7 @@ import '../features/Service/presentation/service_view.dart';
 import '../features/accountant/subscription/presentation/acc_subscription_details.dart';
 import '../features/members/controller/member_controller.dart';
 import '../features/members/presentation/member_session_details.dart';
+import '../features/receptionist/schedule/presentation/daily_schedule.dart';
 import '../features/slot_details_recptionist/presentation/slot_details_receptionist.dart';
 import '../features/slot_details_trainer/presentation/slot_details_register.dart';
 import '../features/slot_details_trainer/presentation/slot_details_trainer_view.dart';
@@ -41,4 +42,5 @@ final List<GetPage<dynamic>> routes = [
   GetPage(name: "/slotdetailsreceptionist", page: () => SlotDetailsReceptionist()),
   GetPage(name: "/slotregister", page: () => SlotRegister()),
   GetPage(name: "/staffregister", page: () => StaffRegister()),
+  GetPage(name: "/dailyschedule", page: () => DailySchedule()),
 ];

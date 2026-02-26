@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:healthandwellness/app/Datagrid3.dart';
+import 'package:healthandwellness/app/mainstore.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
 import 'package:healthandwellness/features/subscriptions/controller/subscription_controller.dart';
 import 'package:intl/intl.dart';
@@ -20,6 +21,7 @@ class TrailSub extends StatefulWidget {
 class _TrailSubState extends State<TrailSub> {
   final UserSubscriptionController userSubscriptionController = Get.find<UserSubscriptionController>();
   final subscription = Get.find<SubscriptionController>();
+  final mainStore = Get.find<MainStore>();
   @override
   Widget build(BuildContext context) {
     return GetBuilder<UserSubscriptionController>(
@@ -42,7 +44,7 @@ class _TrailSubState extends State<TrailSub> {
                       margin: 0,
                       width: 30,
                       height: 30,
-                      background: Colors.green.shade100,
+                      background: mainStore.theme.value.mediumShadeColor,
                       onTap: () {
                         userSubscriptionController.subDataGridData.add({
                           'id': Uuid().v4(),
@@ -95,6 +97,7 @@ class _TrailSubState extends State<TrailSub> {
                             value: {'id': c.rowValue['serviceId'], 'name': c.rowValue['serviceName'], 'value': c.rowValue['serviceName']},
                             items: subscription.list.map((m) => m.toJson()).toList(),
                             onValueChange: (v) {
+                              logG(v);
                               int index = userSubscriptionController.subDataGridData.indexWhere((i) => i['id'] == c.rowValue['id']);
                               userSubscriptionController.subDataGridData[index]['serviceId'] = v['id'];
                               userSubscriptionController.subDataGridData[index]['serviceName'] = v['name'];
@@ -182,8 +185,8 @@ class _TrailSubState extends State<TrailSub> {
                               userSubscriptionController.update();
                             },
                             shadow: [],
-                            background: Colors.green.shade100,
-                            icon: Icon(Icons.delete, size: 14, color: Colors.green.shade900),
+                            background: mainStore.theme.value.mediumShadeColor,
+                            icon: Icon(Icons.delete, size: 14, color: mainStore.theme.value.secondaryColor),
                           );
                         },
                       ),

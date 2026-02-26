@@ -220,7 +220,7 @@ class DateRangePicker extends StatefulHookWidget {
     super.key,
     this.selectedDateRange,
     this.onValueChange,
-    this.width = 200,
+    this.width = 220,
     this.height = 50,
     this.leading,
     this.backgroundColor = Colors.white,
@@ -243,11 +243,11 @@ class _DateRangePickerState extends State<DateRangePicker> {
   // String data = "Select Date Range";
   DateTimeRange? selectedDateRange;
   TextEditingController textboxcontroller = TextEditingController();
+
   @override
   void initState() {
     // TODO: implement initState
-    if (widget.selectedDateRange == null) {
-    } else {
+    if (widget.selectedDateRange != null) {
       setState(() {
         if (DateFormat('dd-MM-yyyy').format(widget.selectedDateRange!.start) == DateFormat('dd-MM-yyyy').format(widget.selectedDateRange!.end)) {
           textboxcontroller.text = DateFormat(widget.dateFormat).format(widget.selectedDateRange!.end);
@@ -257,12 +257,44 @@ class _DateRangePickerState extends State<DateRangePicker> {
         }
       });
     }
-    // if (widget.placeholder != null) {
-    //   setState(() {
-    //     data = widget.placeholder!;
-    //   });
-    // }
     super.initState();
+  }
+
+  // @override
+  // void initState() {
+  //   // TODO: implement initState
+  //   if (widget.selectedDateRange != null) {
+  //     setState(() {
+  //       if (DateFormat('dd-MM-yyyy').format(widget.selectedDateRange!.start) == DateFormat('dd-MM-yyyy').format(widget.selectedDateRange!.end)) {
+  //         textboxcontroller.text = DateFormat(widget.dateFormat).format(widget.selectedDateRange!.end);
+  //       } else {
+  //         textboxcontroller.text =
+  //             "${DateFormat(widget.dateFormat).format(widget.selectedDateRange!.start)}   -   ${DateFormat(widget.dateFormat).format(widget.selectedDateRange!.end)}";
+  //       }
+  //     });
+  //   }
+  //   // if (widget.placeholder != null) {
+  //   //   setState(() {
+  //   //     data = widget.placeholder!;
+  //   //   });
+  //   // }
+  //   super.initState();
+  // }
+
+  @override
+  void didUpdateWidget(covariant DateRangePicker oldWidget) {
+    if (widget.selectedDateRange != null) {
+      setState(() {
+        if (DateFormat('dd-MM-yyyy').format(widget.selectedDateRange!.start) == DateFormat('dd-MM-yyyy').format(widget.selectedDateRange!.end)) {
+          textboxcontroller.text = DateFormat(widget.dateFormat).format(widget.selectedDateRange!.end);
+        } else {
+          textboxcontroller.text =
+              "${DateFormat(widget.dateFormat).format(widget.selectedDateRange!.start)}   -   ${DateFormat(widget.dateFormat).format(widget.selectedDateRange!.end)}";
+        }
+      });
+    }
+    // TODO: implement didUpdateWidget
+    super.didUpdateWidget(oldWidget);
   }
 
   showDatePicker(BuildContext context) {
@@ -360,20 +392,6 @@ class _DateRangePickerState extends State<DateRangePicker> {
 
   @override
   Widget build(BuildContext context) {
-    useEffect(() {
-      if (widget.selectedDateRange == null) {
-      } else {
-        setState(() {
-          if (DateFormat('dd-MM-yyyy').format(widget.selectedDateRange!.start) == DateFormat('dd-MM-yyyy').format(widget.selectedDateRange!.end)) {
-            textboxcontroller.text = DateFormat(widget.dateFormat).format(widget.selectedDateRange!.end);
-          } else {
-            textboxcontroller.text =
-                "${DateFormat(widget.dateFormat).format(widget.selectedDateRange!.start)} - ${DateFormat(widget.dateFormat).format(widget.selectedDateRange!.end)}";
-          }
-        });
-      }
-      return null;
-    }, [widget.selectedDateRange]);
     return Row(
       children: [
         widget.leading ?? Container(),

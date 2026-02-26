@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
+import 'package:healthandwellness/features/login/repository/authenticator.dart';
 
 import '../../login/data/user.dart';
 
@@ -15,6 +16,8 @@ class MemberControllerBinding extends Bindings {
 
 class MemberController extends GetxController {
   List<UserG> members = [];
+
+  final auth = Get.find<Authenticator>();
   RxBool isSearching = false.obs;
   UserG? selectedUser;
   // int currentPage = 1;
@@ -34,6 +37,8 @@ class MemberController extends GetxController {
       final resp = await db
           .collection("User")
           .where("searchTerm", isGreaterThanOrEqualTo: s)
+          .where("userType", isEqualTo: userTypeMap2[UserType.member])
+          .where("isActive", isEqualTo: true)
           .where("searchTerm", isLessThanOrEqualTo: '$s\uf8ff')
           .limit(20)
           .get();
@@ -47,7 +52,17 @@ class MemberController extends GetxController {
   }
 
   Future<void> fetchMembers(FirebaseFirestore db) async {
-    final resp = await db.collection('User').limit(2).get();
+    final user = auth.state;
+    if (user == null) {
+      throw Exception('Unable to authenticate');
+    }
+    Query<Map<String, dynamic>> query = db.collection('User').where("userType", isEqualTo: userTypeMap2[UserType.member]).where("isActive", isEqualTo: true);
+
+    if (user.userType != UserType.admin) {
+      query = query.where('branchId', isEqualTo: user.branchId);
+    }
+
+    final resp = await query.limit(8).get();
     members = resp.docs.map((doc) => UserG.fromJSON(makeMapSerialize(doc.data()))).toList();
     update();
   }

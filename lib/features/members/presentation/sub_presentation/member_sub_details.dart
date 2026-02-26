@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:healthandwellness/app/mainstore.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
 import 'package:healthandwellness/features/login/data/user.dart';
 
@@ -15,6 +16,7 @@ class MemberSubDetails extends StatefulWidget {
 
 class _MemberSubDetailsState extends State<MemberSubDetails> {
   final MemberController memberController = Get.find<MemberController>();
+  final mainStore = Get.find<MainStore>();
   final loader = Get.find<AppLoaderController>();
 
   @override
@@ -64,7 +66,7 @@ class _MemberSubDetailsState extends State<MemberSubDetails> {
                     TextHelper(text: "Any Medical Condition :", width: 180, fontweight: FontWeight.w600),
                     Container(
                       padding: EdgeInsets.symmetric(vertical: 5, horizontal: 3),
-                      decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(5)),
+                      decoration: BoxDecoration(color: mainStore.theme.value.lowShadeColor, borderRadius: BorderRadius.circular(5)),
                       child: TextHelper(
                         text: parseString(data: user.medicalCondition, defaultValue: ""),
                         fontsize: 12,
@@ -81,7 +83,7 @@ class _MemberSubDetailsState extends State<MemberSubDetails> {
                     TextHelper(text: "Any Medication :", width: 180, fontweight: FontWeight.w600),
                     Container(
                       padding: EdgeInsets.symmetric(vertical: 5, horizontal: 3),
-                      decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(5)),
+                      decoration: BoxDecoration(color: mainStore.theme.value.lowShadeColor, borderRadius: BorderRadius.circular(5)),
                       child: TextHelper(
                         text: parseString(data: user.medication, defaultValue: ""),
                         fontsize: 12,
@@ -98,7 +100,7 @@ class _MemberSubDetailsState extends State<MemberSubDetails> {
                     TextHelper(text: "Any Specific Diet :", width: 180, fontweight: FontWeight.w600),
                     Container(
                       padding: EdgeInsets.symmetric(vertical: 5, horizontal: 3),
-                      decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(5)),
+                      decoration: BoxDecoration(color: mainStore.theme.value.lowShadeColor, borderRadius: BorderRadius.circular(5)),
                       child: TextHelper(
                         text: parseString(data: user.diet, defaultValue: ""),
                         fontsize: 12,
@@ -115,7 +117,7 @@ class _MemberSubDetailsState extends State<MemberSubDetails> {
                     TextHelper(text: "Referred By :", width: 180, fontweight: FontWeight.w600),
                     Container(
                       padding: EdgeInsets.symmetric(vertical: 5, horizontal: 3),
-                      decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(5)),
+                      decoration: BoxDecoration(color: mainStore.theme.value.lowShadeColor, borderRadius: BorderRadius.circular(5)),
                       child: TextHelper(
                         text: parseString(data: user.referredByName, defaultValue: ""),
                         fontsize: 12,

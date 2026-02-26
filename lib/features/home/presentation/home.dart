@@ -30,6 +30,19 @@ class _HomeState extends State<Home> {
   final Authenticator user = Get.find<Authenticator>();
   late final EdgeInsets safePadding = MediaQuery.paddingOf(context);
 
+  String getStatus(SlotModel s) {
+    if (s.trainerStartTime == null) {
+      return 'Not started';
+    }
+    if (s.trainerStartTime != null && s.completeAt == null) {
+      return 'Ongoing';
+    }
+    if (s.trainerStartTime != null && s.completeAt != null) {
+      return 'Completed';
+    }
+    return 'Completed';
+  }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -172,7 +185,7 @@ class _HomeState extends State<Home> {
                                   ],
                                 ),
                                 SizedBox(
-                                  height: 100,
+                                  height: 110,
                                   child: ListView.builder(
                                     itemCount: homeController.bookings.length,
                                     scrollDirection: Axis.horizontal,
@@ -192,50 +205,83 @@ class _HomeState extends State<Home> {
                                         },
                                         child: Container(
                                           margin: EdgeInsets.all(10),
-                                          padding: EdgeInsets.all(10),
                                           decoration: BoxDecoration(
                                             color: mainStore.theme.value.mediumShadeColor.withAlpha(50),
                                             border: Border.all(color: Colors.green.shade50),
                                             borderRadius: BorderRadius.circular(10),
                                           ),
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                          child: Stack(
                                             children: [
-                                              TextHelper(
-                                                text: subscriptionController.list.firstWhereOrNull((s) => s.id == m.serviceId)?.name ?? "",
-                                                isWrap: true,
-                                                color: Colors.blueGrey.shade800,
-                                                fontweight: FontWeight.w600,
-                                              ),
-                                              Row(
-                                                spacing: 5,
-                                                children: [
-                                                  Icon(Icons.watch_later_outlined, size: 17, color: mainStore.theme.value.LightTextColor.withAlpha(150)),
-                                                  TextHelper(
-                                                    text: "${m.startTime} - ${m.endTime}",
-                                                    width: 80,
-                                                    fontsize: 12,
-                                                    color: mainStore.theme.value.LightTextColor,
-                                                  ),
-                                                ],
-                                              ),
-                                              Row(
-                                                spacing: 5,
-                                                children: [
-                                                  Icon(Icons.calendar_month_rounded, size: 17, color: mainStore.theme.value.LightTextColor.withAlpha(150)),
-                                                  TextHelper(
-                                                    text: parseDateToString(
-                                                      data: m.date,
-                                                      formatDate: 'dd-MM-yyyy',
-                                                      predefinedDateFormat: 'yyyy-MM-dd',
-                                                      defaultValue: '',
+                                              Container(
+                                                padding: EdgeInsets.all(10),
+                                                child: Column(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    TextHelper(
+                                                      text: subscriptionController.list.firstWhereOrNull((s) => s.id == m.serviceId)?.name ?? "",
+                                                      isWrap: true,
+                                                      color: Colors.blueGrey.shade800,
+                                                      fontweight: FontWeight.w600,
                                                     ),
-                                                    width: 80,
-                                                    fontsize: 12,
-                                                    color: mainStore.theme.value.LightTextColor,
+                                                    Row(
+                                                      spacing: 5,
+                                                      children: [
+                                                        Icon(Icons.watch_later_outlined, size: 17, color: mainStore.theme.value.LightTextColor.withAlpha(150)),
+                                                        TextHelper(
+                                                          text: "${m.startTime} - ${m.endTime}",
+                                                          width: 80,
+                                                          fontsize: 12,
+                                                          color: mainStore.theme.value.LightTextColor,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    Row(
+                                                      spacing: 5,
+                                                      children: [
+                                                        Icon(
+                                                          Icons.calendar_month_rounded,
+                                                          size: 17,
+                                                          color: mainStore.theme.value.LightTextColor.withAlpha(150),
+                                                        ),
+                                                        TextHelper(
+                                                          text: parseDateToString(
+                                                            data: m.date,
+                                                            formatDate: 'dd-MM-yyyy',
+                                                            predefinedDateFormat: 'yyyy-MM-dd',
+                                                            defaultValue: '',
+                                                          ),
+                                                          width: 80,
+                                                          fontsize: 12,
+                                                          color: mainStore.theme.value.LightTextColor,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              Positioned(
+                                                bottom: 0,
+                                                width: double.maxFinite,
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                    color: mainStore.theme.value.HeadColor.withAlpha(
+                                                      getStatus(m).toLowerCase().contains('complete')
+                                                          ? 140
+                                                          : getStatus(m).toLowerCase().contains('ongoing')
+                                                          ? 0
+                                                          : 70,
+                                                    ),
                                                   ),
-                                                ],
+                                                  child: TextHelper(
+                                                    text: getStatus(m),
+                                                    fontsize: 11.5,
+                                                    padding: EdgeInsets.only(left: 10),
+                                                    color: getStatus(m).toLowerCase().contains('ongoing')
+                                                        ? mainStore.theme.value.HeadColor.withAlpha(200)
+                                                        : mainStore.theme.value.BackgroundColor,
+                                                  ),
+                                                ),
                                               ),
                                             ],
                                           ),

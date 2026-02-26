@@ -54,17 +54,25 @@ class CalenderDayDetails {
 class CalenderReportController extends GetxController {
   List<SlotModel> slots = [];
 
+  Map<String, dynamic>? selectedBranch;
+
   final mainStore = Get.find<MainStore>();
   DateTime selectedDate = DateTime.now();
   final SubscriptionController sc = Get.find<SubscriptionController>();
   final FB fb = Get.find<FB>();
 
   Future<void> loadSlots() async {
+    if (selectedBranch == null) {
+      throw Exception("Select a branch to continue!");
+    }
     final db = await fb.getDB();
     final auth = Get.find<Authenticator>();
     final resp = await db
         .collection('slots')
-        .where('branchId', isEqualTo: auth.state!.branchId)
+        .where(
+          'branchId',
+          isEqualTo: parseString(data: selectedBranch?['id'], defaultValue: ''),
+        )
         .where('isActive', isEqualTo: true)
         .where('month', isGreaterThanOrEqualTo: DateFormat('yyyy-MM').format(selectedDate))
         .get();

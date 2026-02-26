@@ -129,7 +129,7 @@ class _BottomNavbarTrainerState extends State<BottomNavbarTrainer> {
                     TextHelper(
                       text: parseString(data: m.keys.toList()[0], defaultValue: ''),
                       fontweight: FontWeight.w600,
-                      fontsize: mainStore.bottomNavBarIndex.value == i ? 11.5 : 11,
+                      fontsize: mainStore.bottomNavBarIndex.value == i ? 11 : 10,
                       width: calcWidth,
                       isWrap: true,
                       color: mainStore.theme.value.DarkTextColor,
@@ -163,7 +163,7 @@ class _BottomNavbarTrainerState extends State<BottomNavbarTrainer> {
                   TextHelper(
                     text: parseString(data: 'Logout', defaultValue: ''),
                     fontweight: FontWeight.w600,
-                    fontsize: 11,
+                    fontsize: 10,
                     color: mainStore.bottomNavBarIndex.value == 10 ? mainStore.theme.value.HeadColor : mainStore.theme.value.BackgroundColor,
                     width: calcWidth,
                     isWrap: true,

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:healthandwellness/core/utility/firebase_service.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
+import 'package:healthandwellness/features/login/data/user.dart';
 import 'package:healthandwellness/features/login/repository/authenticator.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
@@ -81,16 +82,29 @@ class AttendanceController extends GetxController {
     if (auth.state == null) {
       return;
     }
-    final resp = await db
+
+    Query<Map<String, dynamic>> query = db
         .collection('attendance')
         .where('date', isGreaterThanOrEqualTo: DateFormat('yyyy-MM-dd').format(range.start))
-        .where(
-          'userId',
-          isEqualTo: parseString(data: auth.state!.id, defaultValue: ""),
-        )
-        .where('date', isLessThanOrEqualTo: DateFormat('yyyy-MM-dd').format(range.end))
-        .get();
+        .where('date', isLessThanOrEqualTo: DateFormat('yyyy-MM-dd').format(range.end));
 
+    if (auth.state!.userType != UserType.admin) {
+      query = query.where('branchId', isEqualTo: auth.state!.branchId);
+    }
+    if (auth.state!.userType == UserType.receptionist) {
+      query = query.where('userType', whereIn: [userTypeMap2[UserType.receptionist], userTypeMap2[UserType.trainer]]);
+    }
+    if (auth.state!.userType == UserType.branchManager) {
+      query = query.where('userType', whereIn: [userTypeMap2[UserType.branchManager], userTypeMap2[UserType.receptionist], userTypeMap2[UserType.trainer]]);
+    }
+    if (auth.state!.userType == UserType.trainer) {
+      query = query.where(
+        'userId',
+        isEqualTo: parseString(data: auth.state!.id, defaultValue: ""),
+      );
+      query = query.where('userType', isEqualTo: userTypeMap2[UserType.trainer]);
+    }
+    final resp = await query.get();
     list = resp.docs.map<AttendanceModel>((r) => AttendanceModel.fromJson(makeMapSerialize(r.data()))).toList();
     if (list.isNotEmpty) {
       final branches = list.map((l) => l.branchId).toSet().toList();

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:healthandwellness/app/Datagrid3.dart';
 import 'package:healthandwellness/app/mainstore.dart';
+import 'package:healthandwellness/core/branch/controller/branch_controller.dart';
 import 'package:healthandwellness/core/utility/app_loader.dart';
 import 'package:intl/intl.dart';
 
@@ -21,19 +22,32 @@ class _CalenderReportState extends State<CalenderReport> {
   final loader = Get.find<AppLoaderController>();
 
   final CalenderReportController calenderReportController = Get.find<CalenderReportController>();
+  final BranchController branchController = Get.find<BranchController>();
+
+  Future<void> loadData() async {
+    try {
+      loader.startLoading();
+
+      if (calenderReportController.selectedBranch == null) {
+        await branchController.getBranchList();
+        if (branchController.list.isNotEmpty) {
+          calenderReportController.selectedBranch = branchController.list[0].toJson();
+        }
+      }
+
+      await calenderReportController.loadSlots();
+    } catch (e) {
+      showAlert("$e", AlertType.error);
+    } finally {
+      loader.stopLoading();
+    }
+  }
 
   @override
   void initState() {
     // TODO: implement initState
     Future(() async {
-      try {
-        loader.startLoading();
-        await calenderReportController.loadSlots();
-      } catch (e) {
-        showAlert("$e", AlertType.error);
-      } finally {
-        loader.stopLoading();
-      }
+      await loadData();
     });
     super.initState();
   }
@@ -51,7 +65,39 @@ class _CalenderReportState extends State<CalenderReport> {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  TextHelper(text: "Monthly overview", fontsize: 15, fontweight: FontWeight.w600),
+                  const SizedBox(height: 5),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: TextHelper(text: "Monthly overview", fontsize: 15, fontweight: FontWeight.w600),
+                      ),
+                      SizedBox(
+                        width: 130,
+                        child: GetBuilder<BranchController>(
+                          init: branchController,
+                          autoRemove: false,
+                          builder: (branchController) {
+                            return DropDownHelperG(
+                              uniqueKey: UniqueKey().toString(),
+                              trailing: SizedBox.shrink(),
+                              height: 35,
+                              labelText: 'Branch',
+                              showLabelAlways: true,
+                              fontSize: 12,
+                              onValueChange: (v) async {
+                                calenderReportController.selectedBranch = v;
+                                await loadData();
+                                calenderReportController.update();
+                              },
+                              value: calenderReportController.selectedBranch,
+                              items: branchController.list.map((m) => m.toJson()).toList(),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
 
                   CalendarDatePicker2(
                     config: CalendarDatePicker2Config(
@@ -65,6 +111,7 @@ class _CalenderReportState extends State<CalenderReport> {
                       hideScrollViewTopHeader: true,
                       hideScrollViewTopHeaderDivider: true,
                       currentDate: DateTime.now(),
+                      controlsTextStyle: TextStyle(fontSize: 12),
                       calendarType: CalendarDatePicker2Type.single,
                       calendarViewMode: CalendarDatePicker2Mode.day,
                       dayBuilder:

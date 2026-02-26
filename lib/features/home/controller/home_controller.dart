@@ -24,6 +24,7 @@ class HomeController extends GetxController {
   List<SlotModel> todayBooking = [];
   List<SlotModel> bookings = [];
   late final SubscriptionController subscriptionController;
+
   final fb = Get.find<FB>();
   final auth = Get.find<Authenticator>();
 

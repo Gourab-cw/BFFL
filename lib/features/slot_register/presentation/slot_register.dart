@@ -74,7 +74,6 @@ class _SlotRegisterState extends State<SlotRegister> {
               actions: [
                 DateRangePicker(
                   height: 40,
-
                   fontColor: mainStore.theme.value.BackgroundColor,
                   backgroundColor: mainStore.theme.value.HeadColor.withAlpha(180),
                   withBorder: false,

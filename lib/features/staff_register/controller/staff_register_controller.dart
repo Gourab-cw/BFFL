@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:healthandwellness/core/utility/firebase_service.dart';
@@ -23,11 +24,12 @@ class StaffRegisterController extends GetxController {
       throw Exception("No user found");
     }
     final UserG user = auth.state!;
-    final query = db.collection('User');
+    final finalQuery = db.collection('User');
+    Query<Map<String, dynamic>> query = finalQuery;
     if (user.userType != UserType.admin) {
-      query.where('branchId', isEqualTo: user.branchId);
+      query = query.where('branchId', isEqualTo: user.branchId);
     }
-    query.where('isActive', isEqualTo: true);
+    query = query.where('isActive', isEqualTo: true);
     final resp = (await query.get()).docs.map((m) => SlotModel.fromFirestore(m)).toList();
     resp.sort(
       (a, b) => parseInt(

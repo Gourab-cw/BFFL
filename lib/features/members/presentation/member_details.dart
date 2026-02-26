@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:healthandwellness/app/mainstore.dart';
 import 'package:healthandwellness/core/utility/app_loader.dart';
 import 'package:healthandwellness/core/utility/firebase_service.dart';
 import 'package:healthandwellness/features/members/controller/member_controller.dart';
@@ -22,6 +23,7 @@ class MemberDetails extends StatefulWidget {
 
 class _MemberDetailsState extends State<MemberDetails> {
   final MemberController memberController = Get.find<MemberController>();
+  final mainStore = Get.find<MainStore>();
   final loader = Get.find<AppLoaderController>();
   final picklist = Get.find<PickListNotifier>();
   final userSubController = Get.find<UserSubscriptionController>();
@@ -116,7 +118,7 @@ class _MemberDetailsState extends State<MemberDetails> {
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(10),
                                     // boxShadow: [BoxShadow(color: Colors.grey, blurRadius: 10, offset: Offset(2, 2), spreadRadius: 1)],
-                                    color: Colors.green.shade50,
+                                    color: mainStore.theme.value.mediumShadeColor.withAlpha(120),
                                   ),
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(10),
@@ -250,7 +252,7 @@ class _MemberDetailsState extends State<MemberDetails> {
                                                   mainAxisSize: MainAxisSize.min,
                                                   mainAxisAlignment: MainAxisAlignment.start,
                                                   children: [
-                                                    TextHelper(text: "Gender :", fontweight: FontWeight.w600, width: 60, fontsize: subTextSize),
+                                                    TextHelper(text: "Gender :", fontweight: FontWeight.w600, width: 50, fontsize: subTextSize),
                                                     TextHelper(
                                                       text: picklist.getGenderPicklist().firstWhereOrNull((f) => f['id'] == user.genderId)?['name'] ?? "",
                                                       isWrap: true,

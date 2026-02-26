@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:healthandwellness/app/mainstore.dart';
 import 'package:healthandwellness/core/utility/app_loader.dart';
 import 'package:healthandwellness/features/accountant/subscription/controller/acc_subscription_controller.dart';
 import 'package:healthandwellness/features/subscriptions/controller/subscription_controller.dart';
@@ -19,6 +20,7 @@ class AccSubscriptionList extends StatefulWidget {
 
 class _AccSubscriptionListState extends State<AccSubscriptionList> {
   final accSubController = Get.find<AccSubscriptionController>();
+  final mainStore = Get.find<MainStore>();
   final subController = Get.find<SubscriptionController>();
   final loader = Get.find<AppLoaderController>();
   Widget getTypeWidget(UserSubscription us) {
@@ -32,13 +34,13 @@ class _AccSubscriptionListState extends State<AccSubscriptionList> {
       case UserSubscriptionType.dayWise:
         return Container(
           padding: EdgeInsets.symmetric(vertical: 2, horizontal: 5),
-          decoration: BoxDecoration(color: Colors.green.shade200, borderRadius: BorderRadius.circular(10)),
+          decoration: BoxDecoration(color: mainStore.theme.value.mediumShadeColor, borderRadius: BorderRadius.circular(10)),
           child: TextHelper(text: 'Day Wise', fontsize: 12, fontweight: FontWeight.w600),
         );
       case UserSubscriptionType.slotWise:
         return Container(
           padding: EdgeInsets.symmetric(vertical: 2, horizontal: 5),
-          decoration: BoxDecoration(color: Colors.green.shade200, borderRadius: BorderRadius.circular(10)),
+          decoration: BoxDecoration(color: mainStore.theme.value.mediumShadeColor, borderRadius: BorderRadius.circular(10)),
           child: TextHelper(text: 'Slot Wise', fontsize: 12, fontweight: FontWeight.w600),
         );
     }
@@ -68,9 +70,7 @@ class _AccSubscriptionListState extends State<AccSubscriptionList> {
       autoRemove: false,
       builder: (accSubController) {
         return Scaffold(
-          appBar: AppBar(
-            title: TextHelper(text: "Subscriptions", fontsize: 15, fontweight: FontWeight.w600),
-          ),
+          appBar: AppBar(title: Text("Subscriptions")),
           body: Column(
             children: [
               Row(
@@ -82,7 +82,7 @@ class _AccSubscriptionListState extends State<AccSubscriptionList> {
                     ),
                   ),
                   ButtonHelperG(
-                    background: Colors.blueGrey.shade100,
+                    background: mainStore.theme.value.lowShadeColor,
                     shadow: [],
                     onTap: () async {
                       try {
@@ -95,7 +95,7 @@ class _AccSubscriptionListState extends State<AccSubscriptionList> {
                       }
                     },
                     width: 40,
-                    label: Icon(Icons.refresh, color: Colors.green.shade800),
+                    label: Icon(Icons.refresh, color: mainStore.theme.value.HeadColor.withAlpha(200)),
                   ),
                 ],
               ),
@@ -106,22 +106,21 @@ class _AccSubscriptionListState extends State<AccSubscriptionList> {
                     UserSubscription us = accSubController.list[index];
                     return GestureDetector(
                       onTap: () async {
-                        try{
+                        try {
                           loader.startLoading();
                           await accSubController.getDetails(us);
                           Get.toNamed('/accsubscriptiondetails');
-                        }catch(e){
+                        } catch (e) {
                           showAlert("$e", AlertType.error);
-                        }finally{
+                        } finally {
                           loader.stopLoading();
                         }
-
                       },
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Container(
                           padding: EdgeInsets.all(8),
-                          decoration: BoxDecoration(color: Colors.green.shade50, borderRadius: BorderRadiusGeometry.circular(10)),
+                          decoration: BoxDecoration(color: mainStore.theme.value.lowShadeColor, borderRadius: BorderRadiusGeometry.circular(10)),
                           child: Row(
                             spacing: 4,
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,

@@ -150,6 +150,52 @@ class SlotDetailsController extends GetxController {
     }
   }
 
+  Future<void> startSession() async {
+    if (slot == null) {
+      throw Exception("Slot not found!");
+    }
+    final fb = Get.find<FB>();
+    final auth = Get.find<Authenticator>();
+    if (auth.state == null) {
+      throw Exception("User not found!");
+    }
+    final db = await fb.getDB();
+    final batch = db.batch();
+    try {
+      batch.update(db.collection('slots').doc(slot!.id), {'trainerStartTime': Timestamp.now()});
+      await batch.commit();
+      slot = SlotModel.fromFirestore(await db.collection('slots').doc(slot!.id).get());
+      update();
+    } on FirebaseException catch (e) {
+      throw Exception(e.message);
+    } catch (e) {
+      throw Exception("$e");
+    }
+  }
+
+  Future<void> giveRemarks(String remarks) async {
+    if (slot == null) {
+      throw Exception("Slot not found!");
+    }
+    final fb = Get.find<FB>();
+    final auth = Get.find<Authenticator>();
+    if (auth.state == null) {
+      throw Exception("User not found!");
+    }
+    final db = await fb.getDB();
+    final batch = db.batch();
+    try {
+      batch.update(db.collection('slots').doc(slot!.id), {'trainerRemarks': remarks});
+      await batch.commit();
+      slot = SlotModel.fromFirestore(await db.collection('slots').doc(slot!.id).get());
+      update();
+    } on FirebaseException catch (e) {
+      throw Exception(e.message);
+    } catch (e) {
+      throw Exception("$e");
+    }
+  }
+
   Future<void> updateSession(FirebaseFirestore db, SessionModel s) async {
     String userId = s.memberId;
     final resp1 = await db.collection("User").where('id', isEqualTo: userId).where('isActive', isEqualTo: true).get();

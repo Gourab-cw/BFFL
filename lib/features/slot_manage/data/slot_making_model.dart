@@ -13,6 +13,7 @@ class SlotModel {
   final String endTime; // HH:mm
   final String trainerId;
   final String? trainerName;
+  final String? trainerRemarks;
   final int bookingCount;
   final int totalAttend;
   final bool isActive;
@@ -32,6 +33,7 @@ class SlotModel {
     required this.endTime,
     required this.trainerId,
     this.trainerName,
+    this.trainerRemarks,
     required this.bookingCount,
     required this.totalAttend,
     required this.isActive,
@@ -61,7 +63,8 @@ class SlotModel {
       trainerName: parseString(data: data['trainerName'], defaultValue: ''),
       isActive: data['isActive'] ?? false,
       createdAt: data['createdAt'] ?? Timestamp.now(),
-      trainerStartTime: data['trainerStartTime'] ?? Timestamp.now(),
+      trainerStartTime: data['trainerStartTime'],
+      trainerRemarks: data['trainerRemarks'],
     );
   }
 
@@ -84,6 +87,7 @@ class SlotModel {
       hasComplete: parseBool(data: data['hasComplete'], defaultValue: false),
       createdAt: data['createdAt'] ?? Timestamp.now(),
       trainerStartTime: data['trainerStartTime'],
+      trainerRemarks: data['trainerRemarks'],
     );
   }
 
@@ -98,6 +102,7 @@ class SlotModel {
     String? endTime,
     String? trainerId,
     String? trainerName,
+    String? trainerRemarks,
     int? bookingCount,
     int? totalAttend,
     bool? isActive,
@@ -124,6 +129,7 @@ class SlotModel {
       completeAt: completeAt == null ? this.completeAt : Timestamp.fromDate(completeAt),
       trainerStartTime: trainerStartTime == null ? this.trainerStartTime : Timestamp.fromDate(trainerStartTime!),
       createdAt: createdAt == null ? this.createdAt : Timestamp.fromDate(createdAt),
+      trainerRemarks: trainerRemarks ?? this.trainerRemarks,
     );
   }
 
@@ -147,6 +153,7 @@ class SlotModel {
       'isActive': isActive,
       'createdAt': createdAt,
       'trainerStartTime': trainerStartTime,
+      'trainerRemarks': trainerRemarks,
     };
   }
 }
