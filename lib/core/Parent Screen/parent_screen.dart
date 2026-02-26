@@ -16,6 +16,7 @@ import '../../features/calendar_report/presentation/calender_report.dart';
 import '../../features/home/presentation/home_admin.dart';
 import '../../features/home/presentation/member_home.dart';
 import '../../features/login/presentation/login.dart';
+import '../../features/master/presentation/master.dart';
 import '../../features/member_approve/presentation/member_approve_register.dart';
 import '../../features/receptionist/schedule/presentation/daily_schedule.dart';
 import '../../features/slot_details_trainer/presentation/slot_details_register.dart';
@@ -38,7 +39,7 @@ class _ParentScreenState extends State<ParentScreen> {
   final List<Widget> _branchManagerPages = [Home(), DailySchedule(), Members(), CalenderReport(), Home()];
   final List<Widget> _trainerPages = [HomeTrainer(), SlotDetailsRegister(), Attendance(), HomeTrainer()];
   final List<Widget> _memberPages = [HomeMember(), ServiceView(), HomeTrainer()];
-  final List<Widget> _adminPages = [HomeAdmin(), CalenderReport(), MemberApproveRegister(), Attendance()];
+  final List<Widget> _adminPages = [HomeAdmin(), CalenderReport(),Master(), Attendance()];
   final List<Widget> _accPages = [AccSubscriptionList(), HomeTrainer(), Attendance()];
 
   List<Map<String, Icon>> adminMenus = [

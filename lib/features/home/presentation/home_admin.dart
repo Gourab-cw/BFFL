@@ -76,7 +76,7 @@ class _HomeAdminState extends State<HomeAdmin> {
                         TextHelper(text: 'Overview', fontsize: 11, color: mainStore.theme.value.HeadColor.withAlpha(250)),
                         Row(
                           mainAxisSize: MainAxisSize.min,
-                          children: [TextHelper(text: 'Welcome, ${auth.state!.name}', fontweight: FontWeight.w600, fontsize: 16)],
+                          children: [TextHelper(text: 'Welcome, ${auth.state!.name}', fontweight: FontWeight.w600, fontsize: 20)],
                         ),
                       ],
                     ),
@@ -84,10 +84,10 @@ class _HomeAdminState extends State<HomeAdmin> {
                       onTap: () {
                         settingFetchingService();
                       },
-                      width: 30,
-                      height: 30,
+                      width: 35,
+                      height: 35,
                       background: mainStore.theme.value.mediumShadeColor,
-                      icon: Icon(Icons.refresh, size: 18),
+                      icon: Icon(Icons.refresh, size: 20),
                     ),
                   ],
                 ),

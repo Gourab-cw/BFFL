@@ -87,7 +87,7 @@ class _AttendanceState extends State<Attendance> {
       builder: (attendanceStore) {
         return Container(
           width: MediaQuery.of(context).size.width,
-          padding: EdgeInsets.only(top: safePadding.top, left: safePadding.left, bottom: safePadding.bottom, right: safePadding.right),
+          padding: EdgeInsets.only(top: safePadding.top-40, left: safePadding.left+10, bottom: safePadding.bottom, right: safePadding.right+10),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             spacing: 5,

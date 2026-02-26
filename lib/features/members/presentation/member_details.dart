@@ -87,7 +87,7 @@ class _MemberDetailsState extends State<MemberDetails> {
           child: Scaffold(
             appBar: AppBar(title: Text("Member Details")),
             body: Padding(
-              padding: EdgeInsets.only(left: safePadding.left, top: safePadding.top, bottom: safePadding.bottom, right: safePadding.right),
+              padding: EdgeInsets.only(left: safePadding.left, top: safePadding.top-40, bottom: safePadding.bottom, right: safePadding.right),
               child: DefaultTabController(
                 length: 3,
                 child: Column(

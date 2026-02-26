@@ -2,12 +2,11 @@ import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:healthandwellness/app/Datagrid3.dart';
-import 'package:healthandwellness/app/mainstore.dart';
-import 'package:healthandwellness/core/branch/controller/branch_controller.dart';
-import 'package:healthandwellness/core/utility/app_loader.dart';
+import 'package:healthandwellness/app/mainstore.dart';import 'package:healthandwellness/core/utility/app_loader.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/utility/helper.dart';
+import '../../master/branch/controller/branch_controller.dart';
 import '../controller/calendar_report_controller.dart';
 
 class CalenderReport extends StatefulWidget {
@@ -61,7 +60,7 @@ class _CalenderReportState extends State<CalenderReport> {
       builder: (calenderReportController) {
         return Scaffold(
           body: Padding(
-            padding: EdgeInsets.only(left: safePadding.left + 10, right: safePadding.right + 10, top: safePadding.top + 10, bottom: safePadding.bottom),
+            padding: EdgeInsets.only(left: safePadding.left + 10, right: safePadding.right + 10, top: safePadding.top-40, bottom: safePadding.bottom),
             child: SingleChildScrollView(
               child: Column(
                 children: [

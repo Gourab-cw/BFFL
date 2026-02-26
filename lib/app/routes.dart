@@ -10,6 +10,7 @@ import 'package:healthandwellness/features/slot_manage/controller/slot_manage_co
 import '../features/Service/presentation/service_details_view.dart';
 import '../features/Service/presentation/service_view.dart';
 import '../features/accountant/subscription/presentation/acc_subscription_details.dart';
+import '../features/member_approve/presentation/member_approve_register.dart';
 import '../features/members/controller/member_controller.dart';
 import '../features/members/presentation/member_session_details.dart';
 import '../features/receptionist/schedule/presentation/daily_schedule.dart';
@@ -43,4 +44,5 @@ final List<GetPage<dynamic>> routes = [
   GetPage(name: "/slotregister", page: () => SlotRegister()),
   GetPage(name: "/staffregister", page: () => StaffRegister()),
   GetPage(name: "/dailyschedule", page: () => DailySchedule()),
+  GetPage(name: "/memberapproveregister", page: () => MemberApproveRegister()),
 ];

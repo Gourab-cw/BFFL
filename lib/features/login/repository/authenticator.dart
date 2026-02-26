@@ -4,12 +4,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:healthandwellness/app/mainstore.dart';
-import 'package:healthandwellness/core/branch/data/branch_model.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
 import 'package:healthandwellness/features/home/controller/home_controller.dart';
 import 'package:healthandwellness/features/login/data/user.dart';
 
 import '../../../core/utility/firebase_service.dart';
+import '../../master/branch/data/branch_model.dart';
 
 class Authenticator extends GetxController {
   UserG? state;

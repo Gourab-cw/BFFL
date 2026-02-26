@@ -44,11 +44,10 @@ class _MembersState extends State<Members> {
         return Scaffold(
           appBar: AppBar(title: Text("Member List")),
           body: Padding(
-            padding: EdgeInsets.only(left: safePadding.left + 10, top: safePadding.top, bottom: safePadding.bottom, right: safePadding.right + 10),
+            padding: EdgeInsets.only(left: safePadding.left + 10, top: safePadding.top-40, bottom: safePadding.bottom, right: safePadding.right + 10),
             child: Column(
               spacing: 10,
               children: [
-                const SizedBox(height: 5),
                 Obx(
                   () => TextBox(
                     borderRadius: 40,
