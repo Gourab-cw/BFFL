@@ -2275,13 +2275,23 @@ List<Map<String, dynamic>> makeListSerialize(dynamic data) {
   }
 }
 
-int parseInt({required dynamic data, required int defaultInt}) {
+int parseInt({required dynamic data, int? defaultInt}) {
   try {
     return int.tryParse(parseDouble(data: data.toString(), defaultValue: 0.0).toStringAsFixed(0)) == null
-        ? defaultInt
+        ? (defaultInt ?? 0)
         : int.parse(parseDouble(data: data.toString(), defaultValue: 0.0).toStringAsFixed(0));
   } catch (e) {
-    return defaultInt;
+    return (defaultInt ?? 0);
+  }
+}
+
+int parseIntV2(dynamic data, {int? defaultInt}) {
+  try {
+    return int.tryParse(parseDouble(data: data.toString(), defaultValue: 0.0).toStringAsFixed(0)) == null
+        ? (defaultInt ?? 0)
+        : int.parse(parseDouble(data: data.toString(), defaultValue: 0.0).toStringAsFixed(0));
+  } catch (e) {
+    return (defaultInt ?? 0);
   }
 }
 

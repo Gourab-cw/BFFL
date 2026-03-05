@@ -9,6 +9,8 @@ class ServiceModel {
   final int maxBooking;
   final int amount;
   final double totalAmount;
+  final double gstPer;
+  final bool withGST;
   final int totalDays;
   final List<String> trainerId;
 
@@ -23,6 +25,8 @@ class ServiceModel {
     required this.trainerId,
     required this.totalDays,
     required this.amount,
+    required this.gstPer,
+    required this.withGST,
     this.isNewSlot,
     required this.totalAmount,
   });
@@ -34,12 +38,14 @@ class ServiceModel {
       name: parseString(data: json['name'], defaultValue: ""),
       description: parseString(data: json['description'], defaultValue: ""),
       isTrial: parseBool(data: json['isTrial'], defaultValue: false),
+      withGST: parseBool(data: json['withGST'], defaultValue: false),
       image: parseString(data: json['image'], defaultValue: ""),
       maxBooking: parseInt(data: json['maxBooking'], defaultInt: 0),
       trainerId: List<String>.from(json['trainerId'] ?? []),
       amount: parseInt(data: json['amount'], defaultInt: 0),
       totalDays: parseInt(data: json['totalDays'], defaultInt: 0),
       totalAmount: parseDouble(data: json['totalAmount'], defaultValue: 0),
+      gstPer: parseDouble(data: json['gstPer'], defaultValue: 0),
     );
   }
 
@@ -56,6 +62,8 @@ class ServiceModel {
       'amount': amount,
       'totalDays': totalDays,
       'totalAmount': totalAmount,
+      'withGST': withGST,
+      'gstPer': gstPer,
     };
   }
 
@@ -71,7 +79,9 @@ class ServiceModel {
     int? totalDays,
     int? amount,
     double? totalAmount,
+    double? gstPer,
     bool? isNewSlot,
+    bool? withGST,
   }) {
     return ServiceModel(
       id: id ?? this.id,
@@ -85,6 +95,8 @@ class ServiceModel {
       amount: amount ?? this.amount,
       totalAmount: totalAmount ?? this.totalAmount,
       isNewSlot: isNewSlot ?? this.isNewSlot,
+      gstPer: gstPer ?? this.gstPer,
+      withGST: withGST ?? this.withGST,
     );
   }
 }

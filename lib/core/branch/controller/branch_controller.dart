@@ -2,7 +2,8 @@ import 'package:get/get.dart';
 import 'package:healthandwellness/core/utility/firebase_service.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
 import 'package:healthandwellness/features/login/repository/authenticator.dart';
-import 'package:healthandwellness/features/master/branch/data/branch_model.dart';
+
+import '../data/branch_model.dart';
 
 class BranchController extends GetxController {
   final fb = Get.find<FB>();
@@ -15,12 +16,13 @@ class BranchController extends GetxController {
     list = resp.docs.map((m) => BranchModel.fromFirestore(m)).toList();
     update();
   }
+
   @override
   void onInit() {
     // TODO: implement onInit
-    try{
+    try {
       getBranchList();
-    }catch(e){
+    } catch (e) {
       showAlert("$e", AlertType.error);
     }
     super.onInit();

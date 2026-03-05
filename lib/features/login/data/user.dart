@@ -1,7 +1,7 @@
 import 'package:healthandwellness/core/utility/helper.dart';
 import 'package:intl/intl.dart';
 
-enum UserType { cwAdmin, admin, branchManager, receptionist, trainer, accountant, member }
+enum UserType { cwAdmin, admin, branchManager, receptionist, trainer, accountant, member, ledger }
 
 enum MemberType { paid, trial }
 
@@ -13,6 +13,7 @@ final Map<String, UserType> userTypeMap = {
   'JoVVKfIcwkccunAFqIdy': UserType.trainer,
   'nFgfN9g1CV401w0L2OiS': UserType.accountant,
   'Sl9TlKFGMLCGWGFyTQpd': UserType.member,
+  'XNdidAJe5kPovRllUEyU': UserType.ledger,
 };
 
 final Map<UserType, String> userTypeMap2 = {
@@ -23,6 +24,7 @@ final Map<UserType, String> userTypeMap2 = {
   UserType.trainer: 'JoVVKfIcwkccunAFqIdy',
   UserType.accountant: 'nFgfN9g1CV401w0L2OiS',
   UserType.member: 'Sl9TlKFGMLCGWGFyTQpd',
+  UserType.ledger: 'XNdidAJe5kPovRllUEyU',
 };
 
 class UserG {

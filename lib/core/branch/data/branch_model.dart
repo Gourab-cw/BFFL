@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../../../../core/utility/helper.dart';
-
+import '../../utility/helper.dart';
 
 class BranchModel {
   final String id;
