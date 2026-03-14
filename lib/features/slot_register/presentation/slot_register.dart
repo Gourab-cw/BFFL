@@ -72,6 +72,20 @@ class _SlotRegisterState extends State<SlotRegister> {
             appBar: AppBar(
               title: Text('Register'),
               actions: [
+                ButtonHelperG(
+                  shadow: [],
+                  onTap: () async {
+                    try {
+                      Loader.startLoading();
+                      await slotRegisterController.fetchRegister();
+                    } catch (e) {
+                      showAlert('$e', AlertType.error);
+                    } finally {
+                      Loader.stopLoading();
+                    }
+                  },
+                  icon: Icon(Icons.refresh),
+                ),
                 DateRangePicker(
                   height: 40,
                   fontColor: mainStore.theme.value.BackgroundColor,

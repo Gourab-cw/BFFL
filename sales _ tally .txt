@@ -1,0 +1,138 @@
+{
+  "tallycompanyname": "Jalan Brothers Pvt. Ltd.",
+  "IsCancel": "No",
+  "IsOptinal": "No",
+  "baseVoucherTypeName": "Sales Dhulagarh",
+  "vouchertypename": "WPL South Sales",
+  "voucherNo": "K/S/Sep279/25-26",
+  "voucherDate": "20250923",
+  "receranceno":"",
+  "referancedate": "000000",
+  "partyLedgerName": "New TV Centre (WPL)",
+  "voucherAmount": 134836,
+  "SalesPerson": "O/s Whirlpool 24 Pgs South",
+  "placeofsupply": "West Bengal",  
+  "ledgerallocation": [
+    {
+      "slno": "1",      
+      "ledgername": "New TV Centre (WPL)",
+      "amount": 134836,
+      "drCr": "Dr",      
+      "billallocation": [
+        {
+          "Slno": "1",
+          "referanceType": "New Ref",
+          "billNo": "K/S/Sep279/25-26",
+          "billDueDate": "20251023",
+          "amount": 134836,
+          "drCr": "Dr"
+        }
+      ]
+    },
+    {
+      "slno": "2",      
+      "ledgername": "Sales Whirlpool GST @ 18%",
+      "amount": 114267.71,
+      "drCr": "Cr",      
+      "itemallocation": [
+        {          
+         "lineno": "1",
+          "itemname": "215 IMPRO Roy 5S INV Neo Dutch - Z (73107)",
+          "hsncode": "84182100",
+          "gstrate": 18,
+          "uom": "PCS",
+          "qty": 4,
+          "rate": 17881.36,
+          "discount": 15,
+          "amount": 60796.62,
+          "Taxablevalue": 60796.62,
+          "Cgstamount": 5471.7,
+          "Sgstamount": 5471.7,
+          "taxabilitytype": "Taxable",
+          "batchallocation": [
+            {
+              "godownname": "Dhulagarh Godown (South 24)",
+              "batchname": "Primary Batch",
+              "quantity": 4,
+              "rate": 17881.36,
+              "uom": "PCS",
+              "amount": 60796.62
+            }
+          ]          
+        },
+        {          
+          "lineno": "2",
+          "itemname": "XS7012BYS (33010)",
+          "hsncode": "84501100",
+          "gstrate": 18,
+          "uom": "PCS",
+          "qty": 2,
+          "rate": 33211.86,
+          "discount": 19.5,
+          "amount": 53471.09,
+          "Taxablevalue": 53471.09,
+          "Cgstamount": 4812.4,
+          "Sgstamount": 4812.4,
+          "taxabilitytype": "Taxable",
+          "batchallocation": [
+            {
+              "godownname": "Dhulagarh Godown (South 24)",
+              "batchname": "Primary Batch",
+              "quantity": 2,
+              "rate": 33211.86,
+              "uom": "PCS",
+              "amount": 53471.09
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slno": "3",      
+      "ledgername": "Output CGST @ 9%",
+      "amount": 10284.1,
+      "drCr": "Cr"      
+    },
+    {
+      "slno": "4",      
+      "ledgername": "Output SGST @ 9%",
+      "amount": 10284.1,
+      "drCr": "Cr"      
+    },
+    {
+      "slno": "5",      
+      "ledgername": "Rounded Off",
+      "amount": 0.09,
+      "drCr": "Cr"      
+    }
+  ],
+  "shipingDetails": {
+    "buyername": "New TV Centre (WPL)",
+    "addressType": "Primary",
+    "address1": "Paschim Panchgachia, Gocharan, Kulpi Road",
+    "state": "West Bengal",
+    "country": "India",
+    "pincode": "743391",
+    "gstregistrationtype": "Regular",
+    "gstno": "19AWPPD2435D1ZO"
+  },
+  "billingDetails": {
+    "billfromName": "New TV Centre (WPL)",
+    "addressType": "Primary",
+    "address1": "Paschim Panchgachia, Gocharan, Kulpi Road",
+    "state": "West Bengal",
+    "country": "India",
+    "pincode": "743391",
+    "gstregistrationtype": "Regular",
+    "gstno": "19AWPPD2435D1ZO"
+  },
+  "irnDetails": {
+    "ackno": "182520290333695",
+    "ackdate": "20250923",
+    "irn": "1643e422e6a6a79a7f31ee89e76f90cd05b267f8f91a27d25c30917440fddcbf",
+    "distanceinkm": "0",
+    "billtoplace": "Bauria",
+    "shiptoplace": "Bauria"
+  },
+  "EwaybillDetails": []
+}

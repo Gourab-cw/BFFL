@@ -1,0 +1,50 @@
+{
+  "tallycompanyname": "HerbCare Pvt Ltd",
+  "IsCancel": "No",
+  "IsOptinal": "No",
+  "baseVoucherTypeName": "Sales",
+  "vouchertypename": "Service Sales",
+  "voucherNo": "GA000226",
+  "voucherDate": "20260307",
+  "receranceno": "",
+  "referancedate": "000000",
+  "partyLedgerName": "Customer_KFSjiHldtlbwcBXYhllFbyTWQY43",
+  "voucherAmount": 4885.2,
+  "placeofsupply": "Uttar Pradesh",
+  "ledgerallocation": [
+    {
+      "slno": "1",
+      "ledgername": "Customer Ledger",
+      "amount": 4885.2,
+      "drCr": "Dr",
+      "billallocation": [
+        {
+          "Slno": "1",
+          "referanceType": "New Ref",
+          "billNo": "GA000226",
+          "billDueDate": "20260331",
+          "amount": 4885.2,
+          "drCr": "Dr"
+        }
+      ]
+    },
+    {
+      "slno": "2",
+      "ledgername": "Service Income",
+      "amount": 4500,
+      "drCr": "Cr"
+    },
+    {
+      "slno": "3",
+      "ledgername": "Output CGST @ 9%",
+      "amount": 405,
+      "drCr": "Cr"
+    },
+    {
+      "slno": "4",
+      "ledgername": "Output SGST @ 9%",
+      "amount": 405,
+      "drCr": "Cr"
+    }
+  ]
+}

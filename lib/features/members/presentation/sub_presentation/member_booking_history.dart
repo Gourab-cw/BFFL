@@ -3,10 +3,11 @@ import 'package:get/get.dart';
 import 'package:healthandwellness/app/mainstore.dart';
 import 'package:healthandwellness/core/utility/app_loader.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
+import 'package:healthandwellness/features/login/data/user.dart';
+import 'package:healthandwellness/features/login/repository/authenticator.dart';
 import 'package:healthandwellness/features/subscriptions/controller/subscription_controller.dart';
 import 'package:healthandwellness/features/user_subscription/controller/user_subscription_controller.dart';
 import 'package:healthandwellness/features/user_subscription/data/user_subscription.dart';
-import 'package:intl/intl.dart';
 
 import '../../controller/member_controller.dart';
 
@@ -19,33 +20,25 @@ class MemberBookingHistory extends StatefulWidget {
 
 class _MemberBookingHistoryState extends State<MemberBookingHistory> {
   final userSubController = Get.find<UserSubscriptionController>();
+  final auth = Get.find<Authenticator>();
   final mainStore = Get.find<MainStore>();
   final subController = Get.find<SubscriptionController>();
   final loader = Get.find<AppLoaderController>();
   final MemberController memberController = Get.find<MemberController>();
 
   Widget getTypeWidget(UserSubscription us) {
-    switch (us.type) {
-      case UserSubscriptionType.trial:
-        return Container(
-          padding: EdgeInsets.symmetric(vertical: 3, horizontal: 8),
-          decoration: BoxDecoration(color: Colors.amber.shade200, borderRadius: BorderRadius.circular(10)),
-          child: TextHelper(text: 'Trial', fontsize: 12, fontweight: FontWeight.w600),
-        );
-      case UserSubscriptionType.dayWise:
-        return Container(
-          padding: EdgeInsets.symmetric(vertical: 2, horizontal: 5),
-          decoration: BoxDecoration(color: Colors.green.shade200, borderRadius: BorderRadius.circular(10)),
-          child: TextHelper(text: 'Day Wise', fontsize: 12, fontweight: FontWeight.w600),
-        );
-      case UserSubscriptionType.slotWise:
-        return Container(
-          padding: EdgeInsets.symmetric(vertical: 2, horizontal: 5),
-          decoration: BoxDecoration(color: Colors.green.shade200, borderRadius: BorderRadius.circular(10)),
-          child: TextHelper(text: 'Slot Wise', fontsize: 12, fontweight: FontWeight.w600),
-        );
+    if (us.isPaidSubscription) {
+      return Container(
+        padding: EdgeInsets.symmetric(vertical: 2, horizontal: 5),
+        decoration: BoxDecoration(color: Colors.green.shade200, borderRadius: BorderRadius.circular(10)),
+        child: TextHelper(text: 'Paid Service', fontsize: 12, fontweight: FontWeight.w600),
+      );
     }
-    return Container();
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 3, horizontal: 8),
+      decoration: BoxDecoration(color: Colors.amber.shade200, borderRadius: BorderRadius.circular(10)),
+      child: TextHelper(text: 'Trial', fontsize: 12, fontweight: FontWeight.w600),
+    );
   }
 
   @override
@@ -59,37 +52,45 @@ class _MemberBookingHistoryState extends State<MemberBookingHistory> {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                ButtonHelperG(
-                  onTap: () {
-                    userSubController.user = memberController.selectedUser!.toJSON();
-                    Get.toNamed('/usersubscriptionadd');
-                  },
-                  width: 80,
-                  label: TextHelper(text: "   + Create\nsubscription", fontsize: 11.5, isWrap: true, textalign: TextAlign.justify, color: Colors.white),
-                ),
-                ButtonHelperG(
-                  background: mainStore.theme.value.lowShadeColor,
-                  shadow: [],
-                  onTap: () async {
-                    try {
-                      loader.startLoading();
-                      await userSubController.getSubscriptionList(memberController.selectedUser!.id);
-                    } catch (e) {
-                      showAlert("$e", AlertType.error);
-                    } finally {
-                      loader.stopLoading();
-                    }
-                  },
-                  width: 40,
-                  label: Icon(Icons.refresh, color: mainStore.theme.value.HeadColor),
-                ),
+                if (memberController.selectedUser != null &&
+                    memberController.selectedUser!.isApproved &&
+                    auth.state != null &&
+                    auth.state!.userType != UserType.member)
+                  ButtonHelperG(
+                    onTap: () {
+                      userSubController.user = memberController.selectedUser!.toJSON();
+                      Get.toNamed('/usersubscriptionadd');
+                    },
+                    width: 80,
+                    label: TextHelper(text: "   + Create\nsubscription", fontsize: 11.5, isWrap: true, textalign: TextAlign.justify, color: Colors.white),
+                  ),
+                if (memberController.selectedUser != null &&
+                    memberController.selectedUser!.isApproved &&
+                    auth.state != null &&
+                    auth.state!.userType != UserType.member)
+                  ButtonHelperG(
+                    background: mainStore.theme.value.lowShadeColor,
+                    shadow: [],
+                    onTap: () async {
+                      try {
+                        loader.startLoading();
+                        await userSubController.getSubscriptionList(memberController.selectedUser!.id);
+                      } catch (e) {
+                        showAlert("$e", AlertType.error);
+                      } finally {
+                        loader.stopLoading();
+                      }
+                    },
+                    width: 40,
+                    label: Icon(Icons.refresh, color: mainStore.theme.value.HeadColor),
+                  ),
               ],
             ),
             Expanded(
               child: ListView.builder(
-                itemCount: userSubController.allSubscriptions.length,
+                itemCount: userSubController.subscriptionList.length,
                 itemBuilder: (_, index) {
-                  UserSubscription us = userSubController.allSubscriptions[index];
+                  UserSubscription us = userSubController.subscriptionList[index];
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Container(
@@ -134,9 +135,14 @@ class _MemberBookingHistoryState extends State<MemberBookingHistory> {
                             children: [
                               getTypeWidget(us),
                               TextHelper(
-                                text: us.paidAt == null ? 'Not Paid' : 'Paid: ${DateFormat('dd-MM-yyyy').format(us.paidAt!)}',
+                                text: us.isActive == false ? 'Not Active' : 'Active',
                                 fontsize: 11,
-                                color: us.paidAt == null ? Colors.red.shade600 : Colors.grey.shade600,
+                                color: us.isActive == false ? Colors.red.shade600 : Colors.grey.shade600,
+                              ),
+                              TextHelper(
+                                text: us.dueAmount > 0 ? 'Due Amount : ${currenyFormater(value: us.dueAmount, withDrCr: false)}' : 'Paid',
+                                fontsize: 11,
+                                color: us.dueAmount > 0 ? Colors.red.shade600 : Colors.grey.shade600,
                               ),
                             ],
                           ),

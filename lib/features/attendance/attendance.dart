@@ -80,125 +80,132 @@ class _AttendanceState extends State<Attendance> {
 
   @override
   Widget build(BuildContext context) {
-    final safePadding = MediaQuery.of(context).padding;
-    return GetBuilder<AttendanceController>(
-      init: attendanceStore,
-      autoRemove: false,
-      builder: (attendanceStore) {
-        return Container(
-          width: MediaQuery.of(context).size.width,
-          padding: EdgeInsets.only(top: safePadding.top-40, left: safePadding.left+10, bottom: safePadding.bottom, right: safePadding.right+10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            spacing: 5,
-            children: [
-              const SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Scaffold(
+      body: SafeArea(
+        child: GetBuilder<AttendanceController>(
+          init: attendanceStore,
+          autoRemove: false,
+          builder: (attendanceStore) {
+            return Container(
+              width: MediaQuery.of(context).size.width,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                spacing: 5,
                 children: [
-                  TextHelper(text: "Attendance List", fontsize: 16, fontweight: FontWeight.w600),
-                  if (!attendanceStore.todayHaveAttendance && auth.state != null && auth.state!.userType != UserType.admin)
-                    ButtonHelperG(
-                      width: 160,
-                      onTap: () async {
-                        loader.startLoading();
-                        try {
-                          await attendanceStore.giveAttendance();
-                        } catch (e) {
-                          showAlert("$e", AlertType.error);
-                        } finally {
-                          loader.stopLoading();
-                        }
-                      },
-                      icon: Icon(Icons.check, color: Colors.white, size: 18),
-                      label: TextHelper(text: "Mark attendance", color: Colors.white),
-                    ),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  DateRangePicker(
-                    width: 230,
-                    selectedDateRange: attendanceStore.range,
-                    withBorder: true,
-                    height: 40,
-                    onValueChange: (v) async {
-                      attendanceStore.range = v;
-                      Loader.startLoading();
-                      try {
-                        await attendanceStore.getAttendanceList();
-                      } catch (e) {
-                        showAlert("$e", AlertType.error);
-                      } finally {
-                        Loader.stopLoading();
-                      }
-                      attendanceStore.update();
-                    },
-                  ),
-                  ButtonHelperG(
-                    height: 40,
-                    background: mainStore.theme.value.mediumShadeColor,
-                    margin: 0,
-                    onTap: () async {
-                      Loader.startLoading();
-                      try {
-                        await attendanceStore.getAttendanceList();
-                      } catch (e) {
-                        showAlert("$e", AlertType.error);
-                      } finally {
-                        Loader.stopLoading();
-                      }
-                      attendanceStore.update();
-                    },
-                    icon: Icon(Icons.refresh),
-                  ),
-                ],
-              ),
-              SizedBox(height: 5),
-              Expanded(
-                child: Center(
-                  child: DataGridHelper3(
-                    headerColor: getMainStore().theme.value.lowShadeColor,
-                    withBorder: true,
-                    fontSize: 12,
-                    dataSource: attendanceStore.getAttendanceDatasource(),
-                    columnList: [
-                      DataGridColumnModel3(
-                        showFilter: true,
-                        customFilterCellText: (v) => parseDateToString(data: v, formatDate: 'dd-MM-yyyy', predefinedDateFormat: 'yyyy-MM-dd', defaultValue: ''),
-                        dataField: "date",
-                        dataType: CellDataType3.string,
-                        title: "Date",
-                        customCell: (c) {
-                          return TextHelper(
-                            // text: DateFormat("dd-MM-yyyy").format((c.cellValue as Timestamp).toDate()),
-                            text: parseDateToString(data: c.cellValue, formatDate: 'dd-MM-yyyy', predefinedDateFormat: 'yyyy-MM-dd', defaultValue: ''),
-                            textalign: TextAlign.center,
-                            fontsize: 12,
-                          );
-                        },
-                      ),
-                      DataGridColumnModel3(
-                        dataField: "createdAt",
-                        dataType: CellDataType3.string,
-                        title: "Time",
-                        customCell: (c) {
-                          return TextHelper(text: DateFormat("hh:mm a").format((c.cellValue as Timestamp).toDate()), textalign: TextAlign.center, fontsize: 12);
-                        },
-                      ),
-                      DataGridColumnModel3(showFilter: true, dataField: "branchName", dataType: CellDataType3.string, title: "Branch"),
-                      DataGridColumnModel3(showFilter: true, dataField: "userName", dataType: CellDataType3.string, title: "Name"),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      TextHelper(text: "Attendance List", fontsize: 16, fontweight: FontWeight.w600),
+                      if (!attendanceStore.todayHaveAttendance && auth.state != null && auth.state!.userType != UserType.admin)
+                        ButtonHelperG(
+                          width: 160,
+                          onTap: () async {
+                            loader.startLoading();
+                            try {
+                              await attendanceStore.giveAttendance();
+                            } catch (e) {
+                              showAlert("$e", AlertType.error);
+                            } finally {
+                              loader.stopLoading();
+                            }
+                          },
+                          icon: Icon(Icons.check, color: Colors.white, size: 18),
+                          label: TextHelper(text: "Mark attendance", color: Colors.white),
+                        ),
                     ],
-                    uniqueKey: UniqueKey().toString(),
-                    width: MediaQuery.sizeOf(context).width - 10,
                   ),
-                ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      DateRangePicker(
+                        width: 230,
+                        selectedDateRange: attendanceStore.range,
+                        withBorder: true,
+                        height: 40,
+                        onValueChange: (v) async {
+                          attendanceStore.range = v;
+                          Loader.startLoading();
+                          try {
+                            await attendanceStore.getAttendanceList();
+                          } catch (e) {
+                            showAlert("$e", AlertType.error);
+                          } finally {
+                            Loader.stopLoading();
+                          }
+                          attendanceStore.update();
+                        },
+                      ),
+                      ButtonHelperG(
+                        height: 40,
+                        background: mainStore.theme.value.mediumShadeColor,
+                        margin: 0,
+                        onTap: () async {
+                          Loader.startLoading();
+                          try {
+                            await attendanceStore.getAttendanceList();
+                          } catch (e) {
+                            showAlert("$e", AlertType.error);
+                          } finally {
+                            Loader.stopLoading();
+                          }
+                          attendanceStore.update();
+                        },
+                        icon: Icon(Icons.refresh),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 5),
+                  Expanded(
+                    child: Center(
+                      child: DataGridHelper3(
+                        headerColor: getMainStore().theme.value.lowShadeColor,
+                        withBorder: true,
+                        fontSize: 12,
+                        dataSource: attendanceStore.getAttendanceDatasource(),
+                        columnList: [
+                          DataGridColumnModel3(
+                            showFilter: true,
+                            customFilterCellText: (v) =>
+                                parseDateToString(data: v, formatDate: 'dd-MM-yyyy', predefinedDateFormat: 'yyyy-MM-dd', defaultValue: ''),
+                            dataField: "date",
+                            dataType: CellDataType3.string,
+                            title: "Date",
+                            customCell: (c) {
+                              return TextHelper(
+                                // text: DateFormat("dd-MM-yyyy").format((c.cellValue as Timestamp).toDate()),
+                                text: parseDateToString(data: c.cellValue, formatDate: 'dd-MM-yyyy', predefinedDateFormat: 'yyyy-MM-dd', defaultValue: ''),
+                                textalign: TextAlign.center,
+                                fontsize: 12,
+                              );
+                            },
+                          ),
+                          DataGridColumnModel3(
+                            dataField: "createdAt",
+                            dataType: CellDataType3.string,
+                            title: "Time",
+                            customCell: (c) {
+                              return TextHelper(
+                                text: DateFormat("hh:mm a").format((c.cellValue as Timestamp).toDate()),
+                                textalign: TextAlign.center,
+                                fontsize: 12,
+                              );
+                            },
+                          ),
+                          DataGridColumnModel3(showFilter: true, dataField: "branchName", dataType: CellDataType3.string, title: "Branch"),
+                          DataGridColumnModel3(showFilter: true, dataField: "userName", dataType: CellDataType3.string, title: "Name"),
+                        ],
+                        uniqueKey: UniqueKey().toString(),
+                        width: MediaQuery.sizeOf(context).width - 10,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        );
-      },
+            );
+          },
+        ),
+      ),
     );
   }
 }

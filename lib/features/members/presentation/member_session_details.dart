@@ -38,9 +38,7 @@ class _MemberSessionDetailsState extends State<MemberSessionDetails> {
       builder: (mhc) {
         return AppLoader(
           child: Scaffold(
-            appBar: AppBar(
-              title: TextHelper(text: "Session Details", fontsize: 16, fontweight: FontWeight.w600),
-            ),
+            appBar: AppBar(title: Text("Session Details")),
             body: Builder(
               builder: (context) {
                 final booking = mhc.selectedBooking;
@@ -62,6 +60,7 @@ class _MemberSessionDetailsState extends State<MemberSessionDetails> {
                               try {
                                 loader.startLoading();
                                 serviceController.selectedReschedule = booking;
+                                serviceController.selectedMember = {"id": booking.memberId, "name": booking.memberName};
                                 final fb = Get.find<FB>();
                                 final db = await fb.getDB();
                                 await serviceController.getServiceDetails(booking.serviceId, auth.state!.branchId, isReschedule: true);
@@ -98,9 +97,17 @@ class _MemberSessionDetailsState extends State<MemberSessionDetails> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Row(
+                              children: [
+                                const SizedBox(width: 2),
+                                Icon(FontAwesomeIcons.ticket, size: 17, color: Colors.grey.shade600),
+                                const SizedBox(width: 13),
+                                TextHelper(text: booking.subscriptionNo ?? ''),
+                              ],
+                            ),
+                            Row(
                               spacing: 10,
                               children: [
-                                Icon(Icons.calendar_month, color: Colors.grey.shade600),
+                                Icon(Icons.calendar_month, size: 21, color: Colors.grey.shade600),
                                 TextHelper(
                                   text: parseDateToString(data: booking.date, formatDate: "dd-MM-yyyy", predefinedDateFormat: "yyyy-MM-dd", defaultValue: ""),
                                 ),
@@ -109,7 +116,7 @@ class _MemberSessionDetailsState extends State<MemberSessionDetails> {
                             Row(
                               spacing: 10,
                               children: [
-                                Icon(Icons.watch_later_outlined, color: Colors.grey.shade600),
+                                Icon(Icons.watch_later_outlined, size: 21, color: Colors.grey.shade600),
                                 TextHelper(text: "${booking.startTime} - ${booking.endTime}"),
                               ],
                             ),
@@ -127,7 +134,7 @@ class _MemberSessionDetailsState extends State<MemberSessionDetails> {
                                 Row(
                                   spacing: 10,
                                   children: [
-                                    Icon(FontAwesomeIcons.userDoctor, color: Colors.grey.shade600),
+                                    Icon(FontAwesomeIcons.userDoctor, size: 21, color: Colors.grey.shade600),
                                     TextHelper(text: booking.trainerName ?? ""),
                                   ],
                                 ),

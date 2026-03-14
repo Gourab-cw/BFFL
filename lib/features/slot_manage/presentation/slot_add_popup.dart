@@ -105,6 +105,7 @@ Future<void> slotAddPopup(
                                 'startTime': data.startTime,
                                 'endTime': data.endTime,
                                 'serviceId': selectedCourses[i].id,
+                                'trainerId': parseString(data: selectedCourses[i].trainerId.first, defaultValue: ''),
                                 'bookingCount': 0,
                                 'createdAt': Timestamp.now(),
                                 'month': DateFormat('yyyy-MM').format(data.date),

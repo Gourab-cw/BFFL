@@ -9,6 +9,7 @@ class SessionModel {
   final String? memberContact1;
   final String serviceId;
   final String subscriptionId;
+  final String? subscriptionNo;
   final String? serviceName;
   final String? serviceDetails;
   final String trainerId;
@@ -41,6 +42,7 @@ class SessionModel {
     required this.slotId,
     required this.trainerId,
     required this.subscriptionId,
+    required this.subscriptionNo,
     this.trainerName,
     required this.date,
     required this.hasAttend,
@@ -67,6 +69,7 @@ class SessionModel {
       serviceId: data['serviceId'] ?? '',
       slotId: data['slotId'] ?? '',
       subscriptionId: data['subscriptionId'] ?? '',
+      subscriptionNo: data['subscriptionNo'] ?? '',
       trainerId: data['trainerId'] is List ? data['trainerId'][0] ?? "" : data['trainerId'] ?? "",
       date: data['date'] ?? '',
       hasAttend: data['hasAttend'] ?? false,
@@ -116,6 +119,7 @@ class SessionModel {
     String? memberContact1,
     String? serviceId,
     String? subscriptionId,
+    String? subscriptionNo,
     String? serviceName,
     String? serviceDetails,
     String? slotId,
@@ -144,6 +148,7 @@ class SessionModel {
       serviceDetails: serviceDetails ?? this.serviceDetails,
       slotId: slotId ?? this.slotId,
       subscriptionId: subscriptionId ?? this.subscriptionId,
+      subscriptionNo: subscriptionNo ?? this.subscriptionNo,
       trainerId: trainerId ?? this.trainerId,
       trainerName: trainerName ?? this.trainerName,
       date: date ?? this.date,

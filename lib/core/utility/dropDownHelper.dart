@@ -1,12 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:get/get.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
+import 'package:moon_design/moon_design.dart';
 
 import '../../app/mainstore.dart';
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:moon_design/moon_design.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 
 enum DropDownStylingMode { defaultStyle, underlineStyle }
 
@@ -100,15 +101,10 @@ class _DropDownHelperState extends State<DropDownHelper> {
 
   getSelectedIdLabel(String selectedId) {
     if (selectedId == '') return;
-    var index = widget.items.indexWhere(
-      (f) => f[widget.valueExpr]!.toString() == selectedId,
-    );
+    var index = widget.items.indexWhere((f) => f[widget.valueExpr]!.toString() == selectedId);
     if (index != -1) {
       setState(() {
-        selectedTextController.text = parseString(
-          data: makeMapSerialize(widget.items[index])[widget.labelExpr ?? ''],
-          defaultValue: '',
-        );
+        selectedTextController.text = parseString(data: makeMapSerialize(widget.items[index])[widget.labelExpr ?? ''], defaultValue: '');
       });
     } else {
       setState(() {
@@ -121,12 +117,7 @@ class _DropDownHelperState extends State<DropDownHelper> {
     int x = list.indexWhere((f) => f[widget.valueExpr].toString() == id);
     Color color;
     if (x != -1) {
-      color = Color(
-        int.parse(
-          'FF${list[x][widget.iconExpr]!.toString().replaceAll('#', '')}',
-          radix: 16,
-        ),
-      );
+      color = Color(int.parse('FF${list[x][widget.iconExpr]!.toString().replaceAll('#', '')}', radix: 16));
     } else {
       color = const Color.fromRGBO(255, 255, 255, 0);
     }
@@ -135,23 +126,14 @@ class _DropDownHelperState extends State<DropDownHelper> {
         padding: const EdgeInsets.all(5),
         width: 15,
         height: 15,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(100),
-          color: color,
-        ),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(100), color: color),
       ),
     );
   }
 
   filterSearchItems(String text) {
     List filtered = widget.items
-        .where(
-          (f) =>
-              f[widget.labelExpr] != null &&
-              f[widget.labelExpr]!.toString().toLowerCase().contains(
-                text.toLowerCase(),
-              ),
-        )
+        .where((f) => f[widget.labelExpr] != null && f[widget.labelExpr]!.toString().toLowerCase().contains(text.toLowerCase()))
         .toList();
     setState(() {
       itemList = filtered;
@@ -163,25 +145,12 @@ class _DropDownHelperState extends State<DropDownHelper> {
 
     for (Map l in list) {
       if (!parents.keys.contains(l[widget.treeViewParentExpr])) {
-        parents.addAll({
-          l[widget.treeViewParentExpr]: list
-              .where(
-                (w) =>
-                    w[widget.treeViewParentExpr] ==
-                    l[widget.treeViewParentExpr],
-              )
-              .toList(),
-        });
+        parents.addAll({l[widget.treeViewParentExpr]: list.where((w) => w[widget.treeViewParentExpr] == l[widget.treeViewParentExpr]).toList()});
       }
     }
     List data = [];
     for (dynamic m in parents.keys) {
-      data.add({
-        "type": "parent",
-        "identityValue": m,
-        "label": m,
-        "children": parents[m],
-      });
+      data.add({"type": "parent", "identityValue": m, "label": m, "children": parents[m]});
     }
     return data;
   }
@@ -189,9 +158,7 @@ class _DropDownHelperState extends State<DropDownHelper> {
   @override
   void initState() {
     setState(() {
-      itemList = widget.withTreeView
-          ? makeTreeViewList(jsonDecode(jsonEncode(widget.items)))
-          : widget.items;
+      itemList = widget.withTreeView ? makeTreeViewList(jsonDecode(jsonEncode(widget.items))) : widget.items;
       if (widget.multiselectedId != null) {
         multiSelectItemList = [...widget.multiselectedId!];
       }
@@ -216,9 +183,7 @@ class _DropDownHelperState extends State<DropDownHelper> {
       () {
         getSelectedIdLabel(widget.selectedId);
         setState(() {
-          itemList = widget.withTreeView
-              ? makeTreeViewList(jsonDecode(jsonEncode(widget.items)))
-              : widget.items;
+          itemList = widget.withTreeView ? makeTreeViewList(jsonDecode(jsonEncode(widget.items))) : widget.items;
           if (widget.multiselectedId != null) {
             multiSelectItemList = [...widget.multiselectedId!];
           }
@@ -235,16 +200,12 @@ class _DropDownHelperState extends State<DropDownHelper> {
           followerAnchor: widget.followerAnchor,
           dropdownAnchorPosition: widget.dropDownPosition,
           borderRadius: BorderRadius.circular(10),
-          dropdownShadows: const [
-            BoxShadow(color: Color(0xAB9F9F9F), blurRadius: 5, spreadRadius: 1),
-          ],
+          dropdownShadows: const [BoxShadow(color: Color(0xAB9F9F9F), blurRadius: 5, spreadRadius: 1)],
           // minHeight: 80,
           distanceToTarget: widget.withMultiSelect ? 0 : 10,
           maxHeight: widget.listheight,
           show: widget.disable ? false : _showChoices,
-          backgroundColor: mainStore.isDarkEnable.value
-              ? Colors.grey[900]
-              : widget.lightModeBackgroundColor ?? Colors.grey[50],
+          backgroundColor: mainStore.isDarkEnable.value ? Colors.grey[900] : widget.lightModeBackgroundColor ?? Colors.grey[50],
           constrainWidthToChild: true,
           onTapOutside: () => setState(() {
             _showChoices = false;
@@ -252,14 +213,10 @@ class _DropDownHelperState extends State<DropDownHelper> {
             getSelectedIdLabel(widget.selectedId);
           }),
           content: Container(
-            height: itemList.length * 40 > widget.listheight
-                ? widget.listheight
-                : itemList.length * 50,
+            height: itemList.length * 40 > widget.listheight ? widget.listheight : itemList.length * 50,
             alignment: Alignment.topCenter,
             decoration: BoxDecoration(
-              color: mainStore.isDarkEnable.value
-                  ? Colors.grey[900]
-                  : widget.lightModeBackgroundColor ?? Colors.grey[50],
+              color: mainStore.isDarkEnable.value ? Colors.grey[900] : widget.lightModeBackgroundColor ?? Colors.grey[50],
               borderRadius: BorderRadius.circular(26),
             ),
             child: widget.withTreeView
@@ -268,35 +225,15 @@ class _DropDownHelperState extends State<DropDownHelper> {
                     itemCount: itemList.length,
                     itemBuilder: (context, index) => MoonAccordion(
                       borderColor: const Color.fromARGB(255, 136, 136, 136),
-                      decoration: const BoxDecoration(
-                        color: Colors.transparent,
-                      ),
-                      label: Text(
-                        itemList[index]['label'],
-                        style: TextStyle(
-                          color: mainStore.isDarkEnable.value
-                              ? Colors.grey[500]
-                              : Colors.grey[700],
-                        ),
-                      ),
+                      decoration: const BoxDecoration(color: Colors.transparent),
+                      label: Text(itemList[index]['label'], style: TextStyle(color: mainStore.isDarkEnable.value ? Colors.grey[500] : Colors.grey[700])),
                       identityValue: itemList[index]['identityValue'],
                       childrenPadding: const EdgeInsets.all(12),
-                      iconColor: mainStore.isDarkEnable.value
-                          ? Colors.grey[500]
-                          : Colors.grey[700],
-                      expandedIconColor: mainStore.isDarkEnable.value
-                          ? Colors.grey[500]
-                          : Colors.grey[700],
+                      iconColor: mainStore.isDarkEnable.value ? Colors.grey[500] : Colors.grey[700],
+                      expandedIconColor: mainStore.isDarkEnable.value ? Colors.grey[500] : Colors.grey[700],
                       initiallyExpanded: widget.expandAll,
-                      groupIdentityValue:
-                          dropDownHelperStore.currentlyOpenAccordionItem.value,
-                      onExpansionChanged: (value) => setState(
-                        () =>
-                            dropDownHelperStore
-                                .currentlyOpenAccordionItem
-                                .value = value
-                                .toString(),
-                      ),
+                      groupIdentityValue: dropDownHelperStore.currentlyOpenAccordionItem.value,
+                      onExpansionChanged: (value) => setState(() => dropDownHelperStore.currentlyOpenAccordionItem.value = value.toString()),
                       children: List.generate(
                         itemList[index]['children'].length,
                         (x) => MoonMenuItem(
@@ -304,62 +241,30 @@ class _DropDownHelperState extends State<DropDownHelper> {
                           onTap: () {
                             if (widget.withMultiSelect) {
                               setState(() {
-                                multiSelectItemList.any(
-                                      (r) =>
-                                          r ==
-                                          itemList[index]['children'][x][widget
-                                              .valueExpr],
-                                    )
-                                    ? multiSelectItemList.removeWhere(
-                                        (r) =>
-                                            r ==
-                                            itemList[index]['children'][x][widget
-                                                .valueExpr],
-                                      )
-                                    : multiSelectItemList.add(
-                                        itemList[index]['children'][x][widget
-                                            .valueExpr],
-                                      );
+                                multiSelectItemList.any((r) => r == itemList[index]['children'][x][widget.valueExpr])
+                                    ? multiSelectItemList.removeWhere((r) => r == itemList[index]['children'][x][widget.valueExpr])
+                                    : multiSelectItemList.add(itemList[index]['children'][x][widget.valueExpr]);
                               });
                               Timer(const Duration(milliseconds: 700), () {
                                 widget.onValueChange(multiSelectItemList);
                               });
                               return;
                             }
-                            widget.onValueChange(
-                              itemList[index]['children'][x][widget.valueExpr],
-                            );
+                            widget.onValueChange(itemList[index]['children'][x][widget.valueExpr]);
                             setState(() {
                               _showChoices = false;
-                              itemList = widget.withTreeView
-                                  ? makeTreeViewList(
-                                      jsonDecode(jsonEncode(widget.items)),
-                                    )
-                                  : widget.items;
+                              itemList = widget.withTreeView ? makeTreeViewList(jsonDecode(jsonEncode(widget.items))) : widget.items;
                             });
                           },
 
                           label: Row(
                             children: [
-                              widget.withIcon
-                                  ? getLeadingWidget(
-                                      itemList[index]['children'][x]![widget
-                                              .valueExpr]
-                                          .toString(),
-                                      widget.items,
-                                    )
-                                  : Container(),
+                              widget.withIcon ? getLeadingWidget(itemList[index]['children'][x]![widget.valueExpr].toString(), widget.items) : Container(),
                               const SizedBox(width: 5),
                               Expanded(
                                 child: Text(
-                                  itemList[index]['children'][x][widget
-                                          .labelExpr] ??
-                                      "",
-                                  style: TextStyle(
-                                    color: mainStore.isDarkEnable.value
-                                        ? Colors.grey[100]
-                                        : Colors.grey[800],
-                                  ),
+                                  itemList[index]['children'][x][widget.labelExpr] ?? "",
+                                  style: TextStyle(color: mainStore.isDarkEnable.value ? Colors.grey[100] : Colors.grey[800]),
                                 ),
                               ),
                             ],
@@ -367,26 +272,13 @@ class _DropDownHelperState extends State<DropDownHelper> {
                           leading: widget.withMultiSelect
                               ? MoonCheckbox(
                                   tapAreaSizeValue: 10,
-                                  value: multiSelectItemList.any(
-                                    (r) =>
-                                        r ==
-                                        itemList[index]['children'][x][widget
-                                            .valueExpr],
-                                  ),
+                                  value: multiSelectItemList.any((r) => r == itemList[index]['children'][x][widget.valueExpr]),
                                   onChanged: (v) {
                                     setState(() {
                                       if (v == true) {
-                                        multiSelectItemList.add(
-                                          itemList[index]['children'][x][widget
-                                              .valueExpr],
-                                        );
+                                        multiSelectItemList.add(itemList[index]['children'][x][widget.valueExpr]);
                                       } else {
-                                        multiSelectItemList.removeWhere(
-                                          (r) =>
-                                              r ==
-                                              itemList[index]['children'][x][widget
-                                                  .valueExpr],
-                                        );
+                                        multiSelectItemList.removeWhere((r) => r == itemList[index]['children'][x][widget.valueExpr]);
                                       }
                                     });
                                   },
@@ -409,22 +301,13 @@ class _DropDownHelperState extends State<DropDownHelper> {
                       height: 45,
                       verticalGap: 5,
                       absorbGestures: true,
-                      backgroundColor: index % 2 != 0
-                          ? Colors.grey[200]
-                          : Colors.grey[50],
+                      backgroundColor: index % 2 != 0 ? Colors.grey[200] : Colors.grey[50],
                       onTap: () {
                         if (widget.withMultiSelect) {
                           setState(() {
-                            multiSelectItemList.any(
-                                  (r) => r == itemList[index][widget.valueExpr],
-                                )
-                                ? multiSelectItemList.removeWhere(
-                                    (r) =>
-                                        r == itemList[index][widget.valueExpr],
-                                  )
-                                : multiSelectItemList.add(
-                                    itemList[index][widget.valueExpr],
-                                  );
+                            multiSelectItemList.any((r) => r == itemList[index][widget.valueExpr])
+                                ? multiSelectItemList.removeWhere((r) => r == itemList[index][widget.valueExpr])
+                                : multiSelectItemList.add(itemList[index][widget.valueExpr]);
                           });
                           Timer(const Duration(milliseconds: 700), () {
                             widget.onValueChange(multiSelectItemList);
@@ -434,31 +317,17 @@ class _DropDownHelperState extends State<DropDownHelper> {
                         widget.onValueChange(itemList[index][widget.valueExpr]);
                         setState(() {
                           _showChoices = false;
-                          itemList = widget.withTreeView
-                              ? makeTreeViewList(
-                                  jsonDecode(jsonEncode(widget.items)),
-                                )
-                              : widget.items;
+                          itemList = widget.withTreeView ? makeTreeViewList(jsonDecode(jsonEncode(widget.items))) : widget.items;
                         });
                       },
                       label: Row(
                         children: [
-                          widget.withIcon
-                              ? getLeadingWidget(
-                                  itemList[index]![widget.valueExpr].toString(),
-                                  itemList,
-                                )
-                              : Container(),
+                          widget.withIcon ? getLeadingWidget(itemList[index]![widget.valueExpr].toString(), itemList) : Container(),
                           const SizedBox(width: 5),
                           Expanded(
                             child: TextHelper(
-                              text: parseString(
-                                data: itemList[index][widget.labelExpr],
-                                defaultValue: '',
-                              ),
-                              color: mainStore.isDarkEnable.value
-                                  ? Colors.grey[100]
-                                  : Colors.grey[800],
+                              text: parseString(data: itemList[index][widget.labelExpr], defaultValue: ''),
+                              color: mainStore.isDarkEnable.value ? Colors.grey[100] : Colors.grey[800],
                             ),
                           ),
                         ],
@@ -466,21 +335,13 @@ class _DropDownHelperState extends State<DropDownHelper> {
                       leading: widget.withMultiSelect
                           ? MoonCheckbox(
                               tapAreaSizeValue: 10,
-                              value: multiSelectItemList.any(
-                                (r) => r == itemList[index][widget.labelExpr],
-                              ),
+                              value: multiSelectItemList.any((r) => r == itemList[index][widget.labelExpr]),
                               onChanged: (v) {
                                 setState(() {
                                   if (v == true) {
-                                    multiSelectItemList.add(
-                                      itemList[index][widget.labelExpr],
-                                    );
+                                    multiSelectItemList.add(itemList[index][widget.labelExpr]);
                                   } else {
-                                    multiSelectItemList.removeWhere(
-                                      (r) =>
-                                          r ==
-                                          itemList[index][widget.labelExpr],
-                                    );
+                                    multiSelectItemList.removeWhere((r) => r == itemList[index][widget.labelExpr]);
                                   }
                                 });
                               },
@@ -511,20 +372,12 @@ class _DropDownHelperState extends State<DropDownHelper> {
                       child: multiSelectItemList.isEmpty
                           ? widget.customWidgetForBlankData ??
                                 Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 40,
-                                    vertical: 5,
-                                  ),
+                                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 5),
                                   decoration: BoxDecoration(
-                                    color: mainStore.isDarkEnable.value
-                                        ? Colors.grey[900]
-                                        : widget.lightModeBackgroundColor ??
-                                              Colors.grey[300],
+                                    color: mainStore.isDarkEnable.value ? Colors.grey[900] : widget.lightModeBackgroundColor ?? Colors.grey[300],
                                     borderRadius: BorderRadius.circular(10),
                                   ),
-                                  child: Center(
-                                    child: Text(widget.placeholder),
-                                  ),
+                                  child: Center(child: Text(widget.placeholder)),
                                 )
                           : Row(
                               children: multiSelectItemList
@@ -537,34 +390,14 @@ class _DropDownHelperState extends State<DropDownHelper> {
                                           padding: const EdgeInsets.all(10),
                                           decoration: BoxDecoration(
                                             color: mainStore.isDarkEnable.value
-                                                ? const Color.fromARGB(
-                                                    255,
-                                                    119,
-                                                    117,
-                                                    112,
-                                                  )
-                                                : const Color.fromARGB(
-                                                    255,
-                                                    236,
-                                                    236,
-                                                    236,
-                                                  ),
-                                            borderRadius: BorderRadius.circular(
-                                              50,
-                                            ),
+                                                ? const Color.fromARGB(255, 119, 117, 112)
+                                                : const Color.fromARGB(255, 236, 236, 236),
+                                            borderRadius: BorderRadius.circular(50),
                                           ),
-                                          margin: const EdgeInsets.symmetric(
-                                            horizontal: 5,
-                                          ),
+                                          margin: const EdgeInsets.symmetric(horizontal: 5),
                                           child: Text(
-                                            widget.items.firstWhereOrNull(
-                                                  (f) =>
-                                                      f[widget.valueExpr] == m,
-                                                )![widget.labelExpr] ??
-                                                'NA##',
-                                            style: TextStyle(
-                                              fontSize: widget.childFontSize,
-                                            ),
+                                            widget.items.firstWhereOrNull((f) => f[widget.valueExpr] == m)![widget.labelExpr] ?? 'NA##',
+                                            style: TextStyle(fontSize: widget.childFontSize),
                                           ),
                                         ),
                                         Positioned(
@@ -573,34 +406,18 @@ class _DropDownHelperState extends State<DropDownHelper> {
                                           child: GestureDetector(
                                             onTap: () {
                                               setState(() {
-                                                multiSelectItemList.removeWhere(
-                                                  (f) => f == m,
-                                                );
+                                                multiSelectItemList.removeWhere((f) => f == m);
                                               });
-                                              Timer(
-                                                const Duration(
-                                                  milliseconds: 700,
-                                                ),
-                                                () {
-                                                  widget.onValueChange(
-                                                    multiSelectItemList,
-                                                  );
-                                                },
-                                              );
+                                              Timer(const Duration(milliseconds: 700), () {
+                                                widget.onValueChange(multiSelectItemList);
+                                              });
                                               return;
                                             },
                                             child: Container(
-                                              decoration: BoxDecoration(
-                                                color: Colors.red[300],
-                                                borderRadius:
-                                                    BorderRadius.circular(15),
-                                              ),
+                                              decoration: BoxDecoration(color: Colors.red[300], borderRadius: BorderRadius.circular(15)),
                                               child: const Padding(
                                                 padding: EdgeInsets.all(4.0),
-                                                child: Icon(
-                                                  Icons.close,
-                                                  size: 15,
-                                                ),
+                                                child: Icon(Icons.close, size: 15, color: Colors.grey),
                                               ),
                                             ),
                                           ),
@@ -623,19 +440,14 @@ class _DropDownHelperState extends State<DropDownHelper> {
                   mouseCursor: MouseCursor.defer,
                   // backgroundColor:
                   //     mainStore.isDarkEnable.value ? Colors.grey[600] : Colors.white,
-                  textColor: mainStore.isDarkEnable.value
-                      ? Colors.grey[400]
-                      : Colors.grey[900],
-                  backgroundColor: mainStore.isDarkEnable.value
-                      ? Colors.grey[900]
-                      : widget.lightModeBackgroundColor ?? Colors.grey[50],
+                  textColor: mainStore.isDarkEnable.value ? Colors.grey[400] : Colors.grey[900],
+                  backgroundColor: mainStore.isDarkEnable.value ? Colors.grey[900] : widget.lightModeBackgroundColor ?? Colors.grey[50],
                   activeBorderColor: widget.withBorder
                       ? mainStore.isDarkEnable.value
                             ? Colors.grey[800]
                             : Colors.grey[700]
                       : Colors.transparent,
-                  inactiveBorderColor:
-                      widget.stylingMode == DropDownStylingMode.underlineStyle
+                  inactiveBorderColor: widget.stylingMode == DropDownStylingMode.underlineStyle
                       ? mainStore.isDarkEnable.value
                             ? Colors.grey[800]
                             : Colors.grey[600]
@@ -645,16 +457,9 @@ class _DropDownHelperState extends State<DropDownHelper> {
                             : Colors.grey[300]
                       : Colors.transparent,
                   decoration: BoxDecoration(
-                    color: mainStore.isDarkEnable.value
-                        ? Colors.grey[900]
-                        : widget.lightModeBackgroundColor ?? Colors.grey[50],
-                    borderRadius: BorderRadius.circular(
-                      widget.stylingMode == DropDownStylingMode.underlineStyle
-                          ? 0
-                          : 5,
-                    ),
-                    border:
-                        widget.stylingMode == DropDownStylingMode.underlineStyle
+                    color: mainStore.isDarkEnable.value ? Colors.grey[900] : widget.lightModeBackgroundColor ?? Colors.grey[50],
+                    borderRadius: BorderRadius.circular(widget.stylingMode == DropDownStylingMode.underlineStyle ? 0 : 5),
+                    border: widget.stylingMode == DropDownStylingMode.underlineStyle
                         ? Border(
                             bottom: BorderSide(
                               color: widget.withBorder
@@ -682,10 +487,7 @@ class _DropDownHelperState extends State<DropDownHelper> {
                       widget.onTap!();
                     }
                     if (widget.selectOnFocus) {
-                      selectedTextController.selection = TextSelection(
-                        baseOffset: 0,
-                        extentOffset: selectedTextController.text.length,
-                      );
+                      selectedTextController.selection = TextSelection(baseOffset: 0, extentOffset: selectedTextController.text.length);
                     }
                     if (widget.disable) return;
                     setState(() => _showChoices = !_showChoices);
@@ -693,19 +495,12 @@ class _DropDownHelperState extends State<DropDownHelper> {
                   onChanged: (text) {
                     filterSearchItems(text);
                   },
-                  leading: widget.withIcon
-                      ? getLeadingWidget(
-                          widget.selectedId.toString(),
-                          widget.items,
-                        )
-                      : widget.parentLeadingIcon,
+                  leading: widget.withIcon ? getLeadingWidget(widget.selectedId.toString(), widget.items) : widget.parentLeadingIcon,
                   trailing: Center(
                     child: AnimatedRotation(
                       duration: const Duration(milliseconds: 200),
                       turns: _showChoices ? -0.5 : 0,
-                      child: const Icon(
-                        MoonIcons.controls_chevron_down_small_16_light,
-                      ),
+                      child: const Icon(MoonIcons.controls_chevron_down_small_16_light),
                     ),
                   ),
                 ),

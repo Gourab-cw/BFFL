@@ -20,6 +20,7 @@ _VoucherModel _$VoucherModelFromJson(Map<String, dynamic> json) =>
       docTypeId: parseIntV2(json['docTypeId']),
       name: json['name'] as String,
       isActive: json['isActive'] as bool? ?? true,
+      withDiscount: json['withDiscount'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$VoucherModelToJson(_VoucherModel instance) =>
@@ -32,4 +33,5 @@ Map<String, dynamic> _$VoucherModelToJson(_VoucherModel instance) =>
       'docTypeId': instance.docTypeId,
       'name': instance.name,
       'isActive': instance.isActive,
+      'withDiscount': instance.withDiscount,
     };

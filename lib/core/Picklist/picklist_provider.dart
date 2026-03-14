@@ -16,6 +16,9 @@ class PickListNotifier extends GetxController {
 
   Future<void> getPickLists() async {
     // if (state.isNotEmpty) {
+    if (state.isNotEmpty) {
+      return;
+    }
     final firebaseG = Get.find<FB>();
     final db = await firebaseG.getDB();
     final resp = await db.collection("picklists").where("isActive", isEqualTo: true).get();

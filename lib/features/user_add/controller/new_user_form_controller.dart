@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
 import 'package:healthandwellness/features/login/repository/authenticator.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 
 import '../../../core/utility/firebase_service.dart';
 import '../../login/data/user.dart';
@@ -42,6 +43,8 @@ class NewUserFormController extends GetxController {
   final TextEditingController physicalExercise = TextEditingController();
   final TextEditingController diet = TextEditingController();
   final TextEditingController referredByName = TextEditingController();
+  final TextEditingController referredByContact = TextEditingController();
+  final TextEditingController referredByMail = TextEditingController();
 
   // picklist related (store ID or code as string)
   Map<String, dynamic> genderId = {};
@@ -74,10 +77,20 @@ class NewUserFormController extends GetxController {
       if (userCred.user == null) {
         throw Exception("Error on new user making!");
       }
+      int userHave = (await db.collection('User').where('mobile', isEqualTo: mobile.text.trim()).count().get()).count ?? 0;
+
+      if (userHave > 0) {
+        throw Exception("User already exist!");
+      }
+
+      int count = (await db.collection('User').where('companyId', isEqualTo: userState.state!.companyId).count().get()).count ?? 0;
       Map<String, dynamic> data = {
         "id": userCred.user?.uid,
         "password": password,
-        "name": name.text.trim(),
+        "name":
+            '${name.text.trim()} ( ${userState.branch?.name.toUpperCase().substring(0, 2)}-${(count + 1).toString().padLeft(4, '0')}-${DateFormat('yy').format(DateTime.now())} )',
+        "displayName": name.text.trim(),
+        "code": '${userState.branch?.name.toUpperCase().substring(0, 2)}-${(count + 1).toString().padLeft(4, '0')}-${DateFormat('YY').format(DateTime.now())}',
         "searchTerm": name.text.trim().replaceAll(" ", "").toLowerCase(),
         "mail": email.text,
         "branchId": parseString(data: userState.state?.branchId, defaultValue: ""),
@@ -114,7 +127,10 @@ class NewUserFormController extends GetxController {
         "diet": diet.text,
         "referredById": parseString(data: referredById["id"], defaultValue: ""),
         "referredByName": referredByName.text,
+        "referredByMail": referredByMail.text,
+        "referredByContact": referredByContact.text,
         "createdAt": FieldValue.serverTimestamp(),
+        'isPosted': false,
       };
       if (image != null && userCred.user?.uid != null) {
         File file = File(image!.path);
@@ -161,6 +177,8 @@ class NewUserFormController extends GetxController {
     physicalExercise.clear();
     diet.clear();
     referredByName.clear();
+    referredByMail.clear();
+    referredByContact.clear();
 
     // picklist related (store ID or code as string)
     genderId = {};

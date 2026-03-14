@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:healthandwellness/app/Datagrid3.dart';
 import 'package:healthandwellness/app/mainstore.dart';
-import 'package:healthandwellness/core/Theme/theme.dart';
 import 'package:healthandwellness/core/utility/app_loader.dart';
 import 'package:healthandwellness/core/utility/firebase_service.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
@@ -85,8 +84,8 @@ class _HomeState extends State<Home> {
                               children: [
                                 GestureDetector(
                                   onTap: () {
-                                    mainStore.theme.value = BergerTheme.themes[1];
-                                    mainStore.update();
+                                    // mainStore.theme.value = BergerTheme.themes[1];
+                                    // mainStore.update();
                                   },
                                   child: Container(
                                     decoration: BoxDecoration(color: mainStore.theme.value.HeadColor, borderRadius: BorderRadius.circular(40)),
@@ -129,6 +128,9 @@ class _HomeState extends State<Home> {
                                       // background: Colors.green.shade500,
                                     ),
                                     ButtonHelperG(
+                                      onTap: () {
+                                        Get.toNamed('/serviceview');
+                                      },
                                       withBorder: true,
                                       height: 45,
                                       type: ButtonHelperTypeG.outlined,

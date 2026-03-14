@@ -1,0 +1,36 @@
+{
+  "tallycompanyname": "HerbCare Pvt Ltd",
+  "IsCancel": "No",
+  "IsOptinal": "No",
+  "baseVoucherTypeName": "Receipt",
+  "vouchertypename": "Receipt",
+  "voucherNo": "RE000326",
+  "voucherDate": "20260307",
+  "partyLedgerName": "Customer_KFSjiHldtlbwcBXYhllFbyTWQY43",
+  "voucherAmount": 488,
+  "remarks": "",
+  "ledgerallocation": [
+    {
+      "slno": "1",
+      "ledgername": "Customer_KFSjiHldtlbwcBXYhllFbyTWQY43",
+      "amount": 488,
+      "drCr": "Cr",
+      "billallocation": [
+        {
+          "Slno": "1",
+          "referanceType": "Agst Ref",
+          "billNo": "GA000226",
+          "billDueDate": "20260331",
+          "amount": 488,
+          "drCr": "Dr"
+        }
+      ]
+    },
+    {
+      "slno": "2",
+      "ledgername": "UPI",
+      "amount": 488,
+      "drCr": "Dr"
+    }
+  ]
+}

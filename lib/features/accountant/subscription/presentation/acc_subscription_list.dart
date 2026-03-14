@@ -4,7 +4,6 @@ import 'package:healthandwellness/app/mainstore.dart';
 import 'package:healthandwellness/core/utility/app_loader.dart';
 import 'package:healthandwellness/features/accountant/subscription/controller/acc_subscription_controller.dart';
 import 'package:healthandwellness/features/subscriptions/controller/subscription_controller.dart';
-import 'package:healthandwellness/features/user_subscription/controller/user_subscription_controller.dart';
 import 'package:intl/intl.dart';
 import 'package:moon_design/moon_design.dart';
 
@@ -24,26 +23,18 @@ class _AccSubscriptionListState extends State<AccSubscriptionList> {
   final subController = Get.find<SubscriptionController>();
   final loader = Get.find<AppLoaderController>();
   Widget getTypeWidget(UserSubscription us) {
-    switch (us.type) {
-      case UserSubscriptionType.trial:
-        return Container(
-          padding: EdgeInsets.symmetric(vertical: 3, horizontal: 8),
-          decoration: BoxDecoration(color: Colors.amber.shade200, borderRadius: BorderRadius.circular(10)),
-          child: TextHelper(text: 'Trial', fontsize: 12, fontweight: FontWeight.w600),
-        );
-      case UserSubscriptionType.dayWise:
-        return Container(
-          padding: EdgeInsets.symmetric(vertical: 2, horizontal: 5),
-          decoration: BoxDecoration(color: mainStore.theme.value.mediumShadeColor, borderRadius: BorderRadius.circular(10)),
-          child: TextHelper(text: 'Day Wise', fontsize: 12, fontweight: FontWeight.w600),
-        );
-      case UserSubscriptionType.slotWise:
-        return Container(
-          padding: EdgeInsets.symmetric(vertical: 2, horizontal: 5),
-          decoration: BoxDecoration(color: mainStore.theme.value.mediumShadeColor, borderRadius: BorderRadius.circular(10)),
-          child: TextHelper(text: 'Slot Wise', fontsize: 12, fontweight: FontWeight.w600),
-        );
+    if (us.isPaidSubscription) {
+      return Container(
+        padding: EdgeInsets.symmetric(vertical: 2, horizontal: 5),
+        decoration: BoxDecoration(color: mainStore.theme.value.mediumShadeColor, borderRadius: BorderRadius.circular(10)),
+        child: TextHelper(text: 'Paid Service', fontsize: 12, fontweight: FontWeight.w600),
+      );
     }
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 3, horizontal: 8),
+      decoration: BoxDecoration(color: Colors.amber.shade200, borderRadius: BorderRadius.circular(10)),
+      child: TextHelper(text: 'Trial', fontsize: 12, fontweight: FontWeight.w600),
+    );
     return Container();
   }
 
@@ -87,7 +78,7 @@ class _AccSubscriptionListState extends State<AccSubscriptionList> {
                     onTap: () async {
                       try {
                         loader.startLoading();
-                        await accSubController.getList();
+                        await accSubController.getList(force: true);
                       } catch (e) {
                         showAlert("$e", AlertType.error);
                       } finally {
@@ -160,6 +151,12 @@ class _AccSubscriptionListState extends State<AccSubscriptionList> {
                                 children: [
                                   getTypeWidget(us),
                                   TextHelper(text: 'Created At: ${DateFormat('dd-MM-yyyy').format(us.createdAt)}', fontsize: 11, color: Colors.grey.shade600),
+                                  TextHelper(
+                                    text: 'Due Amount: ${currenyFormater(value: us.dueAmount, withDrCr: false)}',
+                                    fontsize: 11,
+                                    fontweight: FontWeight.w600,
+                                    color: mainStore.theme.value.HeadColor,
+                                  ),
                                 ],
                               ),
                             ],

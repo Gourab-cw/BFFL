@@ -6,7 +6,6 @@ import 'package:healthandwellness/core/utility/async_select.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
 import 'package:healthandwellness/features/user_subscription/controller/user_subscription_controller.dart';
 import 'package:healthandwellness/features/user_subscription/presentation/sub_screen/trail_sub.dart';
-import 'package:moon_design/moon_design.dart';
 
 class UserSubscriptionAdd extends StatefulWidget {
   const UserSubscriptionAdd({super.key});
@@ -27,6 +26,23 @@ class _UserSubscriptionAddState extends State<UserSubscriptionAdd> {
       ll.add(SelectItem(id: i, value: list[i].name.toUpperCase()));
     }
     return ll;
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    Future(() async {
+      try {
+        Loader.startLoading();
+        await userSubscriptionController.getVoucher();
+        await userSubscriptionController.loadChargesLedgers();
+      } catch (e) {
+        showAlert("$e", AlertType.error);
+      } finally {
+        Loader.stopLoading();
+      }
+    });
+    super.initState();
   }
 
   @override
@@ -68,30 +84,8 @@ class _UserSubscriptionAddState extends State<UserSubscriptionAdd> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     // mainAxisSize: MainAxisSize.min,
                     children: [
-                      TextHelper(text: "Subscription Type :", fontweight: FontWeight.w600, width: 130),
-                      Wrap(
-                        spacing: 20,
-                        children: [
-                          ...UserSubscriptionType.values.map((m) {
-                            return Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                MoonCheckbox(
-                                  activeColor: mainStore.theme.value.HeadColor.withAlpha(200),
-                                  value: userSubscriptionController.subscriptionType == m,
-                                  onChanged: (v) {
-                                    userSubscriptionController.subscriptionType = m;
-                                    userSubscriptionController.update();
-                                  },
-                                ),
-                                TextHelper(text: m.name.toUpperCase(), fontsize: 12),
-                              ],
-                            );
-                          }),
-                        ],
-                      ),
-                      if (userSubscriptionController.subscriptionType != null) Expanded(child: TrailSub()),
-                      if (userSubscriptionController.subscriptionType != null)
+                      Expanded(child: TrailSub()),
+                      if (userSubscriptionController.allSubscriptions.isNotEmpty)
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -100,8 +94,7 @@ class _UserSubscriptionAddState extends State<UserSubscriptionAdd> {
                                 try {
                                   loader.startLoading();
                                   await userSubscriptionController.saveUserSubscription();
-                                  userSubscriptionController.subDataGridData = [];
-                                  userSubscriptionController.subscriptionType = null;
+                                  userSubscriptionController.allSubscriptions = [];
                                   userSubscriptionController.user = {};
                                   userSubscriptionController.update();
                                   showAlert("Success", AlertType.success);

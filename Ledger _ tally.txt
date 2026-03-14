@@ -1,0 +1,30 @@
+{
+    "data": {
+        "Ledger": [
+            {
+                "tallyCompanyName": "Jalan Brothers Pvt. Ltd.",                 
+                "ledgerName": "21St Century", 
+                "mailingName": "21St Century",                 
+                "ledgerGroup": "Sundry Debtors", 
+                "maintainbillbybill": "Yes", 
+                "address1": "32-6-H-12- B.T.Road.", 
+                "address2": "Kolkata 700002", 
+                "country": "India", 
+                "state": "West Bengal", 
+                "pinCode": "700002", 
+                "contactPerson": "SANTOSH AGARWAL", 
+                "mobileNo": "9830072544", 
+                "emailId": "vishagarwal.in@gmail.com", 
+                "panNo": "ACGPA7554H", 
+                "registrationType": "Regular", 
+                "salespersonName": "JAYJIT SARKAR", 
+                "gstIn": "19ACGPA7554H1ZJ", 
+                "istdsDeductable": "No", 
+                "TypeOfSupply": "Services", 
+                "Taxabilitytype": "\u0004 Not Found", 
+                "TCSApplicable": "No", 
+                "TypeOfDuty": "Others"
+            }
+        ]
+    }
+} 

@@ -1,7 +1,7 @@
 import 'package:healthandwellness/core/utility/helper.dart';
 import 'package:intl/intl.dart';
 
-enum UserType { cwAdmin, admin, branchManager, receptionist, trainer, accountant, member, ledger }
+enum UserType { cwAdmin, admin, branchManager, receptionist, trainer, accountant, member, paymentLedger, chargesLedger }
 
 enum MemberType { paid, trial }
 
@@ -13,7 +13,8 @@ final Map<String, UserType> userTypeMap = {
   'JoVVKfIcwkccunAFqIdy': UserType.trainer,
   'nFgfN9g1CV401w0L2OiS': UserType.accountant,
   'Sl9TlKFGMLCGWGFyTQpd': UserType.member,
-  'XNdidAJe5kPovRllUEyU': UserType.ledger,
+  'XNdidAJe5kPovRllUEyU': UserType.paymentLedger,
+  's4Jt0ceWglK1ZAwerJKS': UserType.chargesLedger,
 };
 
 final Map<UserType, String> userTypeMap2 = {
@@ -24,7 +25,8 @@ final Map<UserType, String> userTypeMap2 = {
   UserType.trainer: 'JoVVKfIcwkccunAFqIdy',
   UserType.accountant: 'nFgfN9g1CV401w0L2OiS',
   UserType.member: 'Sl9TlKFGMLCGWGFyTQpd',
-  UserType.ledger: 'XNdidAJe5kPovRllUEyU',
+  UserType.paymentLedger: 'XNdidAJe5kPovRllUEyU',
+  UserType.chargesLedger: 's4Jt0ceWglK1ZAwerJKS',
 };
 
 class UserG {
@@ -32,7 +34,9 @@ class UserG {
 
   bool isApproved;
   bool isActive;
+  bool withGST;
   String name;
+  String base;
   String mail;
   DateTime? activeFrom;
   DateTime? activeTill;
@@ -72,6 +76,7 @@ class UserG {
     required this.isApproved,
     required this.isActive,
     required this.name,
+    required this.base,
     required this.mail,
     required this.activeFrom,
     required this.activeTill,
@@ -80,6 +85,7 @@ class UserG {
     required this.mobile,
     required this.userType,
     required this.memberType,
+    required this.withGST,
 
     // new
     required this.dob,
@@ -111,8 +117,10 @@ class UserG {
     return UserG(
       id: parseString(data: data["id"], defaultValue: ""),
       isApproved: parseBool(data: data["isApproved"], defaultValue: false),
+      withGST: parseBool(data: data["withGST"], defaultValue: false),
       isActive: parseBool(data: data["isActive"], defaultValue: false),
       name: parseString(data: data["name"], defaultValue: ""),
+      base: parseString(data: data["base"], defaultValue: ""),
       mail: parseString(data: data["mail"], defaultValue: ""),
       branchId: parseString(data: data["branchId"], defaultValue: ""),
       companyId: parseString(data: data["companyId"], defaultValue: ""),
@@ -150,53 +158,13 @@ class UserG {
     );
   }
 
-  Map<String, dynamic> toJSON() => {
-    "id": id,
-    "isApproved": isApproved,
-    "isActive": isActive,
-    "name": name,
-    "mail": mail,
-    "branchId": branchId,
-    "companyId": companyId,
-    "mobile": mobile,
-    "userType": userTypeMap2[userType], // enum → string
-    "memberType": memberType == MemberType.paid ? "paid" : "trial",
-
-    "activeFrom": activeFrom != null ? DateFormat("yyyy-MM-dd").format(activeFrom!) : null,
-    "activeTill": activeTill != null ? DateFormat("yyyy-MM-dd").format(activeTill!) : null,
-
-    // 🔹 new mappings
-    "dob": dob,
-    "age": age,
-    "gender": genderId,
-    "bg": bgId,
-    "height": height,
-    "bodyWeight": bodyWeight,
-    "mobile1": mobile1,
-    "address": address,
-    "pincode": pincode,
-    "city": city,
-    "state": state,
-    "nationality": nationality,
-    "country": country,
-    "profession": profession,
-    "maritialStatus": maritalStatusId,
-    "services": services,
-    "medicalCondition": medicalCondition,
-    "medication": medication,
-    "physicalExercise": physicalExercise,
-    "diet": diet,
-    "referredBy": referredById,
-    "referredByname": referredByName,
-    "profileImage": profileImage,
-  };
-
   // ✅ copyWith
   UserG copyWith({
     String? id,
     bool? isApproved,
     bool? isActive,
     String? name,
+    String? base,
     String? mail,
     DateTime? activeFrom,
     DateTime? activeTill,
@@ -228,12 +196,14 @@ class UserG {
     String? referredById,
     String? referredByName,
     String? profileImage,
+    bool? withGST,
   }) {
     return UserG(
       id: id ?? this.id,
       isActive: isActive ?? this.isActive,
       isApproved: isApproved ?? this.isApproved,
       name: name ?? this.name,
+      base: base ?? this.base,
       mail: mail ?? this.mail,
       activeFrom: activeFrom ?? this.activeFrom,
       activeTill: activeTill ?? this.activeTill,
@@ -265,6 +235,55 @@ class UserG {
       referredById: referredById ?? this.referredById,
       referredByName: referredByName ?? this.referredByName,
       profileImage: profileImage ?? this.profileImage,
+      withGST: withGST ?? this.withGST,
     );
+  }
+
+  Map<String, dynamic> toJSON() {
+    Map<String, dynamic> data = {
+      "id": id,
+      "isApproved": isApproved,
+      "isActive": isActive,
+      "name": name,
+      "base": base,
+      "mail": mail,
+      "branchId": branchId,
+      "companyId": companyId,
+      "mobile": mobile,
+      "userType": userTypeMap2[userType], // enum → string
+      "memberType": memberType == MemberType.paid ? "paid" : "trial",
+
+      "activeFrom": activeFrom != null ? DateFormat("yyyy-MM-dd").format(activeFrom!) : null,
+      "activeTill": activeTill != null ? DateFormat("yyyy-MM-dd").format(activeTill!) : null,
+
+      // 🔹 new mappings
+      "dob": dob,
+      "age": age,
+      "gender": genderId,
+      "bg": bgId,
+      "height": height,
+      "bodyWeight": bodyWeight,
+      "mobile1": mobile1,
+      "address": address,
+      "pincode": pincode,
+      "city": city,
+      "state": state,
+      "nationality": nationality,
+      "country": country,
+      "profession": profession,
+      "maritialStatus": maritalStatusId,
+      "services": services,
+      "medicalCondition": medicalCondition,
+      "medication": medication,
+      "physicalExercise": physicalExercise,
+      "diet": diet,
+      "referredBy": referredById,
+      "referredByname": referredByName,
+      "profileImage": profileImage,
+    };
+    if (userType == UserType.chargesLedger) {
+      data['withGST'] = withGST;
+    }
+    return data;
   }
 }

@@ -10,6 +10,7 @@ import 'package:healthandwellness/features/Service/data/session_model.dart';
 import 'package:healthandwellness/features/login/data/user.dart';
 import 'package:healthandwellness/features/login/repository/authenticator.dart';
 import 'package:healthandwellness/features/slot_manage/data/slot_making_model.dart';
+import 'package:intl/intl.dart';
 
 class SlotDetailsController extends GetxController {
   SlotModel? slot;
@@ -162,6 +163,9 @@ class SlotDetailsController extends GetxController {
     final db = await fb.getDB();
     final batch = db.batch();
     try {
+      if (parseInt(data: slot!.startTime.replaceAll(':', '')) > parseInt(data: DateFormat('HH:mm').format(DateTime.now()))) {
+        throw Exception("Session can start only after ${slot!.startTime}");
+      }
       batch.update(db.collection('slots').doc(slot!.id), {'trainerStartTime': Timestamp.now()});
       await batch.commit();
       slot = SlotModel.fromFirestore(await db.collection('slots').doc(slot!.id).get());

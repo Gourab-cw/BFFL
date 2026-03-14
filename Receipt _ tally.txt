@@ -1,0 +1,96 @@
+{
+  "tallycompanyname": "Jalan Brothers Pvt. Ltd.",  
+  "IsCancel": "No",
+  "IsOptinal": "No",
+  "baseVoucherTypeName": "Receipt",
+  "vouchertypename": "Receipt",
+  "voucherNo": "R/Jul/1217/25-26",
+  "voucherDate": "20250723",  
+  "partyLedgerName": "Mistry Electronics (WPL)",
+  "voucherAmount": 129600,
+  "SalesPerson": "O/s Whirlpool JB Others",
+  "remarks": "Ch No : 611001, Dt : 22-Jul-25, Bank : Punjab National Bank (India), Branch :",  
+  "ledgerallocation": [
+    {
+      "slno": "1",            
+      "ledgername": "Mistry Electronics (WPL)",
+      "amount": 92000,
+      "drCr": "Cr",                 
+      "billallocation": [
+        {
+          "Slno": "1",
+          "referanceType": "Agst Ref",
+          "billNo": "R/Jun/2227/25-26",
+          "billDueDate": "20250728",
+          "amount": 1288,
+          "drCr": "Dr"
+        },
+        {
+          "Slno": "2",
+          "referanceType": "Agst Ref",
+          "billNo": "KW/Jul179/25-26",
+          "billDueDate": "20250818",
+          "amount": 92788,
+          "drCr": "Cr"
+        },
+        {
+          "Slno": "3",
+          "referanceType": "Agst Ref",
+          "billNo": "KW/Jun1098/25-26",
+          "billDueDate": "20250730",
+          "amount": 500,
+          "drCr": "Cr"
+        }
+      ]
+    },
+    {
+      "slno": "2",      
+      "ledgername": "Mistry Electronics (Godrej)",
+      "amount": 37600,
+      "drCr": "Cr",      
+      "billallocation": [
+        {
+          "Slno": "5",
+          "referanceType": "Agst Ref",
+          "billNo": "C/May/0012/23-24",
+          "billDueDate": "20250601",
+          "amount": 3163,
+          "drCr": "Dr"
+        },
+        {
+          "Slno": "6",
+          "referanceType": "Agst Ref",
+          "billNo": "K/Jul/0162/25-26",
+          "billDueDate": "20250818",
+          "amount": 37780,
+          "drCr": "Cr"
+        },
+        {
+          "Slno": "7",
+          "referanceType": "New Ref",
+          "billNo": "R/Jul/1203/25-26",
+          "billDueDate": "20250822",
+          "amount": 2983,
+          "drCr": "Cr"
+        }
+      ]
+    },
+    {
+      "slno": "3",      
+      "ledgercode": "03248640000117",
+      "ledgername": "HDFC Bank Ltd.(03248640000117)",
+      "amount": 129600,
+      "drCr": "Dr",      
+      "bankallocation": [
+        {
+          "bankallocationlineno": "1",
+          "favouringname": "Mistry Electronics",
+          "instdate": "20250723",
+          "instamount": 129600,
+          "transactiontype": "Cheque/DD",
+          "IsDeleted": "No"
+        }
+      ]
+    }
+  ]
+}

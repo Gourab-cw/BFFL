@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:healthandwellness/app/mainstore.dart';
-import 'package:healthandwellness/core/utility/async_select.dart';
 import 'package:healthandwellness/features/Service/controller/service_controller.dart';
 import 'package:healthandwellness/features/home/controller/member_home_controller.dart';
 import 'package:healthandwellness/features/login/data/user.dart';
@@ -13,6 +12,7 @@ import 'package:intl/intl.dart';
 import 'package:moon_design/moon_design.dart';
 
 import '../../../core/utility/app_loader.dart';
+import '../../../core/utility/async_select.dart';
 import '../../../core/utility/helper.dart';
 import '../data/service.dart';
 
@@ -36,14 +36,16 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView> {
 
   Future<void> bookingFetching() async {
     try {
-      loader.startLoading();
-      if (service.selectedService != null && auth.state != null) {
-        await service.getServiceDetails(service.selectedService!.id, auth.state!.branchId);
+      if (auth.state == null) {
+        showAlert('Unable to authenticate', AlertType.error);
+        return;
       }
-      if (auth.state != null) {
-        if (auth.state!.userType == UserType.member) {
-          service.selectedMember = {"id": auth.state!.id, "name": auth.state!.name, "value": auth.state!.name};
-        }
+      loader.startLoading();
+      if (auth.state!.userType == UserType.member) {
+        service.selectedMember = {"id": auth.state!.id, "name": auth.state!.name, "value": auth.state!.name};
+      }
+      if (service.selectedService != null) {
+        await service.getServiceDetails(service.selectedService!.id, auth.state!.branchId);
         service.update();
         setState(() {
           makingBooking = true;
@@ -203,6 +205,52 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView> {
                         TextHelper(text: "${s.totalDays} Days", width: 180),
                       ],
                     ),
+                    const SizedBox(height: 30),
+                    if (auth.state!.userType != UserType.member)
+                      Padding(
+                        padding: const EdgeInsets.all(0.0),
+                        child: Row(
+                          spacing: 10,
+                          children: [
+                            TextHelper(text: "Member :", width: 60, fontweight: FontWeight.w600),
+                            SizedBox(
+                              width: MediaQuery.sizeOf(context).width - 120 > 300 ? 300 : MediaQuery.sizeOf(context).width - 120,
+                              child: AsyncSelect(
+                                backgroundColor: mainStore.theme.value.lowShadeColor,
+                                withBorder: true,
+                                disabled: auth.state?.userType == UserType.member,
+                                parentHeight: 40,
+                                onValueChange: (v) {
+                                  service.selectedMember = makeMapSerialize(v);
+                                  service.update();
+                                },
+                                customComponent: (d) => Container(
+                                  margin: EdgeInsets.all(5),
+                                  color: Colors.grey.shade200,
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      TextHelper(
+                                        text: parseString(data: d["name"], defaultValue: ""),
+                                        fontweight: FontWeight.w500,
+                                      ),
+                                      TextHelper(
+                                        text: parseString(data: d["address"], defaultValue: ""),
+                                        fontsize: 11,
+                                        color: Colors.blueGrey.shade500,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                dropDownPosition: MoonDropdownAnchorPosition.top,
+                                value: service.selectedMember,
+                                uniqueKey: UniqueKey().toString(),
+                                callContent: service.getMemberList,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     const SizedBox(height: 4),
                     if (!makingBooking)
                       ButtonHelperG(
@@ -314,11 +362,15 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView> {
                                           width: 100,
                                           height: 30,
                                           decoration: BoxDecoration(
-                                            color: service.selectedSlot?.id == m.id ? getMainStore().theme.value.lowShadeColor : Colors.white,
+                                            color: service.selectedSlot?.id == m.id
+                                                ? getMainStore().theme.value.mediumShadeColor.withAlpha(130)
+                                                : mainStore.theme.value.BackgroundShadeColor,
                                             border: Border.all(
                                               color: service.availableSlot(m, withRescheduleData: service.selectedReschedule) == null
                                                   ? Colors.red
-                                                  : Colors.black45,
+                                                  : service.selectedSlot?.id == m.id
+                                                  ? getMainStore().theme.value.mediumShadeColor
+                                                  : Colors.transparent,
                                             ),
                                           ),
                                           child: TextHelper(text: "${m.startTime} - ${m.endTime}", width: 100, textalign: TextAlign.center),
@@ -350,11 +402,15 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView> {
                                           width: 100,
                                           height: 30,
                                           decoration: BoxDecoration(
-                                            color: service.selectedSlot?.id == m.id ? getMainStore().theme.value.lowShadeColor : Colors.white,
+                                            color: service.selectedSlot?.id == m.id
+                                                ? getMainStore().theme.value.mediumShadeColor.withAlpha(130)
+                                                : mainStore.theme.value.BackgroundShadeColor,
                                             border: Border.all(
                                               color: service.availableSlot(m, withRescheduleData: service.selectedReschedule) == null
                                                   ? Colors.red
-                                                  : Colors.black45,
+                                                  : service.selectedSlot?.id == m.id
+                                                  ? getMainStore().theme.value.mediumShadeColor
+                                                  : Colors.transparent,
                                             ),
                                           ),
                                           child: TextHelper(text: "${m.startTime} - ${m.endTime}", width: 100, textalign: TextAlign.center),
@@ -386,11 +442,15 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView> {
                                           width: 100,
                                           height: 30,
                                           decoration: BoxDecoration(
-                                            color: service.selectedSlot?.id == m.id ? getMainStore().theme.value.lowShadeColor : Colors.white,
+                                            color: service.selectedSlot?.id == m.id
+                                                ? getMainStore().theme.value.mediumShadeColor.withAlpha(130)
+                                                : mainStore.theme.value.BackgroundShadeColor,
                                             border: Border.all(
                                               color: service.availableSlot(m, withRescheduleData: service.selectedReschedule) == null
                                                   ? Colors.red
-                                                  : Colors.black45,
+                                                  : service.selectedSlot?.id == m.id
+                                                  ? getMainStore().theme.value.mediumShadeColor
+                                                  : Colors.transparent,
                                             ),
                                           ),
                                           child: TextHelper(text: "${m.startTime} - ${m.endTime}", width: 100, textalign: TextAlign.center),
@@ -401,52 +461,7 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView> {
                                 ],
                               ),
                             ),
-                          const SizedBox(height: 30),
-                          if (service.selectedDate != null && auth.state!.userType != UserType.member)
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Row(
-                                spacing: 10,
-                                children: [
-                                  TextHelper(text: "Member :", width: 60, fontweight: FontWeight.w600),
-                                  SizedBox(
-                                    width: MediaQuery.sizeOf(context).width - 120 > 300 ? 300 : MediaQuery.sizeOf(context).width - 120,
-                                    child: AsyncSelect(
-                                      backgroundColor: mainStore.theme.value.lowShadeColor,
-                                      withBorder: true,
-                                      disabled: auth.state?.userType == UserType.member,
-                                      parentHeight: 40,
-                                      onValueChange: (v) {
-                                        service.selectedMember = makeMapSerialize(v);
-                                        service.update();
-                                      },
-                                      customComponent: (d) => Container(
-                                        margin: EdgeInsets.all(5),
-                                        color: Colors.grey.shade200,
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            TextHelper(
-                                              text: parseString(data: d["name"], defaultValue: ""),
-                                              fontweight: FontWeight.w500,
-                                            ),
-                                            TextHelper(
-                                              text: parseString(data: d["address"], defaultValue: ""),
-                                              fontsize: 11,
-                                              color: Colors.blueGrey.shade500,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      dropDownPosition: MoonDropdownAnchorPosition.top,
-                                      value: service.selectedMember,
-                                      uniqueKey: UniqueKey().toString(),
-                                      callContent: service.getMemberList,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
+
                           const SizedBox(height: 30),
                           ButtonHelperG(
                             onTap: () async {
@@ -472,6 +487,9 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView> {
                                 } else {
                                   service.selectedMember = {};
                                 }
+                                setState(() {
+                                  makingBooking = false;
+                                });
                                 service.update();
                                 await memberHomeController.getBookings();
                                 if (isReschedule) {

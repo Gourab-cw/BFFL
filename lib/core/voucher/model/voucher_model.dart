@@ -16,6 +16,7 @@ abstract class VoucherModel with _$VoucherModel {
     @JsonKey(fromJson: parseIntV2) required int docTypeId,
     required String name,
     @Default(true) bool isActive,
+    @Default(false) bool withDiscount,
   }) = _VoucherModel;
 
   factory VoucherModel.fromJson(Map<String, dynamic> json) => _$VoucherModelFromJson(json);

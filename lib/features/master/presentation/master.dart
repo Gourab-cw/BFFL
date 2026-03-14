@@ -1,6 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:flutter/material.dart';
 import 'package:healthandwellness/app/mainstore.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
 
@@ -12,7 +12,6 @@ class Master extends StatefulWidget {
 }
 
 class _MasterState extends State<Master> {
-
   final mainStore = Get.find<MainStore>();
 
   @override
@@ -22,83 +21,112 @@ class _MasterState extends State<Master> {
         child: Column(
           children: [
             const SizedBox(height: 10),
-            TextHelper(text: "Admin Control Panel",fontsize: 18,fontweight: FontWeight.w600,padding: EdgeInsets.symmetric(horizontal: 8),),
+            TextHelper(text: "Admin Control Panel", fontsize: 18, fontweight: FontWeight.w600, padding: EdgeInsets.symmetric(horizontal: 8)),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Wrap(
                 children: [
+                  // CardHelper(
+                  //   boxShadow: [],
+                  //   backgroundColor: mainStore.theme.value.lowShadeColor.withAlpha(180),
+                  //   height: 50,
+                  //   padding: EdgeInsets.symmetric(vertical: 2,horizontal: 16),
+                  //   child: Row(
+                  //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //     children: [
+                  //       Row(
+                  //         mainAxisSize: MainAxisSize.min,
+                  //         spacing:15,
+                  //         children: [
+                  //           Icon(FontAwesomeIcons.suitcaseMedical,size: 20,color: mainStore.theme.value.HeadColor.withAlpha(180),),
+                  //           TextHelper(text: "Company",fontweight: FontWeight.w600,)
+                  //         ],
+                  //       ),
+                  //       ButtonHelperG(
+                  //         background: Colors.transparent,
+                  //         icon: Icon(Icons.chevron_right),
+                  //       )
+                  //     ],
+                  //   ),
+                  // ),
+                  // CardHelper(
+                  //   boxShadow: [],
+                  //   backgroundColor: mainStore.theme.value.lowShadeColor.withAlpha(180),
+                  //   height: 50,
+                  //   padding: EdgeInsets.symmetric(vertical: 2,horizontal: 16),
+                  //   child: Row(
+                  //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //     children: [
+                  //       Row(
+                  //         mainAxisSize: MainAxisSize.min,
+                  //         spacing:15,
+                  //         children: [
+                  //           Icon(FontAwesomeIcons.houseMedical,size: 20,color: mainStore.theme.value.HeadColor.withAlpha(180),),
+                  //           TextHelper(text: "Branch",fontweight: FontWeight.w600,)
+                  //         ],
+                  //       ),
+                  //       ButtonHelperG(
+                  //         background: Colors.transparent,
+                  //         icon: Icon(Icons.chevron_right),
+                  //       )
+                  //     ],
+                  //   ),
+                  // ),
                   CardHelper(
-                    boxShadow: [],
-                    backgroundColor: mainStore.theme.value.lowShadeColor.withAlpha(180),
-                    height: 50,
-                    padding: EdgeInsets.symmetric(vertical: 2,horizontal: 16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          spacing:15,
-                          children: [
-                            Icon(FontAwesomeIcons.suitcaseMedical,size: 20,color: mainStore.theme.value.HeadColor.withAlpha(180),),
-                            TextHelper(text: "Company",fontweight: FontWeight.w600,)
-                          ],
-                        ),
-                        ButtonHelperG(
-                          background: Colors.transparent,
-                          icon: Icon(Icons.chevron_right),
-                        )
-                      ],
-                    ),
-                  ),
-                  CardHelper(
-                    boxShadow: [],
-                    backgroundColor: mainStore.theme.value.lowShadeColor.withAlpha(180),
-                    height: 50,
-                    padding: EdgeInsets.symmetric(vertical: 2,horizontal: 16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          spacing:15,
-                          children: [
-                            Icon(FontAwesomeIcons.houseMedical,size: 20,color: mainStore.theme.value.HeadColor.withAlpha(180),),
-                            TextHelper(text: "Branch",fontweight: FontWeight.w600,)
-                          ],
-                        ),
-                        ButtonHelperG(
-                          background: Colors.transparent,
-                          icon: Icon(Icons.chevron_right),
-                        )
-                      ],
-                    ),
-                  ),
-                  CardHelper(
-                    onTap: (){
+                    onTap: () {
                       Get.toNamed('/memberapproveregister');
                     },
                     boxShadow: [],
                     backgroundColor: mainStore.theme.value.lowShadeColor.withAlpha(180),
                     height: 50,
-                    padding: EdgeInsets.symmetric(vertical: 2,horizontal: 16),
+                    padding: EdgeInsets.symmetric(vertical: 2, horizontal: 16),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Row(
                           mainAxisSize: MainAxisSize.min,
-                          spacing:15,
+                          spacing: 15,
                           children: [
-                            Icon(FontAwesomeIcons.solidUser,size: 20,color: mainStore.theme.value.HeadColor.withAlpha(180),),
-                            TextHelper(text: "Approve Member",fontweight: FontWeight.w600,)
+                            Icon(FontAwesomeIcons.solidUser, size: 20, color: mainStore.theme.value.HeadColor.withAlpha(180)),
+                            TextHelper(text: "Approve Member", fontweight: FontWeight.w600),
                           ],
                         ),
                         ButtonHelperG(
-                          onTap: (){
+                          onTap: () {
                             Get.toNamed('/memberapproveregister');
                           },
                           background: Colors.transparent,
                           icon: Icon(Icons.chevron_right),
-                        )
+                        ),
+                      ],
+                    ),
+                  ),
+                  CardHelper(
+                    onTap: () {
+                      Get.toNamed('/staff');
+                    },
+                    boxShadow: [],
+                    backgroundColor: mainStore.theme.value.lowShadeColor.withAlpha(180),
+                    height: 50,
+                    padding: EdgeInsets.symmetric(vertical: 2, horizontal: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          spacing: 15,
+                          children: [
+                            Icon(FontAwesomeIcons.users, size: 20, color: mainStore.theme.value.HeadColor.withAlpha(180)),
+                            TextHelper(text: "Staffs", fontweight: FontWeight.w600),
+                          ],
+                        ),
+                        ButtonHelperG(
+                          onTap: () {
+                            Get.toNamed('/staff');
+                          },
+                          background: Colors.transparent,
+                          icon: Icon(Icons.chevron_right),
+                        ),
                       ],
                     ),
                   ),
@@ -106,51 +134,25 @@ class _MasterState extends State<Master> {
                     boxShadow: [],
                     backgroundColor: mainStore.theme.value.lowShadeColor.withAlpha(180),
                     height: 50,
-                    padding: EdgeInsets.symmetric(vertical: 2,horizontal: 16),
+                    padding: EdgeInsets.symmetric(vertical: 2, horizontal: 16),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Row(
                           mainAxisSize: MainAxisSize.min,
-                          spacing:15,
+                          spacing: 15,
                           children: [
-                            Icon(FontAwesomeIcons.users,size: 20,color: mainStore.theme.value.HeadColor.withAlpha(180),),
-                            TextHelper(text: "Staffs",fontweight: FontWeight.w600,)
+                            Icon(FontAwesomeIcons.calendarDay, size: 20, color: mainStore.theme.value.HeadColor.withAlpha(180)),
+                            TextHelper(text: "Holidays", fontweight: FontWeight.w600),
                           ],
                         ),
-                        ButtonHelperG(
-                          background: Colors.transparent,
-                          icon: Icon(Icons.chevron_right),
-                        )
+                        ButtonHelperG(background: Colors.transparent, icon: Icon(Icons.chevron_right)),
                       ],
                     ),
                   ),
-                  CardHelper(
-                    boxShadow: [],
-                    backgroundColor: mainStore.theme.value.lowShadeColor.withAlpha(180),
-                    height: 50,
-                    padding: EdgeInsets.symmetric(vertical: 2,horizontal: 16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          spacing:15,
-                          children: [
-                            Icon(FontAwesomeIcons.calendarDay,size: 20,color: mainStore.theme.value.HeadColor.withAlpha(180),),
-                            TextHelper(text: "Holidays",fontweight: FontWeight.w600,)
-                          ],
-                        ),
-                        ButtonHelperG(
-                          background: Colors.transparent,
-                          icon: Icon(Icons.chevron_right),
-                        )
-                      ],
-                    ),
-                  )
                 ],
               ),
-            )
+            ),
           ],
         ),
       ),

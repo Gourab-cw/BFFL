@@ -4,10 +4,13 @@ import 'package:get/get.dart';
 import 'package:healthandwellness/app/Datagrid3.dart';
 import 'package:healthandwellness/app/mainstore.dart';
 import 'package:healthandwellness/core/utility/app_loader.dart';
+import 'package:healthandwellness/features/slot_details_trainer/controller/slot_details_controller.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/branch/controller/branch_controller.dart';
+import '../../../core/utility/firebase_service.dart';
 import '../../../core/utility/helper.dart';
+import '../../slot_manage/data/slot_making_model.dart';
 import '../controller/calendar_report_controller.dart';
 
 class CalenderReport extends StatefulWidget {
@@ -21,6 +24,7 @@ class _CalenderReportState extends State<CalenderReport> {
   final mainStore = Get.find<MainStore>();
   final loader = Get.find<AppLoaderController>();
 
+  final slotDetailsController = Get.find<SlotDetailsController>();
   final CalenderReportController calenderReportController = Get.find<CalenderReportController>();
   final BranchController branchController = Get.find<BranchController>();
 
@@ -54,14 +58,12 @@ class _CalenderReportState extends State<CalenderReport> {
 
   @override
   Widget build(BuildContext context) {
-    final safePadding = MediaQuery.paddingOf(context);
     return GetBuilder<CalenderReportController>(
       init: calenderReportController,
       autoRemove: false,
       builder: (calenderReportController) {
         return Scaffold(
-          body: Padding(
-            padding: EdgeInsets.only(left: safePadding.left + 10, right: safePadding.right + 10, top: safePadding.top - 40, bottom: safePadding.bottom),
+          body: SafeArea(
             child: SingleChildScrollView(
               child: Column(
                 children: [
@@ -184,7 +186,33 @@ class _CalenderReportState extends State<CalenderReport> {
                               dataSource: m.slots.map((m) => m.toJSON()).toList(),
                               fontSize: 12,
                               columnList: [
-                                DataGridColumnModel3(dataField: "slot", dataType: CellDataType3.string, title: "Slot"),
+                                DataGridColumnModel3(
+                                  dataField: "slot",
+                                  dataType: CellDataType3.string,
+                                  title: "Slot",
+                                  customCell: (c) {
+                                    return GestureDetector(
+                                      onTap: () async {
+                                        try {
+                                          Loader.startLoading();
+                                          final fb = Get.find<FB>();
+                                          final db = await fb.getDB();
+                                          final resp = await db.collection('slots').doc(c.rowValue['slotId']).get();
+                                          if (!resp.exists) {
+                                            throw Exception('No slot data found!');
+                                          }
+                                          await slotDetailsController.getSlotDetails(selectedSlot: SlotModel.fromFirestore(resp));
+                                          Get.toNamed('/slotdetailsreceptionist');
+                                        } catch (e) {
+                                          showAlert("$e", AlertType.error);
+                                        } finally {
+                                          Loader.stopLoading();
+                                        }
+                                      },
+                                      child: TextHelper(text: c.cellValue, textalign: TextAlign.center, fontsize: 12),
+                                    );
+                                  },
+                                ),
                                 DataGridColumnModel3(dataField: "booked", dataType: CellDataType3.int, title: "Booking"),
                                 DataGridColumnModel3(dataField: 'totalAttendance', dataType: CellDataType3.int, title: "Attend"),
                               ],

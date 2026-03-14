@@ -68,12 +68,18 @@ class ServiceController extends GetxController {
 
   Future<List<Map<String, dynamic>>> getMemberList(String q) async {
     try {
+      final userAuth = auth.state;
+      if (userAuth == null) {
+        showAlert('Unable to authenticate', AlertType.error);
+        return [];
+      }
       final resp = await db
           .collection("User")
           .where('userType', isEqualTo: userTypeMap2[UserType.member])
+          .where('branchId', isEqualTo: userAuth.branchId)
           .where("searchTerm", isGreaterThanOrEqualTo: q.replaceAll(" ", "").toLowerCase().trim())
           .where("searchTerm", isLessThanOrEqualTo: '${q.replaceAll(" ", "").toLowerCase().trim()}\uf8ff')
-          .limit(20)
+          .limit(6)
           .get();
       return resp.docs
           .map(
@@ -205,13 +211,18 @@ class ServiceController extends GetxController {
   }
 
   Future<void> getServiceDetails(String serviceId, String branchId, {isReschedule = false}) async {
-    if (auth.state == null) {
-      return showAlert("No user found", AlertType.error);
+    if (selectedMember.isEmpty) {
+      throw Exception("No user found");
     }
+
     final query = db
         .collection('userSubscription')
-        .where('paidAt', isNull: false)
         .where('subscriptionId', isEqualTo: serviceId)
+        .where(
+          'userId',
+          isEqualTo: parseString(data: selectedMember['id'], defaultValue: ''),
+        )
+        .where('branchId', isEqualTo: branchId)
         .where('isActive', isEqualTo: true)
         .where('endDate', isGreaterThanOrEqualTo: DateFormat('yyyy-MM-dd').format(DateTime.now()));
     if (!isReschedule) {

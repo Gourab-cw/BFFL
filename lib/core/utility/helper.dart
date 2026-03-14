@@ -5,6 +5,7 @@ import 'dart:math';
 import 'dart:ui' as ui;
 
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crypto/crypto.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dio/dio.dart' as _dio;
@@ -2295,11 +2296,19 @@ int parseIntV2(dynamic data, {int? defaultInt}) {
   }
 }
 
-double parseDouble({required dynamic data, required double defaultValue}) {
+double parseDouble({required dynamic data, double? defaultValue}) {
   try {
-    return double.tryParse(data.toString()) == null ? defaultValue : double.parse(data.toString());
+    return double.tryParse(data.toString()) == null ? (defaultValue ?? 0) : double.parse(data.toString());
   } catch (e) {
-    return defaultValue;
+    return (defaultValue ?? 0);
+  }
+}
+
+double parseDoubleV2(dynamic data, {double? defaultValue}) {
+  try {
+    return double.tryParse(data.toString()) == null ? (defaultValue ?? 0) : double.parse(data.toString());
+  } catch (e) {
+    return (defaultValue ?? 0);
   }
 }
 
@@ -2323,6 +2332,15 @@ double parseDoubleWithFixLength({required dynamic data, required double defaultV
 }
 
 String parseString({required dynamic data, required String defaultValue}) {
+  try {
+    if (data == null) return defaultValue;
+    return (data.toString() == 'null' || data.toString().trim().isEmpty) ? defaultValue : data.toString();
+  } catch (e) {
+    return defaultValue;
+  }
+}
+
+String parseStringV2(dynamic data, {String defaultValue = ''}) {
   try {
     if (data == null) return defaultValue;
     return (data.toString() == 'null' || data.toString().trim().isEmpty) ? defaultValue : data.toString();
@@ -2970,3 +2988,7 @@ class CardHelper extends StatelessWidget {
     return container;
   }
 }
+
+Timestamp timestampFromJson(dynamic json) => json as Timestamp;
+
+Timestamp timestampToJson(Timestamp timestamp) => timestamp;

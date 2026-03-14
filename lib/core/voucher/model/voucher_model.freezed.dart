@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$VoucherModel {
 
- String get id; String get suffix; String get prefix; String get branchId; List<String> get paymentMethods;@JsonKey(fromJson: parseIntV2) int get docTypeId; String get name; bool get isActive;
+ String get id; String get suffix; String get prefix; String get branchId; List<String> get paymentMethods;@JsonKey(fromJson: parseIntV2) int get docTypeId; String get name; bool get isActive; bool get withDiscount;
 /// Create a copy of VoucherModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $VoucherModelCopyWith<VoucherModel> get copyWith => _$VoucherModelCopyWithImpl<V
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is VoucherModel&&(identical(other.id, id) || other.id == id)&&(identical(other.suffix, suffix) || other.suffix == suffix)&&(identical(other.prefix, prefix) || other.prefix == prefix)&&(identical(other.branchId, branchId) || other.branchId == branchId)&&const DeepCollectionEquality().equals(other.paymentMethods, paymentMethods)&&(identical(other.docTypeId, docTypeId) || other.docTypeId == docTypeId)&&(identical(other.name, name) || other.name == name)&&(identical(other.isActive, isActive) || other.isActive == isActive));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is VoucherModel&&(identical(other.id, id) || other.id == id)&&(identical(other.suffix, suffix) || other.suffix == suffix)&&(identical(other.prefix, prefix) || other.prefix == prefix)&&(identical(other.branchId, branchId) || other.branchId == branchId)&&const DeepCollectionEquality().equals(other.paymentMethods, paymentMethods)&&(identical(other.docTypeId, docTypeId) || other.docTypeId == docTypeId)&&(identical(other.name, name) || other.name == name)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.withDiscount, withDiscount) || other.withDiscount == withDiscount));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,suffix,prefix,branchId,const DeepCollectionEquality().hash(paymentMethods),docTypeId,name,isActive);
+int get hashCode => Object.hash(runtimeType,id,suffix,prefix,branchId,const DeepCollectionEquality().hash(paymentMethods),docTypeId,name,isActive,withDiscount);
 
 @override
 String toString() {
-  return 'VoucherModel(id: $id, suffix: $suffix, prefix: $prefix, branchId: $branchId, paymentMethods: $paymentMethods, docTypeId: $docTypeId, name: $name, isActive: $isActive)';
+  return 'VoucherModel(id: $id, suffix: $suffix, prefix: $prefix, branchId: $branchId, paymentMethods: $paymentMethods, docTypeId: $docTypeId, name: $name, isActive: $isActive, withDiscount: $withDiscount)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $VoucherModelCopyWith<$Res>  {
   factory $VoucherModelCopyWith(VoucherModel value, $Res Function(VoucherModel) _then) = _$VoucherModelCopyWithImpl;
 @useResult
 $Res call({
- String id, String suffix, String prefix, String branchId, List<String> paymentMethods,@JsonKey(fromJson: parseIntV2) int docTypeId, String name, bool isActive
+ String id, String suffix, String prefix, String branchId, List<String> paymentMethods,@JsonKey(fromJson: parseIntV2) int docTypeId, String name, bool isActive, bool withDiscount
 });
 
 
@@ -65,7 +65,7 @@ class _$VoucherModelCopyWithImpl<$Res>
 
 /// Create a copy of VoucherModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? suffix = null,Object? prefix = null,Object? branchId = null,Object? paymentMethods = null,Object? docTypeId = null,Object? name = null,Object? isActive = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? suffix = null,Object? prefix = null,Object? branchId = null,Object? paymentMethods = null,Object? docTypeId = null,Object? name = null,Object? isActive = null,Object? withDiscount = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,suffix: null == suffix ? _self.suffix : suffix // ignore: cast_nullable_to_non_nullable
@@ -75,6 +75,7 @@ as String,paymentMethods: null == paymentMethods ? _self.paymentMethods : paymen
 as List<String>,docTypeId: null == docTypeId ? _self.docTypeId : docTypeId // ignore: cast_nullable_to_non_nullable
 as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,isActive: null == isActive ? _self.isActive : isActive // ignore: cast_nullable_to_non_nullable
+as bool,withDiscount: null == withDiscount ? _self.withDiscount : withDiscount // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }
@@ -160,10 +161,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String suffix,  String prefix,  String branchId,  List<String> paymentMethods, @JsonKey(fromJson: parseIntV2)  int docTypeId,  String name,  bool isActive)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String suffix,  String prefix,  String branchId,  List<String> paymentMethods, @JsonKey(fromJson: parseIntV2)  int docTypeId,  String name,  bool isActive,  bool withDiscount)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _VoucherModel() when $default != null:
-return $default(_that.id,_that.suffix,_that.prefix,_that.branchId,_that.paymentMethods,_that.docTypeId,_that.name,_that.isActive);case _:
+return $default(_that.id,_that.suffix,_that.prefix,_that.branchId,_that.paymentMethods,_that.docTypeId,_that.name,_that.isActive,_that.withDiscount);case _:
   return orElse();
 
 }
@@ -181,10 +182,10 @@ return $default(_that.id,_that.suffix,_that.prefix,_that.branchId,_that.paymentM
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String suffix,  String prefix,  String branchId,  List<String> paymentMethods, @JsonKey(fromJson: parseIntV2)  int docTypeId,  String name,  bool isActive)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String suffix,  String prefix,  String branchId,  List<String> paymentMethods, @JsonKey(fromJson: parseIntV2)  int docTypeId,  String name,  bool isActive,  bool withDiscount)  $default,) {final _that = this;
 switch (_that) {
 case _VoucherModel():
-return $default(_that.id,_that.suffix,_that.prefix,_that.branchId,_that.paymentMethods,_that.docTypeId,_that.name,_that.isActive);case _:
+return $default(_that.id,_that.suffix,_that.prefix,_that.branchId,_that.paymentMethods,_that.docTypeId,_that.name,_that.isActive,_that.withDiscount);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -201,10 +202,10 @@ return $default(_that.id,_that.suffix,_that.prefix,_that.branchId,_that.paymentM
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String suffix,  String prefix,  String branchId,  List<String> paymentMethods, @JsonKey(fromJson: parseIntV2)  int docTypeId,  String name,  bool isActive)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String suffix,  String prefix,  String branchId,  List<String> paymentMethods, @JsonKey(fromJson: parseIntV2)  int docTypeId,  String name,  bool isActive,  bool withDiscount)?  $default,) {final _that = this;
 switch (_that) {
 case _VoucherModel() when $default != null:
-return $default(_that.id,_that.suffix,_that.prefix,_that.branchId,_that.paymentMethods,_that.docTypeId,_that.name,_that.isActive);case _:
+return $default(_that.id,_that.suffix,_that.prefix,_that.branchId,_that.paymentMethods,_that.docTypeId,_that.name,_that.isActive,_that.withDiscount);case _:
   return null;
 
 }
@@ -216,7 +217,7 @@ return $default(_that.id,_that.suffix,_that.prefix,_that.branchId,_that.paymentM
 @JsonSerializable()
 
 class _VoucherModel implements VoucherModel {
-  const _VoucherModel({required this.id, required this.suffix, required this.prefix, required this.branchId, final  List<String> paymentMethods = const ['CASH'], @JsonKey(fromJson: parseIntV2) required this.docTypeId, required this.name, this.isActive = true}): _paymentMethods = paymentMethods;
+  const _VoucherModel({required this.id, required this.suffix, required this.prefix, required this.branchId, final  List<String> paymentMethods = const ['CASH'], @JsonKey(fromJson: parseIntV2) required this.docTypeId, required this.name, this.isActive = true, this.withDiscount = false}): _paymentMethods = paymentMethods;
   factory _VoucherModel.fromJson(Map<String, dynamic> json) => _$VoucherModelFromJson(json);
 
 @override final  String id;
@@ -233,6 +234,7 @@ class _VoucherModel implements VoucherModel {
 @override@JsonKey(fromJson: parseIntV2) final  int docTypeId;
 @override final  String name;
 @override@JsonKey() final  bool isActive;
+@override@JsonKey() final  bool withDiscount;
 
 /// Create a copy of VoucherModel
 /// with the given fields replaced by the non-null parameter values.
@@ -247,16 +249,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _VoucherModel&&(identical(other.id, id) || other.id == id)&&(identical(other.suffix, suffix) || other.suffix == suffix)&&(identical(other.prefix, prefix) || other.prefix == prefix)&&(identical(other.branchId, branchId) || other.branchId == branchId)&&const DeepCollectionEquality().equals(other._paymentMethods, _paymentMethods)&&(identical(other.docTypeId, docTypeId) || other.docTypeId == docTypeId)&&(identical(other.name, name) || other.name == name)&&(identical(other.isActive, isActive) || other.isActive == isActive));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _VoucherModel&&(identical(other.id, id) || other.id == id)&&(identical(other.suffix, suffix) || other.suffix == suffix)&&(identical(other.prefix, prefix) || other.prefix == prefix)&&(identical(other.branchId, branchId) || other.branchId == branchId)&&const DeepCollectionEquality().equals(other._paymentMethods, _paymentMethods)&&(identical(other.docTypeId, docTypeId) || other.docTypeId == docTypeId)&&(identical(other.name, name) || other.name == name)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.withDiscount, withDiscount) || other.withDiscount == withDiscount));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,suffix,prefix,branchId,const DeepCollectionEquality().hash(_paymentMethods),docTypeId,name,isActive);
+int get hashCode => Object.hash(runtimeType,id,suffix,prefix,branchId,const DeepCollectionEquality().hash(_paymentMethods),docTypeId,name,isActive,withDiscount);
 
 @override
 String toString() {
-  return 'VoucherModel(id: $id, suffix: $suffix, prefix: $prefix, branchId: $branchId, paymentMethods: $paymentMethods, docTypeId: $docTypeId, name: $name, isActive: $isActive)';
+  return 'VoucherModel(id: $id, suffix: $suffix, prefix: $prefix, branchId: $branchId, paymentMethods: $paymentMethods, docTypeId: $docTypeId, name: $name, isActive: $isActive, withDiscount: $withDiscount)';
 }
 
 
@@ -267,7 +269,7 @@ abstract mixin class _$VoucherModelCopyWith<$Res> implements $VoucherModelCopyWi
   factory _$VoucherModelCopyWith(_VoucherModel value, $Res Function(_VoucherModel) _then) = __$VoucherModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String suffix, String prefix, String branchId, List<String> paymentMethods,@JsonKey(fromJson: parseIntV2) int docTypeId, String name, bool isActive
+ String id, String suffix, String prefix, String branchId, List<String> paymentMethods,@JsonKey(fromJson: parseIntV2) int docTypeId, String name, bool isActive, bool withDiscount
 });
 
 
@@ -284,7 +286,7 @@ class __$VoucherModelCopyWithImpl<$Res>
 
 /// Create a copy of VoucherModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? suffix = null,Object? prefix = null,Object? branchId = null,Object? paymentMethods = null,Object? docTypeId = null,Object? name = null,Object? isActive = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? suffix = null,Object? prefix = null,Object? branchId = null,Object? paymentMethods = null,Object? docTypeId = null,Object? name = null,Object? isActive = null,Object? withDiscount = null,}) {
   return _then(_VoucherModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,suffix: null == suffix ? _self.suffix : suffix // ignore: cast_nullable_to_non_nullable
@@ -294,6 +296,7 @@ as String,paymentMethods: null == paymentMethods ? _self._paymentMethods : payme
 as List<String>,docTypeId: null == docTypeId ? _self.docTypeId : docTypeId // ignore: cast_nullable_to_non_nullable
 as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,isActive: null == isActive ? _self.isActive : isActive // ignore: cast_nullable_to_non_nullable
+as bool,withDiscount: null == withDiscount ? _self.withDiscount : withDiscount // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }

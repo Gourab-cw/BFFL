@@ -319,16 +319,16 @@ class _DateRangePickerState extends State<DateRangePicker> {
                   config: CalendarDatePicker2Config(
                     allowSameValueSelection: true,
                     dynamicCalendarRows: true,
-                    daySplashColor: Colors.blue.shade100,
+                    daySplashColor: getMainStore().theme.value.secondaryColor.withAlpha(10),
                     selectedDayHighlightColor: getMainStore().theme.value.secondaryColor,
-                    selectedRangeHighlightColor: Colors.blueAccent.shade100.withAlpha(40),
+                    selectedRangeHighlightColor: getMainStore().theme.value.secondaryColor.withAlpha(40),
                     rangeBidirectional: true,
                     animateToDisplayedMonthDate: true,
                     calendarType: CalendarDatePicker2Type.range,
                     calendarViewMode: CalendarDatePicker2Mode.day,
                     firstDayOfWeek: 1,
                   ),
-                  value: widget.selectedDateRange != null ? [widget.selectedDateRange!.start, widget.selectedDateRange!.end] : [DateTime.now()],
+                  value: widget.selectedDateRange != null ? [widget.selectedDateRange!.start, widget.selectedDateRange!.end] : [],
                   onValueChanged: (value) {
                     if (widget.withSingleSelect) {
                       if (value.length > 1) {

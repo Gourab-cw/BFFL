@@ -77,7 +77,7 @@ class _SlotDetailsTrainerViewState extends State<SlotDetailsTrainerView> {
                 children: [
                   Container(
                     padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                    decoration: BoxDecoration(color: mainStore.theme.value.mediumShadeColor.withAlpha(180), borderRadius: BorderRadius.circular(8)),
+                    decoration: BoxDecoration(color: mainStore.theme.value.lowShadeColor.withAlpha(180), borderRadius: BorderRadius.circular(8)),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -167,12 +167,9 @@ class _SlotDetailsTrainerViewState extends State<SlotDetailsTrainerView> {
                         const SizedBox(height: 10),
                         if (slot.trainerStartTime == null)
                           Opacity(
-                            opacity: enableEndSession(slot) ? 1 : 0.3,
+                            opacity: 1,
                             child: ButtonHelperG(
                               onTap: () async {
-                                if (!enableEndSession(slot)) {
-                                  return;
-                                }
                                 try {
                                   loader.startLoading();
                                   await slotController.startSession();
@@ -183,6 +180,7 @@ class _SlotDetailsTrainerViewState extends State<SlotDetailsTrainerView> {
                                 }
                               },
                               label: TextHelper(text: "Start Session", color: Colors.white),
+                              background: mainStore.theme.value.HeadColor,
                               width: MediaQuery.sizeOf(context).width * 0.9 > 400 ? 400 : MediaQuery.sizeOf(context).width * 0.9,
                             ),
                           ),

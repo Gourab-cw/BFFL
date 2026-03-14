@@ -9,6 +9,7 @@ import 'package:healthandwellness/features/slot_manage/data/slot_making_model.da
 import 'package:healthandwellness/features/subscriptions/controller/subscription_controller.dart';
 import 'package:moon_design/moon_design.dart';
 
+import '../../../core/utility/firebase_service.dart';
 import '../../login/data/user.dart';
 import '../../login/repository/authenticator.dart';
 import '../controller/home_controller.dart';
@@ -25,6 +26,7 @@ class _HomeTrainerState extends State<HomeTrainer> {
   final loader = Get.find<AppLoaderController>();
   final auth = Get.find<Authenticator>();
   final SubscriptionController subscriptionController = Get.find<SubscriptionController>();
+  final SlotDetailsController slotDetailsController = Get.find<SlotDetailsController>();
 
   late final HomeController homeController;
   final Authenticator user = Get.find<Authenticator>();
@@ -238,16 +240,17 @@ class _HomeTrainerState extends State<HomeTrainer> {
                                                   getStatus(m).toLowerCase().contains('complete')
                                                       ? 140
                                                       : getStatus(m).toLowerCase().contains('ongoing')
-                                                      ? 0
+                                                      ? 20
                                                       : 70,
                                                 ),
                                               ),
                                               child: TextHelper(
                                                 text: getStatus(m),
                                                 fontsize: 11.5,
+                                                fontweight: FontWeight.w600,
                                                 padding: EdgeInsets.only(left: 10),
                                                 color: getStatus(m).toLowerCase().contains('ongoing')
-                                                    ? mainStore.theme.value.HeadColor.withAlpha(200)
+                                                    ? mainStore.theme.value.HeadColor.withAlpha(120)
                                                     : mainStore.theme.value.BackgroundColor,
                                               ),
                                             ),
@@ -401,7 +404,33 @@ class _HomeTrainerState extends State<HomeTrainer> {
                                                           // headerFontSize: 11,
                                                           dataSource: m.slots.map((m) => m.toJSON()).toList(),
                                                           columnList: [
-                                                            DataGridColumnModel3(dataField: "slot", title: 'Slot', dataType: CellDataType3.string),
+                                                            DataGridColumnModel3(
+                                                              dataField: "slot",
+                                                              title: 'Slot',
+                                                              customCell: (c) {
+                                                                return GestureDetector(
+                                                                  onTap: () async {
+                                                                    try {
+                                                                      Loader.startLoading();
+                                                                      final fb = Get.find<FB>();
+                                                                      final db = await fb.getDB();
+                                                                      final resp = await db.collection('slots').doc(c.rowValue['slotId']).get();
+                                                                      if (!resp.exists) {
+                                                                        throw Exception('No slot data found!');
+                                                                      }
+                                                                      await slotDetailsController.getSlotDetails(selectedSlot: SlotModel.fromFirestore(resp));
+                                                                      Get.toNamed('/slotdetailsreceptionist');
+                                                                    } catch (e) {
+                                                                      showAlert("$e", AlertType.error);
+                                                                    } finally {
+                                                                      Loader.stopLoading();
+                                                                    }
+                                                                  },
+                                                                  child: TextHelper(text: c.cellValue, textalign: TextAlign.center, fontsize: 12),
+                                                                );
+                                                              },
+                                                              dataType: CellDataType3.string,
+                                                            ),
                                                             DataGridColumnModel3(dataField: "booked", title: 'Booked', dataType: CellDataType3.string),
                                                             DataGridColumnModel3(
                                                               dataField: "totalAttendance",

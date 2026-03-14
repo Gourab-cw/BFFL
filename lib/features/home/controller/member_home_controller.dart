@@ -20,8 +20,46 @@ class MemberHomeController extends GetxController {
   final fb = Get.find<FB>();
   final auth = Get.find<Authenticator>();
 
-  SessionModel? getTodaysBooking() {
-    return bookings.firstWhereOrNull((b) => b.date == DateFormat('yyyy-MM-dd').format(DateTime.now()));
+  List<SessionModel> getTodaysBooking() {
+    return bookings.where((b) => b.date == DateFormat('yyyy-MM-dd').format(DateTime.now())).toList();
+  }
+
+  Future<int> getTotalBookingCount() async {
+    try {
+      final user = auth.state;
+      if (user == null) return 0;
+      final db = await fb.getDB();
+      final resp = await db
+          .collection('session')
+          .where('memberId', isEqualTo: user.id)
+          .where('date', isGreaterThanOrEqualTo: DateFormat('yyyy-MM-dd').format(DateTime.now()))
+          .count()
+          .get();
+      return resp.count ?? 0;
+    } catch (e) {
+      showAlert('$e', AlertType.error);
+      return 0;
+    }
+  }
+
+  Future<int> getActiveSubscriptionCount() async {
+    try {
+      final user = auth.state;
+      if (user == null) return 0;
+      final db = await fb.getDB();
+      logG(user.id);
+      final resp = await db
+          .collection('userSubscription')
+          .where('userId', isEqualTo: user.id)
+          .where('endDate', isGreaterThanOrEqualTo: DateFormat('yyyy-MM-dd').format(DateTime.now()))
+          .where('startDate', isLessThanOrEqualTo: DateFormat('yyyy-MM-dd').format(DateTime.now()))
+          .count()
+          .get();
+      return resp.count ?? 0;
+    } catch (e) {
+      showAlert('$e', AlertType.error);
+      return 0;
+    }
   }
 
   List<SessionModel> getUpcomingBooking() {

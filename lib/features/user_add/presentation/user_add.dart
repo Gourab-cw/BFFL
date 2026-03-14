@@ -49,13 +49,13 @@ class _UserAddState extends State<UserAdd> {
             ButtonHelperG(
               onTap: () async {
                 try {
-                  loaderController.startLoading();
+                  Loader.startLoading();
                   await c.saveNewMember();
                   showAlert("Successful", AlertType.success);
                 } catch (e) {
                   showAlert("$e", AlertType.error);
                 } finally {
-                  loaderController.stopLoading();
+                  Loader.stopLoading();
                 }
               },
               width: 80,
@@ -267,14 +267,14 @@ class _UserAddState extends State<UserAdd> {
                             const SizedBox(height: 10),
                             Row(
                               children: [
-                                TextHelper(text: "Contact No. :", width: 90, fontsize: 13, fontweight: FontWeight.w600),
+                                TextHelper(text: "Contact No :", width: 90, fontsize: 13, fontweight: FontWeight.w600),
                                 TextBox(controller: c.mobile, placeholder: "", width: 240),
                               ],
                             ),
                             const SizedBox(height: 10),
                             Row(
                               children: [
-                                TextHelper(text: "Emergency No. :", width: 90, fontsize: 13, fontweight: FontWeight.w600),
+                                TextHelper(text: "Alternative No :", width: 100, fontsize: 13, fontweight: FontWeight.w600),
                                 TextBox(controller: c.mobile1, placeholder: "", showAlwaysLabel: true, width: 240),
                               ],
                             ),
@@ -520,6 +520,20 @@ class _UserAddState extends State<UserAdd> {
                               children: [
                                 TextHelper(text: "Referred By Name :", width: 140, fontsize: 13, fontweight: FontWeight.w600),
                                 TextBox(controller: c.referredByName, placeholder: "", width: 240),
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+                            Row(
+                              children: [
+                                TextHelper(text: "Referred By Contact :", width: 140, fontsize: 13, fontweight: FontWeight.w600),
+                                TextBox(controller: c.referredByContact, placeholder: "", width: 240),
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+                            Row(
+                              children: [
+                                TextHelper(text: "Referred By Mail :", width: 140, fontsize: 13, fontweight: FontWeight.w600),
+                                TextBox(controller: c.referredByMail, placeholder: "", width: 240),
                               ],
                             ),
                           ],

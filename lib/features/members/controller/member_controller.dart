@@ -1,9 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:get/get_state_manager/src/simple/list_notifier.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
 import 'package:healthandwellness/features/login/repository/authenticator.dart';
 
+import '../../../core/utility/firebase_service.dart';
+import '../../Payment/data/payment_model.dart';
 import '../../login/data/user.dart';
 
 class MemberControllerBinding extends Bindings {
@@ -16,6 +19,7 @@ class MemberControllerBinding extends Bindings {
 
 class MemberController extends GetxController {
   List<UserG> members = [];
+  List<PaymentModel> payments = [];
 
   final auth = Get.find<Authenticator>();
   RxBool isSearching = false.obs;
@@ -69,5 +73,29 @@ class MemberController extends GetxController {
 
   Future<void> makeApprove(UserG user, FirebaseFirestore db) async {
     await db.collection('User').doc(user.id).update({"isApproved": true, 'activeFrom': Timestamp.now()});
+  }
+
+  Future<void> getPaymentList({force = false}) async {
+    if (!force && payments.isNotEmpty) return;
+    final user = auth.state;
+    if (user == null) {
+      throw Exception('Unable to authenticate');
+    }
+    if (selectedUser == null) {
+      throw Exception('No user selected');
+    }
+    final fb = Get.find<FB>();
+    final db = await fb.getDB();
+    final resp = await db.collection('payment').where('userId', isEqualTo: selectedUser!.id).get();
+    payments = resp.docs.map((doc) => PaymentModel.fromJson(makeMapSerialize(doc.data()))).toList();
+    update();
+  }
+
+  Disposer addListener(GetStateUpdate listener) {
+    // TODO: implement addListener
+    if (payments.isNotEmpty) {
+      getPaymentList(force: true);
+    }
+    return super.addListener(listener);
   }
 }

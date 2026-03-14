@@ -7,8 +7,10 @@ import 'package:healthandwellness/features/members/presentation/member_details.d
 import 'package:healthandwellness/features/members/presentation/members.dart';
 import 'package:healthandwellness/features/slot_manage/controller/slot_manage_controller.dart';
 
+import '../features/Payment/presentation/payment_details.dart';
 import '../features/Service/presentation/service_details_view.dart';
 import '../features/Service/presentation/service_view.dart';
+import '../features/accountant/history/presentation/accountant_history.dart';
 import '../features/accountant/subscription/presentation/acc_subscription_details.dart';
 import '../features/member_approve/presentation/member_approve_register.dart';
 import '../features/members/controller/member_controller.dart';
@@ -19,6 +21,7 @@ import '../features/slot_details_trainer/presentation/slot_details_register.dart
 import '../features/slot_details_trainer/presentation/slot_details_trainer_view.dart';
 import '../features/slot_manage/presentation/slot_manage.dart';
 import '../features/slot_register/presentation/slot_register.dart';
+import '../features/staff/presentation/staff.dart';
 import '../features/staff_register/presentation/staff_register.dart';
 import '../features/subscriptions/controller/subscription_controller.dart';
 import '../features/user_add/controller/new_user_form_controller.dart';
@@ -45,4 +48,7 @@ final List<GetPage<dynamic>> routes = [
   GetPage(name: "/staffregister", page: () => StaffRegister()),
   GetPage(name: "/dailyschedule", page: () => DailySchedule()),
   GetPage(name: "/memberapproveregister", page: () => MemberApproveRegister()),
+  GetPage(name: "/paymentDetails", page: () => PaymentDetails()),
+  GetPage(name: "/staff", page: () => Staff()),
+  GetPage(name: "/accountantHistory", page: () => AccountantHistory()),
 ];

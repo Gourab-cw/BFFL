@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:healthandwellness/app/mainstore.dart';
+import 'package:healthandwellness/core/Theme/theme.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
 import 'package:healthandwellness/features/home/controller/home_controller.dart';
 import 'package:healthandwellness/features/login/data/user.dart';
@@ -40,6 +41,23 @@ class Authenticator extends GetxController {
         state = UserG.fromJSON(makeMapSerialize(querySnapshot.data()));
         final branchResp = await db.collection('Branch').doc(state!.branchId).get();
         branch = BranchModel.fromFirestore(branchResp);
+        MainStore mainStore = Get.find<MainStore>();
+        if (state!.userType == UserType.admin) {
+          mainStore.theme.value = BergerTheme.themes[1];
+        }
+        if (state!.userType == UserType.member) {
+          mainStore.theme.value = BergerTheme.themes[2];
+        }
+        if (state!.userType == UserType.accountant) {
+          mainStore.theme.value = BergerTheme.themes[5];
+        }
+        if (state!.userType == UserType.trainer) {
+          mainStore.theme.value = BergerTheme.themes[10];
+        }
+        if (state!.userType == UserType.receptionist) {
+          mainStore.theme.value = BergerTheme.themes[7];
+        }
+
         update();
         return true;
       } else {
@@ -52,26 +70,51 @@ class Authenticator extends GetxController {
 
   Future<bool> emailLogin({required String email, required String password}) async {
     try {
+      FirebaseFirestore db = await _firebase.getDB();
+      final resp = await db.collection("User").where('mail', isEqualTo: email).limit(1).get();
+      if (resp.docs.isEmpty) {
+        showAlert("No user found", AlertType.error);
+        return false;
+      }
+      if (resp.docs.first.exists &&
+          makeMapSerialize(resp.docs.first.data())["userType"] == userTypeMap2[UserType.member] &&
+          (!parseBool(data: makeMapSerialize(resp.docs.first.data())["isActive"], defaultValue: false) ||
+              !parseBool(data: makeMapSerialize(resp.docs.first.data())["isApproved"], defaultValue: false))) {
+        showAlert("Approval in process – we’ll notify you soon.", AlertType.error);
+        return false;
+      }
       final User? user = await _firebase.makeEmailLogin(email: email, password: password);
       if (user != null) {
-        FirebaseFirestore db = await _firebase.getDB();
+        MainStore mainStore = Get.find<MainStore>();
         final resp = await db.collection("User").doc(user.uid).get();
-        if (!resp.exists) {
-          showAlert("No user found", AlertType.error);
-          return false;
-        }
+
         if (resp.exists && makeMapSerialize(resp.data())["isActive"] == true) {
           if (_firebase.token != null) {
             await db.collection("User").doc(user.uid).update({"token": _firebase.token});
           }
-          UserG user0 = UserG.fromJSON(makeMapSerialize(resp.data()));
-          if (user0.userType == UserType.member && (!user0.isActive || !user0.isApproved)) {
-            showAlert("Approval in process – we’ll notify you soon.", AlertType.error);
-            return false;
-          }
+          // UserG user0 = UserG.fromJSON(makeMapSerialize(resp.data()));
+          // if (user0.userType == UserType.member && (!user0.isActive || !user0.isApproved)) {
+          //   showAlert("Approval in process – we’ll notify you soon.", AlertType.error);
+          //   return false;
+          // }
           state = UserG.fromJSON(makeMapSerialize(resp.data()));
           final branchResp = await db.collection('Branch').doc(state!.branchId).get();
           branch = BranchModel.fromFirestore(branchResp);
+          if (state!.userType == UserType.admin) {
+            mainStore.theme.value = BergerTheme.themes[1];
+          }
+          if (state!.userType == UserType.trainer) {
+            mainStore.theme.value = BergerTheme.themes[6];
+          }
+          if (state!.userType == UserType.receptionist) {
+            mainStore.theme.value = BergerTheme.themes[7];
+          }
+          if (state!.userType == UserType.accountant) {
+            mainStore.theme.value = BergerTheme.themes[5];
+          }
+          if (state!.userType == UserType.member) {
+            mainStore.theme.value = BergerTheme.themes[2];
+          }
           update();
           return true;
         } else {

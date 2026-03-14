@@ -1,7 +1,10 @@
 import 'package:get/get.dart';
 import 'package:healthandwellness/core/voucher/controller/voucher_controller.dart';
+import 'package:healthandwellness/features/staff/controller/staff_controller.dart';
 
+import '../../features/Payment/controller/payment_controller.dart';
 import '../../features/Service/controller/service_controller.dart';
+import '../../features/accountant/history/controller/accountant_history_controller.dart';
 import '../../features/accountant/subscription/controller/acc_subscription_controller.dart';
 import '../../features/calendar_report/controller/calendar_report_controller.dart';
 import '../../features/home/controller/admin_home_controller.dart';
@@ -35,5 +38,8 @@ class InitBindings extends Bindings {
     Get.lazyPut(() => AdminHomeController(), fenix: true);
     Get.lazyPut(() => BranchController(), fenix: true);
     Get.lazyPut(() => VoucherController(), fenix: true);
+    Get.lazyPut(() => AccountantHistoryController(), fenix: true);
+    Get.lazyPut(() => PaymentController(), fenix: true);
+    Get.lazyPut(() => StaffController(), fenix: true);
   }
 }
