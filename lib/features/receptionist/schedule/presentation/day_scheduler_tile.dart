@@ -123,8 +123,8 @@ class _DaySchedulerTileState extends State<DaySchedulerTile> {
                     Row(
                       spacing: 8,
                       children: [
-                        TextHelper(text: session.memberName ?? "", fontweight: FontWeight.w600),
-                        TextHelper(text: session.memberContact1 == "" ? "" : ' ( ${session.memberContact1} ) ', fontsize: 11),
+                        TextHelper(text: session.memberName ?? "", fontweight: FontWeight.w600, fontsize: 11),
+                        // TextHelper(text: session.memberContact1 == "" ? "" : ' ( ${session.memberContact1} ) ', fontsize: 11),
                       ],
                     ),
 

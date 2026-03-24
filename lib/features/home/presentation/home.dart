@@ -9,6 +9,7 @@ import 'package:healthandwellness/features/slot_manage/data/slot_making_model.da
 import 'package:healthandwellness/features/subscriptions/controller/subscription_controller.dart';
 import 'package:moon_design/moon_design.dart';
 
+import '../../login/data/user.dart';
 import '../../login/repository/authenticator.dart';
 import '../../slot_details_trainer/controller/slot_details_controller.dart';
 import '../controller/home_controller.dart';
@@ -67,6 +68,7 @@ class _HomeState extends State<Home> {
           init: homeController,
           autoRemove: false,
           builder: (homeController) {
+            final auth = Get.find<Authenticator>();
             return GetBuilder<SubscriptionController>(
               init: subscriptionController,
               autoRemove: false,
@@ -156,18 +158,24 @@ class _HomeState extends State<Home> {
                                       width: 150,
                                       background: mainStore.theme.value.secondaryColor.withAlpha(50),
                                     ),
-                                    ButtonHelperG(
-                                      onTap: () {
-                                        Get.toNamed('/slotmanage');
-                                      },
-                                      withBorder: true,
-                                      height: 45,
-                                      type: ButtonHelperTypeG.outlined,
-                                      icon: Icon(MoonIcons.generic_users_24_regular, color: mainStore.theme.value.HeadColor, size: 28),
-                                      label: TextHelper(text: "Slot Manage", fontsize: 14, color: mainStore.theme.value.HeadColor, fontweight: FontWeight.w600),
-                                      width: 150,
-                                      background: mainStore.theme.value.secondaryColor.withAlpha(50),
-                                    ),
+                                    if (auth.state != null && auth.state!.userType == UserType.admin || auth.state!.userType == UserType.branchManager)
+                                      ButtonHelperG(
+                                        onTap: () {
+                                          Get.toNamed('/slotmanage');
+                                        },
+                                        withBorder: true,
+                                        height: 45,
+                                        type: ButtonHelperTypeG.outlined,
+                                        icon: Icon(MoonIcons.generic_users_24_regular, color: mainStore.theme.value.HeadColor, size: 28),
+                                        label: TextHelper(
+                                          text: "Slot Manage",
+                                          fontsize: 14,
+                                          color: mainStore.theme.value.HeadColor,
+                                          fontweight: FontWeight.w600,
+                                        ),
+                                        width: 150,
+                                        background: mainStore.theme.value.secondaryColor.withAlpha(50),
+                                      ),
                                   ],
                                 ),
                                 const SizedBox(height: 30),

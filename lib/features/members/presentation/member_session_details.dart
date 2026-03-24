@@ -30,6 +30,16 @@ class _MemberSessionDetailsState extends State<MemberSessionDetails> {
   final mhc = Get.find<MemberHomeController>();
 
   final TextEditingController feedback = TextEditingController();
+
+  bool hasSessionEnd() {
+    final booking = mhc.selectedBooking;
+    if (booking == null) {
+      return false;
+    }
+    return parseInt(data: booking.endTime.replaceAll(':', ''), defaultInt: 0) <
+        parseInt(data: DateFormat('HH:mm').format(DateTime.now()).replaceAll(':', ''), defaultInt: 0);
+  }
+
   @override
   Widget build(BuildContext context) {
     return GetBuilder<MemberHomeController>(
@@ -54,40 +64,48 @@ class _MemberSessionDetailsState extends State<MemberSessionDetails> {
                           Expanded(
                             child: TextHelper(text: booking.serviceName ?? "", fontweight: FontWeight.w600, fontsize: 16),
                           ),
-                          ButtonHelperG(
-                            width: 100,
-                            onTap: () async {
-                              try {
-                                loader.startLoading();
-                                serviceController.selectedReschedule = booking;
-                                serviceController.selectedMember = {"id": booking.memberId, "name": booking.memberName};
-                                final fb = Get.find<FB>();
-                                final db = await fb.getDB();
-                                await serviceController.getServiceDetails(booking.serviceId, auth.state!.branchId, isReschedule: true);
-                                ServiceModel sv = ServiceModel.fromJson(
-                                  makeMapSerialize((await db.collection('Subscription').doc(booking.serviceId).get()).data()),
-                                );
-                                serviceController.selectedService = sv;
-                                if (!serviceController.services.any((s) => s.id == sv.id)) {
-                                  serviceController.services.add(sv);
-                                }
-                                List<String> trainers = serviceController.selectedService!.trainerId;
-                                final resp1 = await db.collection("User").where('id', whereIn: trainers).get();
-                                List<UserG> trainser_users = resp1.docs.map((m) => UserG.fromJSON(makeMapSerialize(m.data()))).toList();
-                                for (var f in trainser_users) {
-                                  if (!serviceController.trainers.any((a) => a.id == f.id)) {
-                                    serviceController.trainers.add(f);
-                                  }
-                                }
-                                Get.toNamed('/servicedetailsview?isReschedule=1');
-                              } catch (e) {
-                                showAlert("$e", AlertType.error);
-                              } finally {
-                                loader.stopLoading();
-                              }
-                            },
-                            label: TextHelper(text: "Reschedule", color: Colors.white),
-                          ),
+                          !booking.hasAttend && hasSessionEnd() && auth.state!.userType == UserType.member
+                              ? Container(
+                                  decoration: BoxDecoration(color: mainStore.theme.value.HeadColor.withAlpha(100), borderRadius: BorderRadius.circular(4)),
+                                  padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 8),
+                                  child: TextHelper(text: 'Not Attended', fontsize: 11, color: mainStore.theme.value.DarkTextColor),
+                                )
+                              : booking.hasAttend
+                              ? SizedBox()
+                              : ButtonHelperG(
+                                  width: 100,
+                                  onTap: () async {
+                                    try {
+                                      loader.startLoading();
+                                      serviceController.selectedReschedule = booking;
+                                      serviceController.selectedMember = {"id": booking.memberId, "name": booking.memberName};
+                                      final fb = Get.find<FB>();
+                                      final db = await fb.getDB();
+                                      await serviceController.getServiceDetails(booking.serviceId, auth.state!.branchId, isReschedule: true);
+                                      ServiceModel sv = ServiceModel.fromJson(
+                                        makeMapSerialize((await db.collection('Subscription').doc(booking.serviceId).get()).data()),
+                                      );
+                                      serviceController.selectedService = sv;
+                                      if (!serviceController.services.any((s) => s.id == sv.id)) {
+                                        serviceController.services.add(sv);
+                                      }
+                                      List<String> trainers = serviceController.selectedService!.trainerId;
+                                      final resp1 = await db.collection("User").where('id', whereIn: trainers).get();
+                                      List<UserG> trainser_users = resp1.docs.map((m) => UserG.fromJSON(makeMapSerialize(m.data()))).toList();
+                                      for (var f in trainser_users) {
+                                        if (!serviceController.trainers.any((a) => a.id == f.id)) {
+                                          serviceController.trainers.add(f);
+                                        }
+                                      }
+                                      Get.toNamed('/servicedetailsview?isReschedule=1');
+                                    } catch (e) {
+                                      showAlert("$e", AlertType.error);
+                                    } finally {
+                                      loader.stopLoading();
+                                    }
+                                  },
+                                  label: TextHelper(text: "Reschedule", color: Colors.white),
+                                ),
                         ],
                       ),
                       Padding(
@@ -161,13 +179,17 @@ class _MemberSessionDetailsState extends State<MemberSessionDetails> {
                       if (booking.hasAttend)
                         Row(
                           children: [
-                            TextHelper(text: "Attend at :", width: 80),
-                            TextHelper(text: booking.attendedAt == null ? "" : (DateFormat("dd-MM-yyyy hh:mm a").format(booking.attendedAt!)), fontsize: 15),
+                            TextHelper(text: "Attended at :", width: 90),
+                            TextHelper(
+                              text: booking.attendedAt == null ? "" : (DateFormat("dd-MM-yyyy hh:mm a").format(booking.attendedAt!)),
+                              fontsize: 14,
+                              fontweight: FontWeight.w600,
+                            ),
                           ],
                         ),
                       Spacer(),
 
-                      booking.feedback == ""
+                      booking.feedback == "" && booking.hasAttend
                           ? Row(
                               spacing: 10,
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -209,19 +231,27 @@ class _MemberSessionDetailsState extends State<MemberSessionDetails> {
                             ),
                       const SizedBox(height: 20),
                       if (!booking.hasAttend && DateFormat('yyyy-MM-dd').format(DateTime.now()) == booking.date)
-                        ButtonHelperG(
-                          onTap: () async {
-                            try {
-                              loader.startLoading();
-                              await mhc.markAttendance(booking);
-                            } catch (e) {
-                              showAlert("$e", AlertType.error);
-                            } finally {
-                              loader.stopLoading();
-                            }
-                          },
-                          width: 150,
-                          label: TextHelper(text: "Mark as attend", color: Colors.white),
+                        Opacity(
+                          opacity: (auth.state!.userType == UserType.member && hasSessionEnd()) ? 0.4 : 1,
+                          child: ButtonHelperG(
+                            onTap: () async {
+                              if (auth.state!.userType == UserType.member && hasSessionEnd()) {
+                                showAlert('Session has ended', AlertType.error);
+                                return;
+                              }
+
+                              try {
+                                loader.startLoading();
+                                await mhc.markAttendance(booking);
+                              } catch (e) {
+                                showAlert("$e", AlertType.error);
+                              } finally {
+                                loader.stopLoading();
+                              }
+                            },
+                            width: 150,
+                            label: TextHelper(text: "Mark as attend", color: Colors.white),
+                          ),
                         ),
                       Spacer(),
                     ],

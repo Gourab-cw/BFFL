@@ -98,7 +98,7 @@ class _BottomNavbarTrainerState extends State<BottomNavbarTrainer> {
         padding: const EdgeInsets.all(0),
         // color: const Color.fromARGB(255, 151, 239, 160),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             ...List.generate(menus.length, (i) {
@@ -109,6 +109,47 @@ class _BottomNavbarTrainerState extends State<BottomNavbarTrainer> {
                   mainStore.bottomNavBarIndex.value = i;
                   // Get.toNamed("/home");
                 },
+                child: SizedBox(
+                  width: MediaQuery.sizeOf(context).width / (menus.length + 1),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 500),
+                        curve: Curves.fastEaseInToSlowEaseOut,
+                        height: 28,
+                        width: calcWidth > 35 ? 35 : calcWidth,
+                        decoration: BoxDecoration(
+                          color: mainStore.bottomNavBarIndex.value == i ? mainStore.theme.value.BackgroundShadeColor.withAlpha(100) : Colors.transparent,
+                          borderRadius: BorderRadius.circular(100),
+                        ),
+                        child: Icon(
+                          m.values.toList()[0].icon,
+                          size: m.values.toList()[0].size,
+                          color: mainStore.bottomNavBarIndex.value == i ? mainStore.theme.value.DarkTextColor : mainStore.theme.value.DarkTextColor,
+                        ),
+                      ),
+                      TextHelper(
+                        text: parseString(data: m.keys.toList()[0], defaultValue: ''),
+                        fontweight: mainStore.bottomNavBarIndex.value == i ? FontWeight.w600 : FontWeight.w500,
+                        fontsize: mainStore.bottomNavBarIndex.value == i ? 11 : 10,
+                        width: calcWidth,
+                        isWrap: true,
+                        color: mainStore.theme.value.DarkTextColor,
+                        textalign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }),
+            GestureDetector(
+              onTap: () async {
+                await showLogoutPopup();
+              },
+              child: SizedBox(
+                width: MediaQuery.sizeOf(context).width / (menus.length + 1),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -117,59 +158,26 @@ class _BottomNavbarTrainerState extends State<BottomNavbarTrainer> {
                       height: 28,
                       width: calcWidth > 40 ? 40 : calcWidth,
                       decoration: BoxDecoration(
-                        color: mainStore.bottomNavBarIndex.value == i ? mainStore.theme.value.BackgroundShadeColor.withAlpha(100) : Colors.transparent,
+                        color: mainStore.bottomNavBarIndex.value == 10 ? Colors.white.withAlpha(160) : Colors.transparent,
                         borderRadius: BorderRadius.circular(100),
                       ),
                       child: Icon(
-                        m.values.toList()[0].icon,
-                        size: m.values.toList()[0].size,
-                        color: mainStore.bottomNavBarIndex.value == i ? mainStore.theme.value.DarkTextColor : mainStore.theme.value.DarkTextColor,
+                        Icons.logout,
+                        size: 17,
+                        color: mainStore.bottomNavBarIndex.value == 10 ? mainStore.theme.value.HeadColor : mainStore.theme.value.BackgroundColor,
                       ),
                     ),
                     TextHelper(
-                      text: parseString(data: m.keys.toList()[0], defaultValue: ''),
-                      fontweight: FontWeight.w600,
-                      fontsize: mainStore.bottomNavBarIndex.value == i ? 11 : 10,
+                      text: parseString(data: 'Logout', defaultValue: ''),
+                      fontsize: 10,
+                      color: mainStore.bottomNavBarIndex.value == 10 ? mainStore.theme.value.HeadColor : mainStore.theme.value.BackgroundColor,
                       width: calcWidth,
                       isWrap: true,
-                      color: mainStore.theme.value.DarkTextColor,
                       textalign: TextAlign.center,
+                      fontweight: FontWeight.w500,
                     ),
                   ],
                 ),
-              );
-            }),
-            GestureDetector(
-              onTap: () async {
-                await showLogoutPopup();
-              },
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    height: 28,
-                    width: calcWidth > 40 ? 40 : calcWidth,
-                    decoration: BoxDecoration(
-                      color: mainStore.bottomNavBarIndex.value == 10 ? Colors.white.withAlpha(160) : Colors.transparent,
-                      borderRadius: BorderRadius.circular(100),
-                    ),
-                    child: Icon(
-                      Icons.logout,
-                      size: 18,
-                      color: mainStore.bottomNavBarIndex.value == 10 ? mainStore.theme.value.HeadColor : mainStore.theme.value.BackgroundColor,
-                    ),
-                  ),
-                  TextHelper(
-                    text: parseString(data: 'Logout', defaultValue: ''),
-                    fontweight: FontWeight.w600,
-                    fontsize: 10,
-                    color: mainStore.bottomNavBarIndex.value == 10 ? mainStore.theme.value.HeadColor : mainStore.theme.value.BackgroundColor,
-                    width: calcWidth,
-                    isWrap: true,
-                    textalign: TextAlign.center,
-                  ),
-                ],
               ),
             ),
           ],

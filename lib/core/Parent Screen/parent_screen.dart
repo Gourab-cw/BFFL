@@ -38,12 +38,18 @@ class _ParentScreenState extends State<ParentScreen> {
   final Authenticator userRef = Get.find<Authenticator>();
   late final EdgeInsets safePadding = MediaQuery.paddingOf(context);
   final List<Widget> _pages = [Home(), DailySchedule(), Members(), Attendance(), StaffRegister(), Home()];
-  final List<Widget> _branchManagerPages = [Home(), DailySchedule(), Members(), CalenderReport(), Home()];
+  final List<Widget> _branchManagerPages = [Home(), DailySchedule(), StaffRegister(), CalenderReport(), Master()];
   final List<Widget> _trainerPages = [HomeTrainer(), SlotDetailsRegister(), Attendance(), HomeTrainer()];
   final List<Widget> _memberPages = [HomeMember(), ServiceView(), MemberDetails()];
   final List<Widget> _adminPages = [HomeAdmin(), CalenderReport(), Master(), Attendance()];
   final List<Widget> _accPages = [AccSubscriptionList(), AccountantHistory(), Attendance()];
-
+  List<Map<String, Icon>> branchManagerMenus = [
+    {"Home": Icon(MoonIcons.generic_home_24_regular)},
+    {"Schedule": Icon(MoonIcons.time_calendar_24_regular)},
+    {"Attendance": Icon(Icons.badge_outlined, size: 20)},
+    {"Overview": Icon(MoonIcons.shop_card_24_regular)},
+    {"Master": Icon(Icons.admin_panel_settings_rounded, size: 20)},
+  ];
   List<Map<String, Icon>> adminMenus = [
     {"Home": Icon(Icons.home_filled, size: 20)},
     {"Overview": Icon(Icons.calendar_month, size: 20)},
@@ -75,6 +81,9 @@ class _ParentScreenState extends State<ParentScreen> {
     {"Members": Icon(MoonIcons.generic_users_24_regular)},
     {"Staff": Icon(Icons.badge_outlined, size: 20)},
   ];
+
+  //
+
   @override
   void initState() {
     // TODO: implement initState
@@ -106,6 +115,10 @@ class _ParentScreenState extends State<ParentScreen> {
       // return BottomNavbarTrainer(menus: trainerMenus);
       return BottomNavbarTrainer(menus: memberMenus);
     }
+    if (userRef.state?.userType == UserType.branchManager) {
+      // return BottomNavbarTrainer(menus: trainerMenus);
+      return BottomNavbarTrainer(menus: branchManagerMenus);
+    }
 
     return BottomNavbar();
   }
@@ -122,6 +135,9 @@ class _ParentScreenState extends State<ParentScreen> {
     }
     if (userRef.state?.userType == UserType.accountant) {
       return _accPages;
+    }
+    if (userRef.state?.userType == UserType.branchManager) {
+      return _branchManagerPages;
     }
     return _pages;
   }

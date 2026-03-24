@@ -27,6 +27,7 @@ import '../features/subscriptions/controller/subscription_controller.dart';
 import '../features/user_add/controller/new_user_form_controller.dart';
 import '../features/user_add/presentation/user_add.dart';
 import '../features/user_subscription/presentation/user_subscription_add.dart';
+import '../features/user_subscription/presentation/user_subscription_details.dart';
 
 final List<GetPage<dynamic>> routes = [
   GetPage(name: "/login", page: () => Login()),
@@ -51,4 +52,5 @@ final List<GetPage<dynamic>> routes = [
   GetPage(name: "/paymentDetails", page: () => PaymentDetails()),
   GetPage(name: "/staff", page: () => Staff()),
   GetPage(name: "/accountantHistory", page: () => AccountantHistory()),
+  GetPage(name: "/userSubscriptionDetails", page: () => UserSubscriptionDetails()),
 ];

@@ -1,5 +1,7 @@
 import 'package:healthandwellness/core/utility/helper.dart';
 
+import '../../login/data/user.dart';
+
 class ServiceModel {
   final String id;
   final String name;
@@ -13,6 +15,7 @@ class ServiceModel {
   final bool withGST;
   final int totalDays;
   final List<String> trainerId;
+  final List<UserG>? trainersData;
 
   final bool? isNewSlot;
   ServiceModel({
@@ -28,6 +31,7 @@ class ServiceModel {
     required this.gstPer,
     required this.withGST,
     this.isNewSlot,
+    this.trainersData,
     required this.totalAmount,
   });
 
@@ -82,6 +86,7 @@ class ServiceModel {
     double? gstPer,
     bool? isNewSlot,
     bool? withGST,
+    List<UserG>? trainersData,
   }) {
     return ServiceModel(
       id: id ?? this.id,
@@ -97,6 +102,7 @@ class ServiceModel {
       isNewSlot: isNewSlot ?? this.isNewSlot,
       gstPer: gstPer ?? this.gstPer,
       withGST: withGST ?? this.withGST,
+      trainersData: trainersData ?? this.trainersData,
     );
   }
 }

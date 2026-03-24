@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:healthandwellness/app/mainstore.dart';
 import 'package:healthandwellness/core/utility/app_loader.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
+import 'package:healthandwellness/features/Payment/controller/payment_controller.dart';
 import 'package:intl/intl.dart';
 
 import '../../controller/member_controller.dart';
@@ -17,6 +18,7 @@ class MemberPaymentDetails extends StatefulWidget {
 class _MemberPaymentDetailsState extends State<MemberPaymentDetails> {
   final mainStore = Get.find<MainStore>();
   final memberController = Get.find<MemberController>();
+  final paymentController = Get.find<PaymentController>();
 
   @override
   void initState() {
@@ -45,6 +47,10 @@ class _MemberPaymentDetailsState extends State<MemberPaymentDetails> {
           itemBuilder: (_, index) {
             final payment = memberController.payments[index];
             return CardHelper(
+              onTap: () {
+                paymentController.selectedPayment = payment;
+                Get.toNamed('/paymentDetails');
+              },
               height: 80,
               backgroundColor: mainStore.theme.value.lowShadeColor,
               child: Column(

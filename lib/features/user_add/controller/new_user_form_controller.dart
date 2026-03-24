@@ -90,7 +90,7 @@ class NewUserFormController extends GetxController {
         "name":
             '${name.text.trim()} ( ${userState.branch?.name.toUpperCase().substring(0, 2)}-${(count + 1).toString().padLeft(4, '0')}-${DateFormat('yy').format(DateTime.now())} )',
         "displayName": name.text.trim(),
-        "code": '${userState.branch?.name.toUpperCase().substring(0, 2)}-${(count + 1).toString().padLeft(4, '0')}-${DateFormat('YY').format(DateTime.now())}',
+        "code": '${userState.branch?.name.toUpperCase().substring(0, 2)}-${(count + 1).toString().padLeft(4, '0')}-${DateFormat('yy').format(DateTime.now())}',
         "searchTerm": name.text.trim().replaceAll(" ", "").toLowerCase(),
         "mail": email.text,
         "branchId": parseString(data: userState.state?.branchId, defaultValue: ""),

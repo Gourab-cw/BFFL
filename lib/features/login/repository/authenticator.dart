@@ -71,19 +71,21 @@ class Authenticator extends GetxController {
   Future<bool> emailLogin({required String email, required String password}) async {
     try {
       FirebaseFirestore db = await _firebase.getDB();
-      final resp = await db.collection("User").where('mail', isEqualTo: email).limit(1).get();
-      if (resp.docs.isEmpty) {
+      final User? user = await _firebase.makeEmailLogin(email: email, password: password);
+      if (user == null) {
+        return false;
+      }
+      final resp = await db.collection("User").doc(user?.uid).get();
+      if (!resp.exists) {
         showAlert("No user found", AlertType.error);
         return false;
       }
-      if (resp.docs.first.exists &&
-          makeMapSerialize(resp.docs.first.data())["userType"] == userTypeMap2[UserType.member] &&
-          (!parseBool(data: makeMapSerialize(resp.docs.first.data())["isActive"], defaultValue: false) ||
-              !parseBool(data: makeMapSerialize(resp.docs.first.data())["isApproved"], defaultValue: false))) {
+      UserG userG = UserG.fromJSON(makeMapSerialize(resp.data()));
+      if (userG.userType == UserType.member && (userG.isActive == false || userG.isApproved == false)) {
         showAlert("Approval in process – we’ll notify you soon.", AlertType.error);
         return false;
       }
-      final User? user = await _firebase.makeEmailLogin(email: email, password: password);
+
       if (user != null) {
         MainStore mainStore = Get.find<MainStore>();
         final resp = await db.collection("User").doc(user.uid).get();

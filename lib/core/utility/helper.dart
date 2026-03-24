@@ -94,6 +94,7 @@ class TextHelper extends StatelessWidget {
     this.onlyBottomBorder = false,
     this.withBorder = false,
     this.isWrap = false,
+    this.isSelectable = false,
     this.fontsize = 13,
     this.borderRadius = 8,
     this.fontweight = FontWeight.w400,
@@ -107,6 +108,7 @@ class TextHelper extends StatelessWidget {
   final bool showRequired;
   final bool onlyBottomBorder;
   final bool withBorder;
+  final bool isSelectable;
   final double fontsize;
   final double borderRadius;
   final double? width;
@@ -153,17 +155,29 @@ class TextHelper extends StatelessWidget {
           : Alignment.centerLeft,
       child: Wrap(
         children: [
-          Text(
-            !camalToLabel ? text : makeCamalToLabel(text),
-            softWrap: isWrap,
-            style: TextStyle(
-              color: color ?? (mainStore.isDarkEnable.value ? Colors.blueGrey.shade200 : mainStore.theme.value.LightTextColor),
-              fontSize: fontsize,
-              fontWeight: fontweight,
-              overflow: isWrap ? TextOverflow.visible : TextOverflow.ellipsis,
-              shadows: shadow,
-            ),
-          ),
+          isSelectable
+              ? SelectableText(
+                  !camalToLabel ? text : makeCamalToLabel(text),
+                  maxLines: !isWrap ? 1 : null,
+                  style: TextStyle(
+                    color: color ?? (mainStore.isDarkEnable.value ? Colors.blueGrey.shade200 : mainStore.theme.value.LightTextColor),
+                    fontSize: fontsize,
+                    fontWeight: fontweight,
+                    overflow: isWrap ? TextOverflow.visible : TextOverflow.ellipsis,
+                    shadows: shadow,
+                  ),
+                )
+              : Text(
+                  !camalToLabel ? text : makeCamalToLabel(text),
+                  softWrap: isWrap,
+                  style: TextStyle(
+                    color: color ?? (mainStore.isDarkEnable.value ? Colors.blueGrey.shade200 : mainStore.theme.value.LightTextColor),
+                    fontSize: fontsize,
+                    fontWeight: fontweight,
+                    overflow: isWrap ? TextOverflow.visible : TextOverflow.ellipsis,
+                    shadows: shadow,
+                  ),
+                ),
           if (showRequired) const Text(' *', style: TextStyle(color: Colors.red)),
         ],
       ),
@@ -1528,7 +1542,7 @@ class _DropDownHelperGState extends State<DropDownHelperG> {
   Widget singleSelectWidget(Map<String, dynamic> data, int index) {
     return GestureDetector(
       onTap: () {
-        Timer(const Duration(milliseconds: 200), () {
+        Timer(const Duration(milliseconds: 10), () {
           dropDownStore.showList.value = false;
           if (widget.onHiding != null) {
             widget.onHiding!();
@@ -1536,8 +1550,8 @@ class _DropDownHelperGState extends State<DropDownHelperG> {
         });
         if (widget.onValueChange != null) {
           widget.onValueChange!(data);
-          dropDownStore.selectedValue.value = makeMapSerialize(data);
-          dropDownStore.textController.value.text = parseString(data: dropDownStore.selectedValue[widget.displayKey], defaultValue: '');
+          // dropDownStore.selectedValue.value = makeMapSerialize(data);
+          // dropDownStore.textController.value.text = parseString(data: dropDownStore.selectedValue[widget.displayKey], defaultValue: '');
         }
       },
       child: widget.customRow != null
@@ -1613,17 +1627,33 @@ class _DropDownHelperGState extends State<DropDownHelperG> {
 
   @override
   void initState() {
-    Timer(const Duration(milliseconds: 600), () {
+    // Timer(const Duration(milliseconds: 600), () {
+    //   dropDownStore.list.value = widget.items;
+    //   dropDownStore.filteredList.value = widget.items;
+    //   dropDownStore.selectedList.value = widget.multiSelectValue ?? [];
+    //   if (widget.value != null && widget.isMultiSelect == false && dropDownStore.init.value == false) {
+    //     dropDownStore.textController.value.text = parseString(data: widget.value![widget.displayKey], defaultValue: '');
+    //     Timer(const Duration(milliseconds: 700), () {
+    //       dropDownStore.init.value = true;
+    //     });
+    //   }
+    //   Timer(const Duration(milliseconds: 500), () {
+    //     if (widget.manageRawStore != null) {
+    //       widget.manageRawStore!(dropDownStore);
+    //     }
+    //   });
+    // });
+    Future(() {
       dropDownStore.list.value = widget.items;
       dropDownStore.filteredList.value = widget.items;
       dropDownStore.selectedList.value = widget.multiSelectValue ?? [];
       if (widget.value != null && widget.isMultiSelect == false && dropDownStore.init.value == false) {
         dropDownStore.textController.value.text = parseString(data: widget.value![widget.displayKey], defaultValue: '');
-        Timer(const Duration(milliseconds: 700), () {
+        Timer(const Duration(milliseconds: 100), () {
           dropDownStore.init.value = true;
         });
       }
-      Timer(const Duration(milliseconds: 500), () {
+      Timer(const Duration(milliseconds: 200), () {
         if (widget.manageRawStore != null) {
           widget.manageRawStore!(dropDownStore);
         }
@@ -2694,8 +2724,8 @@ Future<DeviceDetails> getDeviceDetails() async {
 
 Future<void> makePhoneCall(String number, BuildContext context) async {
   List<String> numberList = number.split(',');
-  if (numberList.length == 1) {
-    if (GetPlatform.isAndroid == false) return;
+  if (numberList.length == 1 && GetPlatform.isMobile) {
+    // if (GetPlatform.isAndroid == false) return;
     String phnNo = parseString(data: numberList[0], defaultValue: '');
     if (phnNo == '') return showAlert("No number found to call", AlertType.error, context);
     bool grant = await Permission.phone.request().isGranted;
@@ -2712,10 +2742,11 @@ Future<void> makePhoneCall(String number, BuildContext context) async {
         showAlert("Give call permission to continue", AlertType.error, context);
       }
     }
-  } else if (numberList.length > 1) {
+  } else if (numberList.length > 1 || !GetPlatform.isMobile) {
     return showDialog(
       context: context,
       builder: (_) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
         insetPadding: const EdgeInsets.all(10),
         child: SizedBox(
           width: 100,
@@ -2728,6 +2759,11 @@ Future<void> makePhoneCall(String number, BuildContext context) async {
                   .map(
                     (m) => GestureDetector(
                       onTap: () async {
+                        if (GetPlatform.isMobile == false) {
+                          Clipboard.setData(ClipboardData(text: m));
+                          showAlert("$m copied to clipboard", AlertType.success, context);
+                          return;
+                        }
                         bool grant = await Permission.phone.request().isGranted;
                         if (grant) {
                           UssdPhoneCallSms().phoneCall(phoneNumber: m);
@@ -2759,6 +2795,7 @@ Future<void> makePhoneCall(String number, BuildContext context) async {
                             ),
                             TextHelper(
                               text: parseString(data: m, defaultValue: ''),
+                              isSelectable: true,
                               fontsize: 14,
                               fontweight: FontWeight.w600,
                             ),

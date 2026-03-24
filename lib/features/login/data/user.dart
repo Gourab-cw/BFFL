@@ -31,6 +31,8 @@ final Map<UserType, String> userTypeMap2 = {
 
 class UserG {
   String id;
+  String code;
+  String displayName;
 
   bool isApproved;
   bool isActive;
@@ -76,6 +78,8 @@ class UserG {
     required this.isApproved,
     required this.isActive,
     required this.name,
+    required this.displayName,
+    required this.code,
     required this.base,
     required this.mail,
     required this.activeFrom,
@@ -120,6 +124,8 @@ class UserG {
       withGST: parseBool(data: data["withGST"], defaultValue: false),
       isActive: parseBool(data: data["isActive"], defaultValue: false),
       name: parseString(data: data["name"], defaultValue: ""),
+      displayName: parseString(data: data["displayName"], defaultValue: ""),
+      code: parseString(data: data["code"], defaultValue: ""),
       base: parseString(data: data["base"], defaultValue: ""),
       mail: parseString(data: data["mail"], defaultValue: ""),
       branchId: parseString(data: data["branchId"], defaultValue: ""),
@@ -164,6 +170,8 @@ class UserG {
     bool? isApproved,
     bool? isActive,
     String? name,
+    String? code,
+    String? displayName,
     String? base,
     String? mail,
     DateTime? activeFrom,
@@ -203,6 +211,8 @@ class UserG {
       isActive: isActive ?? this.isActive,
       isApproved: isApproved ?? this.isApproved,
       name: name ?? this.name,
+      displayName: displayName ?? this.displayName,
+      code: code ?? this.code,
       base: base ?? this.base,
       mail: mail ?? this.mail,
       activeFrom: activeFrom ?? this.activeFrom,
@@ -245,6 +255,8 @@ class UserG {
       "isApproved": isApproved,
       "isActive": isActive,
       "name": name,
+      "code": code,
+      "displayName": displayName,
       "base": base,
       "mail": mail,
       "branchId": branchId,

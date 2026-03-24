@@ -123,6 +123,16 @@ class _MembersState extends State<Members> {
                                   ],
                                 ),
                               ),
+                              if (user.mobile != "")
+                                ButtonHelperG(
+                                  onTap: () {
+                                    makePhoneCall(user.mobile1 != "" ? '${user.mobile},${user.mobile1}' : user.mobile, context);
+                                  },
+                                  background: mainStore.theme.value.mediumShadeColor,
+                                  width: 35,
+                                  height: 35,
+                                  label: Icon(Icons.phone, size: 16),
+                                ),
                             ],
                           ),
                         ),

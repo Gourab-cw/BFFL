@@ -143,8 +143,15 @@ class MemberHomeController extends GetxController {
     }
     final db = await fb.getDB();
     try {
-      await db.collection('session').doc(sm.id).update({'attendedAt': Timestamp.now(), 'hasAttend': true, 'attendanceGivenBy': auth.state!.id});
-      await db.collection('slot').doc(sm.slotId).update({'totalAttend': FieldValue.increment(1)});
+      SessionModel checkSm = SessionModel.fromFirestore((await db.collection('session').doc(sm.id).get()));
+      if (checkSm.hasAttend) {
+        throw Exception("Already marked as attended");
+      }
+      Timestamp tm = Timestamp.now();
+      await db.collection('session').doc(sm.id).update({'attendedAt': tm, 'hasAttend': true, 'attendanceGivenBy': auth.state!.id});
+      await db.collection('slots').doc(sm.slotId).update({'totalAttend': FieldValue.increment(1)});
+      selectedBooking = selectedBooking!.copyWith(attendedAt: tm.toDate(), hasAttend: true);
+      update();
     } on FirebaseException catch (e) {
       throw Exception(e.message);
     } catch (e) {
@@ -161,6 +168,8 @@ class MemberHomeController extends GetxController {
     final db = await fb.getDB();
     try {
       await db.collection('session').doc(sm.id).update({'feedback': feedback});
+      selectedBooking = selectedBooking!.copyWith(feedback: feedback);
+      update();
     } on FirebaseException catch (e) {
       throw Exception(e.message);
     } catch (e) {

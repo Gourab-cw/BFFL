@@ -10,6 +10,8 @@ class BranchModel {
   final String mobile;
   final String activeFrom;
   final String inactiveFrom;
+  final String lunchStart;
+  final String lunchEnd;
   final bool isActive;
 
   BranchModel({
@@ -20,6 +22,8 @@ class BranchModel {
     required this.mobile,
     required this.activeFrom,
     required this.inactiveFrom,
+    required this.lunchStart,
+    required this.lunchEnd,
     required this.isActive,
   });
 
@@ -33,6 +37,8 @@ class BranchModel {
       name: parseString(data: data['name'], defaultValue: ''),
       mail: parseString(data: data['mail'], defaultValue: ''),
       mobile: parseString(data: data['mobile'], defaultValue: ''),
+      lunchStart: parseString(data: data['lunchStart'], defaultValue: ''),
+      lunchEnd: parseString(data: data['lunchEnd'], defaultValue: ''),
       activeFrom: parseString(data: data['activeFrom'], defaultValue: ''),
       inactiveFrom: parseString(data: data['inactiveFrom'], defaultValue: ''),
       isActive: parseBool(data: data['isActive'], defaultValue: false),
@@ -48,19 +54,34 @@ class BranchModel {
       'mail': mail,
       'mobile': mobile,
       'activeFrom': activeFrom,
+      'lunchStart': lunchStart,
+      'lunchEnd': lunchEnd,
       'inactiveFrom': inactiveFrom,
       'isActive': isActive,
     });
   }
 
   /// -------------------- COPY WITH --------------------
-  BranchModel copyWith({String? id, String? companyId, String? name, String? mail, String? mobile, String? activeFrom, String? inactiveFrom, bool? isActive}) {
+  BranchModel copyWith({
+    String? id,
+    String? companyId,
+    String? name,
+    String? mail,
+    String? mobile,
+    String? activeFrom,
+    String? lunchStart,
+    String? lunchEnd,
+    String? inactiveFrom,
+    bool? isActive,
+  }) {
     return BranchModel(
       id: id ?? this.id,
       companyId: companyId ?? this.companyId,
       name: name ?? this.name,
       mail: mail ?? this.mail,
       mobile: mobile ?? this.mobile,
+      lunchStart: lunchStart ?? this.lunchStart,
+      lunchEnd: lunchEnd ?? this.lunchEnd,
       activeFrom: activeFrom ?? this.activeFrom,
       inactiveFrom: inactiveFrom ?? this.inactiveFrom,
       isActive: isActive ?? this.isActive,

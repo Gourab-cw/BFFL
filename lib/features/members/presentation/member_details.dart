@@ -153,7 +153,7 @@ class _MemberDetailsState extends State<MemberDetails> {
                                         Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
-                                            TextHelper(text: user.name, textalign: TextAlign.left, fontweight: FontWeight.w600),
+                                            TextHelper(text: user.name, fontsize: 12, textalign: TextAlign.left, fontweight: FontWeight.w600),
                                             if (!isExpanded)
                                               TextHelper(text: user.address, textalign: TextAlign.left, fontsize: 11, fontweight: FontWeight.w400),
                                           ],

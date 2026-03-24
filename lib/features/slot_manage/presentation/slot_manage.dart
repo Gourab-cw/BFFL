@@ -7,6 +7,7 @@ import 'package:healthandwellness/core/utility/firebase_service.dart';
 import 'package:healthandwellness/features/login/repository/authenticator.dart';
 import 'package:healthandwellness/features/slot_manage/controller/slot_manage_controller.dart';
 import 'package:healthandwellness/features/slot_manage/presentation/slot_add_popup.dart';
+import 'package:healthandwellness/features/slot_manage/presentation/slot_add_popup_weekly.dart';
 import 'package:healthandwellness/features/subscriptions/controller/subscription_controller.dart';
 import 'package:intl/intl.dart';
 
@@ -41,6 +42,45 @@ class _SlotManageState extends State<SlotManage> {
       }
     });
     super.initState();
+  }
+
+  Future<void> handleFillSlotClick() async {
+    await showAdaptiveDialog(
+      context: context,
+      builder: (_) {
+        return Dialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          child: SizedBox(
+            height: 130,
+            width: 200,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  ButtonHelperG(
+                    height: 35,
+                    width: 180,
+                    label: TextHelper(text: 'Fill Slots From Last Month', color: mainStore.theme.value.BackgroundColor),
+                  ),
+                  ButtonHelperG(
+                    onTap: () async {
+                      goBack(context);
+                      await slotAddPopupWeekly(context);
+                    },
+                    height: 35,
+                    width: 180,
+                    label: TextHelper(text: 'Fill Slots From Last Weeks', color: mainStore.theme.value.BackgroundColor),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -91,6 +131,7 @@ class _SlotManageState extends State<SlotManage> {
                           height: 35,
                           fontSize: 13.2,
                           width: 120,
+                          backgroundColor: Colors.white,
                           onTap: () {
                             DateTimePicker.dateTimePicker(
                               mode: CupertinoDatePickerMode.monthYear,
@@ -105,6 +146,43 @@ class _SlotManageState extends State<SlotManage> {
                           readonly: true,
                           initialValue: slotController.month == null ? "" : DateFormat('MMM, yyyy').format(slotController.month!),
                         ),
+                      ),
+                      ButtonHelperG(
+                        onTap: () async {
+                          await handleFillSlotClick();
+                          return;
+                          // try {
+                          //   loader.startLoading();
+                          //   await slotController.slotDataFeelFromLastMonth();
+                          // } catch (e) {
+                          //   showAlert("$e", AlertType.error);
+                          // } finally {
+                          //   loader.stopLoading();
+                          // }
+                        },
+                        height: 35,
+                        shadow: [BoxShadow(spreadRadius: 0.6, blurRadius: 0.1, color: Colors.grey.shade200)],
+                        icon: Icon(Icons.calendar_month, size: 16),
+                        type: ButtonHelperTypeG.outlined,
+                        label: TextHelper(text: "Fill Slots", fontsize: 12),
+                        width: 80,
+                        borderColor: mainStore.theme.value.mediumShadeColor,
+                      ),
+                      ButtonHelperG(
+                        onTap: () async {
+                          try {
+                            loader.startLoading();
+                            await slotController.slotDataFeel();
+                          } catch (e) {
+                            showAlert("$e", AlertType.error);
+                          } finally {
+                            loader.stopLoading();
+                          }
+                        },
+                        height: 35,
+                        icon: Icon(Icons.cloud_download, color: Colors.white, size: 16),
+                        label: TextHelper(text: "Slots", color: Colors.white, fontsize: 12),
+                        width: 80,
                       ),
                     ],
                   ),
@@ -123,6 +201,7 @@ class _SlotManageState extends State<SlotManage> {
                               showAlwaysLabel: true,
                               fontSize: 13.2,
                               width: 80,
+                              backgroundColor: Colors.white,
                               onTap: () {
                                 DateTimePicker.dateTimePicker(
                                   mode: CupertinoDatePickerMode.time,
@@ -145,6 +224,7 @@ class _SlotManageState extends State<SlotManage> {
                               showAlwaysLabel: true,
                               fontSize: 13.2,
                               width: 75,
+                              backgroundColor: Colors.white,
                               onTap: () {
                                 DateTimePicker.dateTimePicker(
                                   mode: CupertinoDatePickerMode.time,
@@ -167,27 +247,12 @@ class _SlotManageState extends State<SlotManage> {
                               controller: slotController.period,
                               showAlwaysLabel: true,
                               fontSize: 13,
+                              backgroundColor: Colors.white,
                               width: 80,
                               keyboard: TextInputType.numberWithOptions(),
                             ),
                           ],
                         ),
-                      ),
-                      ButtonHelperG(
-                        onTap: () async {
-                          try {
-                            loader.startLoading();
-                            await slotController.slotDataFeel();
-                          } catch (e) {
-                            showAlert("$e", AlertType.error);
-                          } finally {
-                            loader.stopLoading();
-                          }
-                        },
-                        height: 35,
-                        icon: Icon(Icons.calendar_month, color: Colors.white, size: 16),
-                        label: TextHelper(text: "Fill slots", color: Colors.white, fontsize: 12),
-                        width: 80,
                       ),
                     ],
                   ),
@@ -197,6 +262,10 @@ class _SlotManageState extends State<SlotManage> {
                       init: subscriptionController,
                       autoRemove: false,
                       builder: (subscriptionController) {
+                        final branch = authenticator.branch;
+                        if (branch == null) {
+                          return Center(child: TextHelper(text: 'No branch found!'));
+                        }
                         return DataGridHelper3(
                           dataSource: slotController.slotData,
                           columnFixCount: 1,
@@ -259,6 +328,47 @@ class _SlotManageState extends State<SlotManage> {
                                           fontsize: 12,
                                         );
                                       } else {
+                                        String date = DateFormat(
+                                          'yyyy-MM-dd',
+                                        ).format(DateTime(slotController.month!.year, slotController.month!.month, parseInt(data: c.cellIndex.toString())));
+                                        int holidayIndex = slotController.holidayList.indexWhere((h) => h.holidayDate == date);
+
+                                        if (holidayIndex != -1) {
+                                          return Container(
+                                            color: Colors.amber.shade50,
+                                            child: Center(
+                                              child: TextHelper(
+                                                text: slotController.holidayList[holidayIndex].holidayName,
+                                                color: Colors.amber.shade500,
+                                                fontweight: FontWeight.w600,
+                                                fontsize: 11,
+                                                textalign: TextAlign.center,
+                                              ),
+                                            ),
+                                          );
+                                        }
+
+                                        int startTime = parseInt(data: c.rowValue['startTime'].toString().replaceAll(':', ''), defaultInt: 0);
+                                        int endTime = parseInt(data: c.rowValue['endTime'].toString().replaceAll(':', ''), defaultInt: 0);
+
+                                        int lunchStartTime = parseInt(data: branch.lunchStart.replaceAll(':', ''), defaultInt: 0);
+                                        int lunchEndTime = parseInt(data: branch.lunchEnd.replaceAll(':', ''), defaultInt: 0);
+
+                                        if (startTime >= lunchStartTime && endTime <= lunchEndTime) {
+                                          return Container(
+                                            color: Colors.red.shade50,
+                                            child: Center(
+                                              child: TextHelper(
+                                                text: 'Lunch Break',
+                                                color: Colors.red.shade200,
+                                                fontweight: FontWeight.w600,
+                                                fontsize: 11,
+                                                textalign: TextAlign.center,
+                                              ),
+                                            ),
+                                          );
+                                        }
+
                                         return GestureDetector(
                                           onTap: () {
                                             slotAddPopup(

@@ -55,6 +55,40 @@ class MemberController extends GetxController {
     }
   }
 
+  // Future<void> init(FirebaseFirestore db) async {
+  //   try {
+  //     final resp = await db.collection("User").where("userType", isEqualTo: userTypeMap2[UserType.member]).where("isActive", isEqualTo: true).get();
+  //     List<UserG> localMembers = resp.docs.map((doc) => UserG.fromJSON(makeMapSerialize(doc.data()))).toList();
+  //
+  //     List<String> branchIds = [];
+  //     for (UserG user in localMembers) {
+  //       branchIds.add(user.branchId);
+  //     }
+  //
+  //     List<BranchModel> branchs = (await db.collection('Branch').where('id', whereIn: branchIds).get()).docs
+  //         .map((doc) => BranchModel.fromFirestore(doc))
+  //         .toList();
+  //
+  //     final batch = db.batch();
+  //     int count = (await db.collection('User').where('branchId', isEqualTo: localMembers.first.branchId).count().get()).count ?? 0;
+  //     for (UserG user in localMembers) {
+  //       count++;
+  //       batch.update(db.collection('User').doc(user.id), {
+  //         'name':
+  //             '${user.name.split('(').first.trim()} ( ${(branchs.firstWhereOrNull((b) => b.id == user.branchId)?.name ?? "").toUpperCase().substring(0, 2)}-${(count + 1).toString().padLeft(4, '0')}-${DateFormat('yy').format(DateTime.now())} )',
+  //         'displayName': user.name.split('(').first.trim(),
+  //         'code':
+  //             '${(branchs.firstWhereOrNull((b) => b.id == user.branchId)?.name ?? "").toUpperCase().substring(0, 2)}-${(count + 1).toString().padLeft(4, '0')}-${DateFormat('yy').format(DateTime.now())}',
+  //       });
+  //     }
+  //     await batch.commit();
+  //   } catch (e) {
+  //     showAlert("$e", AlertType.error);
+  //   } finally {
+  //     isSearching.value = false;
+  //   }
+  // }
+
   Future<void> fetchMembers(FirebaseFirestore db) async {
     final user = auth.state;
     if (user == null) {
