@@ -102,6 +102,7 @@ class _SlotManageState extends State<SlotManage> {
                       final db = await fb.getDB();
                       await slotController.saveSlots(db, authenticator.state!);
                       slotController.slots = [];
+                      await slotController.slotDataFeel();
                       slotController.update();
                     } catch (e) {
                       showAlert("$e", AlertType.error);

@@ -1465,8 +1465,8 @@ class _DropDownHelperGState extends State<DropDownHelperG> {
             SizedBox(
               width: 50,
               child: MoonCheckbox(
-                activeColor: getMainStore().theme.value.lowShadeColor,
-                checkColor: getMainStore().theme.value.HeadColor,
+                activeColor: Colors.blue[50],
+                checkColor: Colors.blue[800],
                 value: dropDownStore.selectedList.any((t) => t[widget.valueKey] == data[widget.valueKey]),
                 onChanged: (v) {
                   if (dropDownStore.selectedList.any((t) => t[widget.valueKey] == data[widget.valueKey])) {
@@ -1542,7 +1542,7 @@ class _DropDownHelperGState extends State<DropDownHelperG> {
   Widget singleSelectWidget(Map<String, dynamic> data, int index) {
     return GestureDetector(
       onTap: () {
-        Timer(const Duration(milliseconds: 10), () {
+        Timer(const Duration(milliseconds: 200), () {
           dropDownStore.showList.value = false;
           if (widget.onHiding != null) {
             widget.onHiding!();
@@ -1550,8 +1550,8 @@ class _DropDownHelperGState extends State<DropDownHelperG> {
         });
         if (widget.onValueChange != null) {
           widget.onValueChange!(data);
-          // dropDownStore.selectedValue.value = makeMapSerialize(data);
-          // dropDownStore.textController.value.text = parseString(data: dropDownStore.selectedValue[widget.displayKey], defaultValue: '');
+          dropDownStore.selectedValue.value = makeMapSerialize(data);
+          dropDownStore.textController.value.text = parseString(data: dropDownStore.selectedValue[widget.displayKey], defaultValue: '');
         }
       },
       child: widget.customRow != null
@@ -1579,7 +1579,7 @@ class _DropDownHelperGState extends State<DropDownHelperG> {
 
   Widget treeViewWidgetSingleSelect(Map<String, dynamic> data) {
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 3),
+      margin: const EdgeInsets.symmetric(vertical: 3),
       child: MoonAccordion(
         shadows: [],
         label: TextHelper(text: data['label']),
@@ -1627,33 +1627,17 @@ class _DropDownHelperGState extends State<DropDownHelperG> {
 
   @override
   void initState() {
-    // Timer(const Duration(milliseconds: 600), () {
-    //   dropDownStore.list.value = widget.items;
-    //   dropDownStore.filteredList.value = widget.items;
-    //   dropDownStore.selectedList.value = widget.multiSelectValue ?? [];
-    //   if (widget.value != null && widget.isMultiSelect == false && dropDownStore.init.value == false) {
-    //     dropDownStore.textController.value.text = parseString(data: widget.value![widget.displayKey], defaultValue: '');
-    //     Timer(const Duration(milliseconds: 700), () {
-    //       dropDownStore.init.value = true;
-    //     });
-    //   }
-    //   Timer(const Duration(milliseconds: 500), () {
-    //     if (widget.manageRawStore != null) {
-    //       widget.manageRawStore!(dropDownStore);
-    //     }
-    //   });
-    // });
-    Future(() {
+    Timer(const Duration(milliseconds: 600), () {
       dropDownStore.list.value = widget.items;
       dropDownStore.filteredList.value = widget.items;
       dropDownStore.selectedList.value = widget.multiSelectValue ?? [];
       if (widget.value != null && widget.isMultiSelect == false && dropDownStore.init.value == false) {
         dropDownStore.textController.value.text = parseString(data: widget.value![widget.displayKey], defaultValue: '');
-        Timer(const Duration(milliseconds: 100), () {
+        Timer(const Duration(milliseconds: 700), () {
           dropDownStore.init.value = true;
         });
       }
-      Timer(const Duration(milliseconds: 200), () {
+      Timer(const Duration(milliseconds: 500), () {
         if (widget.manageRawStore != null) {
           widget.manageRawStore!(dropDownStore);
         }
@@ -1714,6 +1698,7 @@ class _DropDownHelperGState extends State<DropDownHelperG> {
   void dispose() {
     // TODO: implement dispose
     dropDownStore.init.value = false;
+    Get.delete<DropDownStore>(tag: widget.uniqueKey);
     super.dispose();
   }
 
@@ -2192,102 +2177,157 @@ class JsonViewerG extends StatelessWidget {
 // HELPER FUNCTIONS ========
 
 showAlert(String content, AlertType alertType, [BuildContext? context, Duration? duration, bool? withUndoBtn, Function? onUndoBtnClick]) {
-  final stackTrace = StackTrace.current;
-  logG("alert message  - $content \nfrom - $stackTrace");
-  MainStore mainStore = Get.find<MainStore>();
-  Color? _getColor(AlertType alertType) {
-    switch (alertType) {
-      case AlertType.error:
-        return Colors.red[600];
-      case AlertType.success:
-        return Colors.green[600];
-      default:
-        return Colors.green[600];
+  return AlertService.showAlert(content, alertType, duration: duration, withUndoBtn: withUndoBtn, onUndoBtnClick: onUndoBtnClick);
+}
+
+class AlertService {
+  static final List<OverlayEntry> _entries = [];
+
+  static void showAlert(String content, AlertType alertType, {Duration? duration, bool? withUndoBtn, Function? onUndoBtnClick}) {
+    Color getBackgroundColor() {
+      switch (alertType) {
+        case AlertType.error:
+          return Colors.red.shade50;
+        case AlertType.success:
+          return Colors.green.shade50;
+        default:
+          return Colors.blue.shade50;
+      }
     }
+
+    Color getBorderColor({bool isDark = false}) {
+      switch (alertType) {
+        case AlertType.error:
+          return isDark ? Colors.red.shade300 : Colors.red.shade100;
+        case AlertType.success:
+          return isDark ? Colors.green.shade400 : Colors.green.shade100;
+        default:
+          return isDark ? Colors.blue.shade400 : Colors.blue.shade100;
+      }
+    }
+
+    Color getTextColor() {
+      switch (alertType) {
+        case AlertType.error:
+          return Colors.red.shade400;
+        case AlertType.success:
+          return Colors.green.shade800;
+        default:
+          return Colors.blue.shade800;
+      }
+    }
+
+    late OverlayEntry entry;
+
+    entry = OverlayEntry(
+      builder: (context) {
+        int index = _entries.indexOf(entry);
+        double start = 20;
+        return StatefulBuilder(
+          builder: (context, setState) {
+            Future.delayed(const Duration(milliseconds: 200), () {
+              setState(() {
+                start = 55;
+              });
+            });
+            return AnimatedPositioned(
+              curve: Curves.fastEaseInToSlowEaseOut,
+              duration: const Duration(milliseconds: 700),
+              bottom: start + (index * 55),
+              // right: 20,
+              left: (MediaQuery.of(context).size.width - 380) / 2,
+              child: Material(
+                color: Colors.transparent,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  width: 380,
+                  decoration: BoxDecoration(
+                    color: getBackgroundColor(),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: getBorderColor()),
+                    boxShadow: [BoxShadow(blurRadius: 4, spreadRadius: 1, color: Colors.grey.shade100)],
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(alertType == AlertType.success ? Icons.check_circle : Icons.info, size: 18, color: getTextColor()),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            TextHelper(
+                              text:
+                                  (alertType == AlertType.success
+                                          ? "Success"
+                                          : alertType == AlertType.info
+                                          ? "Info"
+                                          : "Error")
+                                      .toUpperCase(),
+                              color: getTextColor(),
+                              fontsize: 11,
+                              fontweight: FontWeight.w600,
+                            ),
+                            TextHelper(
+                              text: content,
+                              isWrap: true,
+                              fontsize: 12,
+                              color: Colors.grey.shade800,
+                              fontweight: FontWeight.w600,
+                              textalign: TextAlign.left,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Spacer(),
+                      if (withUndoBtn == true)
+                        TextButton(
+                          onPressed: () {
+                            onUndoBtnClick?.call();
+                            remove(entry);
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(5),
+                            decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Colors.white),
+                            child: TextHelper(text: "Undo", fontsize: 12, fontweight: FontWeight.w600),
+                          ),
+                        ),
+                      GestureDetector(
+                        onTap: () => remove(entry),
+                        child: Container(
+                          padding: const EdgeInsets.all(5),
+                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Colors.white),
+                          child: Icon(Icons.close, size: 15, color: getBorderColor(isDark: true)),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+
+    _entries.add(entry);
+    Overlay.of(Get.overlayContext!).insert(entry);
+
+    Future.delayed(duration ?? const Duration(seconds: 3), () {
+      remove(entry);
+    });
   }
 
-  Color? getBackgroundColor(AlertType alertType) {
-    switch (alertType) {
-      case AlertType.error:
-        return Colors.red[50];
-      case AlertType.success:
-        return getMainStore().theme.value.lowShadeColor;
-      default:
-        return getMainStore().theme.value.lowShadeColor;
+  static void remove(OverlayEntry entry) {
+    if (_entries.contains(entry)) {
+      entry.remove();
+      _entries.remove(entry);
+
+      for (var e in _entries) {
+        e.markNeedsBuild();
+      }
     }
   }
-
-  Color? getTextColor(AlertType alertType) {
-    switch (alertType) {
-      case AlertType.error:
-        return Colors.red.shade400;
-      case AlertType.success:
-        return Colors.green.shade500;
-      default:
-        return Colors.green.shade500;
-    }
-  }
-
-  Color? getSubTextColor(AlertType alertType) {
-    switch (alertType) {
-      case AlertType.error:
-        return Colors.red.shade400;
-      case AlertType.success:
-        return Colors.green.shade800;
-      default:
-        return Colors.green.shade800;
-    }
-  }
-
-  SnackbarController? _controller;
-
-  _controller = Get.snackbar(
-    alertType == AlertType.success
-        ? "Success"
-        : alertType == AlertType.error
-        ? "Error"
-        : "Info",
-    content.replaceAll('Exception:', '').trim(),
-    mainButton: withUndoBtn == null
-        ? null
-        : TextButton(
-            onPressed: () {
-              if (onUndoBtnClick != null) {
-                onUndoBtnClick();
-                _controller?.close(withAnimations: false);
-              }
-            },
-            child: const Text("Undo", style: TextStyle(fontWeight: FontWeight.w600)),
-          ),
-    messageText: TextHelper(
-      text: content.replaceAll('Exception:', '').trim(),
-      fontsize: 12,
-      isWrap: true,
-      fontweight: FontWeight.w600,
-      color: getSubTextColor(alertType),
-    ),
-    titleText: TextHelper(
-      text: alertType == AlertType.success
-          ? "Success"
-          : alertType == AlertType.error
-          ? "Error"
-          : "Info",
-      fontsize: 14,
-      fontweight: FontWeight.w600,
-      color: getTextColor(alertType),
-    ),
-    padding: const EdgeInsets.all(5),
-    snackPosition: SnackPosition.BOTTOM,
-    backgroundColor: getBackgroundColor(alertType),
-    colorText: _getColor(alertType),
-    margin: const EdgeInsets.symmetric(vertical: 3, horizontal: 28),
-    borderRadius: 14,
-    duration: duration ?? Duration(seconds: alertType == AlertType.error ? 6 : 3),
-    icon: alertType == AlertType.success ? Icon(Icons.check_circle, color: _getColor(alertType)) : Icon(Icons.info, color: _getColor(alertType)),
-    isDismissible: true,
-    forwardAnimationCurve: Curves.easeOutBack,
-  );
-  return;
 }
 
 Map<String, dynamic> makeMapSerialize(dynamic data) {
@@ -2815,7 +2855,7 @@ Future<void> makePhoneCall(String number, BuildContext context) async {
 }
 
 String generateRandomPassword({int length = 12}) {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#\$%!';
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#';
 
   final rand = Random.secure();
   return List.generate(length, (_) => chars[rand.nextInt(chars.length)]).join();

@@ -198,7 +198,7 @@ class _LoginState extends State<Login> {
                                     }
                                   } else {
                                     try {
-                                      bool redirect = await user.emailLogin(email: emailController.text, password: passwordController.text);
+                                      bool redirect = await user.emailLogin(email: emailController.text.trim(), password: passwordController.text.trim());
                                       // if(redirect){
                                       //   Get.offAllNamed("/home");
                                       // }

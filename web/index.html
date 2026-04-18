@@ -15,24 +15,108 @@
     the `--base-href` argument provided to `flutter build`.
   -->
   <base href="$FLUTTER_BASE_HREF">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="description" content="Health & Wellness App">
 
   <!-- iOS meta tags & icons -->
-  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="healthandwellness">
+  <meta name="apple-mobile-web-app-title" content="call">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
 
-  <title>healthandwellness</title>
+  <title>Health & Wellness</title>
   <link rel="manifest" href="manifest.json">
+  <style>
+.loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.loader__circle {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  margin: 0 4px;
+  animation: loader_901 1s ease-in-out infinite;
+}
+
+.loader__circle:nth-of-type(1) {
+  background-color: #0e103a;
+  animation-delay: 0;
+}
+
+.loader__circle:nth-of-type(2) {
+  background-color: #2f5367;
+  animation-delay: 0.25s;
+}
+
+.loader__circle:nth-of-type(3) {
+  background-color: #f7901e;
+  animation-delay: 0.5s;
+}
+
+.loader__circle:nth-of-type(4) {
+  background-color: #0e103a;
+  animation-delay: 0.75s;
+}
+
+@keyframes loader_901 {
+  0% {
+    transform: scale(1);
+  }
+
+  20% {
+    transform: scale(1.2);
+  }
+
+  40% {
+    transform: scale(1);
+  }
+}
+.logo{
+    width: 300px;
+    margin: auto;
+    position: relative;
+    display: block;
+    margin-bottom: 20px;
+    margin-top: 36dvh;
+}
+.heading{
+    font-family: 'Rubik', sans-serif;
+    text-align: center;
+    margin-top: 40dvh;
+    font-size: 3rem;
+    color: #0e103a;
+    font-weight: 500;
+	}
+  </style>
 </head>
 <body>
+<h1 style="font-family:'Rubik', sans-serif" class="heading">Health & Wellness </h1>
+<div class="loader" id="loading-indicator">
+  <div class="loader__circle"></div>
+  <div class="loader__circle"></div>
+  <div class="loader__circle"></div>
+  <div class="loader__circle"></div>
+</div>
   <script src="flutter_bootstrap.js" async></script>
+<script>
+  window.addEventListener('flutter-first-frame', function () {
+      var loadingIndicator = document.getElementById('loading-indicator');
+      if (loadingIndicator) {
+          loadingIndicator.remove();
+      }
+  });
+</script>
 </body>
 </html>

@@ -43,6 +43,7 @@ class GSTDetails {
 
 class AccSubscriptionController extends GetxController {
   VoucherModel? voucher;
+  final TextEditingController search = TextEditingController();
   final TextEditingController amount = TextEditingController();
   final TextEditingController discAmountController = TextEditingController();
   RxDouble discAmount = 0.0.obs;

@@ -13,7 +13,7 @@ MainStore getMainStore() {
 }
 
 class MainStore extends GetxController {
-  Rx<BTheme> theme = BergerTheme.themes[1].obs;
+  Rx<BTheme> theme = BergerTheme.themes[11].obs;
   bool appInit = false;
   late FirebaseG firebaseG;
   Rx<bool> giveCallLogRequiredPermission = false.obs;

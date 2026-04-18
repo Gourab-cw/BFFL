@@ -43,8 +43,10 @@ Future<void> slotAddPopup(
             s.date == DateFormat('yyyy-MM-dd').format(data.date) &&
             s.startTime == data.startTime &&
             s.endTime == data.endTime &&
-            s.serviceId == tableData[i]['service'],
+            s.serviceId == tableData[i]['service'] &&
+            s.trainerId == tableData[i]['trainer'],
       );
+      print(" index ===== $index");
       if (index == -1) {
         SlotModel s = SlotModel.fromJSON(
           makeMapSerialize({
@@ -140,7 +142,16 @@ Future<void> slotAddPopup(
                                   ButtonHelperG(
                                     onTap: () {
                                       setState(() {
+                                        slotController.slots.removeWhere(
+                                          (r) =>
+                                              r.startTime == data.startTime &&
+                                              r.endTime == data.endTime &&
+                                              r.date == DateFormat("yyyy-MM-dd").format(data.date) &&
+                                              r.serviceId == v.rowValue['service'] &&
+                                              r.trainerId == v.rowValue['trainer'],
+                                        );
                                         tableData.removeWhere((t) => t['uid'] == v.rowValue['uid']);
+                                        slotController.update();
                                       });
                                     },
                                     width: 30,

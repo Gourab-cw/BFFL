@@ -147,14 +147,14 @@ class _UserAddState extends State<UserAdd> {
                           children: [
                             Row(
                               children: [
-                                TextHelper(text: "Name :", width: 50, fontsize: 13, fontweight: FontWeight.w600),
+                                TextHelper(text: "Name :", width: 60, fontsize: 13, fontweight: FontWeight.w600, showRequired: true),
                                 TextBox(controller: c.name, placeholder: "", width: 260),
                               ],
                             ),
                             const SizedBox(height: 10),
                             Row(
                               children: [
-                                TextHelper(text: "DOB :", width: 50, fontsize: 13, fontweight: FontWeight.w600),
+                                TextHelper(text: "DOB :", width: 60, fontsize: 13, fontweight: FontWeight.w600),
                                 DatePickerHelper(
                                   height: 40,
                                   withBorder: true,
@@ -175,7 +175,7 @@ class _UserAddState extends State<UserAdd> {
                             const SizedBox(height: 10),
                             Row(
                               children: [
-                                TextHelper(text: "Age :", width: 50, fontsize: 13, fontweight: FontWeight.w600),
+                                TextHelper(text: "Age :", width: 60, fontsize: 13, fontweight: FontWeight.w600),
                                 TextBox(
                                   controller: c.age,
                                   placeholder: "",
@@ -260,14 +260,14 @@ class _UserAddState extends State<UserAdd> {
                             const SizedBox(height: 10),
                             Row(
                               children: [
-                                TextHelper(text: "Email :", width: 90, fontsize: 13, fontweight: FontWeight.w600),
+                                TextHelper(text: "Email :", width: 90, fontsize: 13, fontweight: FontWeight.w600, showRequired: true),
                                 TextBox(controller: c.email, placeholder: "", width: 240),
                               ],
                             ),
                             const SizedBox(height: 10),
                             Row(
                               children: [
-                                TextHelper(text: "Contact No :", width: 90, fontsize: 13, fontweight: FontWeight.w600),
+                                TextHelper(text: "Contact No :", width: 90, fontsize: 13, fontweight: FontWeight.w600, showRequired: true),
                                 TextBox(controller: c.mobile, placeholder: "", width: 240),
                               ],
                             ),

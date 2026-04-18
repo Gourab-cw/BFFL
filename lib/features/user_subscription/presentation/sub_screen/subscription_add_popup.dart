@@ -240,6 +240,7 @@ Future subscriptionAddPopup(BuildContext context, UserSubscriptionController sub
                       showClearText: false,
                       uniqueKey: UniqueKey().toString(),
                       onValueChange: (v) {
+                        // logG(v);
                         setState(() {
                           selectedService = sc.list.firstWhereOrNull((m) => m.id == v['id']);
                         });

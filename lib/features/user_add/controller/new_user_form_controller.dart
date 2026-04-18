@@ -1,10 +1,12 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dio/dio.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
+import 'package:healthandwellness/core/utility/welcome_email_template.dart';
 import 'package:healthandwellness/features/login/repository/authenticator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -65,6 +67,14 @@ class NewUserFormController extends GetxController {
       if (name.text.isEmpty || name.text.length < 3) {
         throw Exception("Give a valid name!");
       }
+      if (mobile.text.isEmpty || mobile.text.length < 8) {
+        throw Exception("Give a valid contact!");
+      }
+      int userHave = (await db.collection('User').where('mobile', isEqualTo: mobile.text.trim()).count().get()).count ?? 0;
+
+      if (userHave > 0) {
+        throw Exception("User already exist!");
+      }
       String password = generateRandomPassword(length: 6);
       final userCred = await auth.createUserWithEmailAndPassword(email: email.text, password: password);
       String userTypeId = "";
@@ -77,18 +87,14 @@ class NewUserFormController extends GetxController {
       if (userCred.user == null) {
         throw Exception("Error on new user making!");
       }
-      int userHave = (await db.collection('User').where('mobile', isEqualTo: mobile.text.trim()).count().get()).count ?? 0;
-
-      if (userHave > 0) {
-        throw Exception("User already exist!");
-      }
 
       int count = (await db.collection('User').where('companyId', isEqualTo: userState.state!.companyId).count().get()).count ?? 0;
+      String userName =
+          '${name.text.trim()} ( ${userState.branch?.name.toUpperCase().substring(0, 2)}-${(count + 1).toString().padLeft(4, '0')}-${DateFormat('yy').format(DateTime.now())} )';
       Map<String, dynamic> data = {
         "id": userCred.user?.uid,
         "password": password,
-        "name":
-            '${name.text.trim()} ( ${userState.branch?.name.toUpperCase().substring(0, 2)}-${(count + 1).toString().padLeft(4, '0')}-${DateFormat('yy').format(DateTime.now())} )',
+        "name": userName,
         "displayName": name.text.trim(),
         "code": '${userState.branch?.name.toUpperCase().substring(0, 2)}-${(count + 1).toString().padLeft(4, '0')}-${DateFormat('yy').format(DateTime.now())}',
         "searchTerm": name.text.trim().replaceAll(" ", "").toLowerCase(),
@@ -147,6 +153,21 @@ class NewUserFormController extends GetxController {
         }
       }
       await db.collection("User").doc(userCred.user!.uid).set(data);
+      final authenticator = Get.find<Authenticator>();
+      if (authenticator.company != null && authenticator.company!.memberCreationMailSent == true) {
+        Dio dio = Dio();
+        await dio.post(
+          "https://saleszing.in/apis/sendtheemail/sendtheemail.php",
+          data: {
+            "replyToEmailId": authenticator.company!.memberCreationMailTo ?? "subirhore@circuitworld.in",
+            "ccEmailId": "subirhore@circuitworld.in",
+            "toEmailId": authenticator.company!.memberCreationMailTo ?? "subirhore@circuitworld.in",
+            "toSubject": "Welcome to Health and Wellness",
+            "toBody": getWelcomeEmailTemplate(name: userName, email: email.text, password: password),
+          },
+        );
+      }
+
       clear();
       update();
     } catch (e) {

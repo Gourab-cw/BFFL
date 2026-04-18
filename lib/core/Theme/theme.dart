@@ -100,15 +100,15 @@ class BergerTheme {
     // 6️⃣ Red & White
     BTheme(
       themeId: 6,
-      lowShadeColor: Color(0xfffff1f2),
-      mediumShadeColor: Color(0xfffecdd3),
-      secondaryColor: Color.fromARGB(255, 253, 89, 89),
-      HeadColor: Color.fromARGB(255, 255, 55, 55),
+      lowShadeColor: Color(0xFFF3F3F3),
+      mediumShadeColor: Color(0xFFE0E0E0),
+      secondaryColor: Color.fromARGB(255, 15, 28, 52),
+      HeadColor: Color.fromARGB(255, 241, 108, 108),
       LightTextColor: Color(0xff111827),
       DarkTextColor: Color(0xffffffff),
       BackgroundColor: Color(0xffffffff),
       BackgroundShadeColor: Color(0xfffef2f2),
-      BottomNavColor: Color.fromARGB(255, 237, 55, 55),
+      BottomNavColor: Color(0xFFBF360C),
     ),
 
     // 7️⃣ Medical Calm Green
@@ -163,6 +163,30 @@ class BergerTheme {
       BackgroundColor: Color(0xfffffcf8),
       BackgroundShadeColor: Color(0xffffedd5),
       BottomNavColor: Color(0xffea580c),
+    ),
+    BTheme(
+      themeId: 11,
+      lowShadeColor: Color(0xfff5f7fa),
+      mediumShadeColor: Color(0xffd1d5db),
+      secondaryColor: Color(0xff64748b),
+      HeadColor: Color(0xff0f172a),
+      LightTextColor: Color(0xff475569),
+      DarkTextColor: Color(0xffffffff),
+      BackgroundColor: Color(0xfffcfcfd),
+      BackgroundShadeColor: Color(0xffeef2f7),
+      BottomNavColor: Color(0xff334155),
+    ),
+    BTheme(
+      themeId: 13,
+      lowShadeColor: Color(0xFFFCF2E4),
+      mediumShadeColor: Color(0xFFF5D2C2),
+      secondaryColor: Color(0xFF153434),
+      HeadColor: Color(0xFF023047),
+      LightTextColor: Color(0xff181b1e),
+      DarkTextColor: Color(0xffffffff),
+      BackgroundColor: Color(0xfffffdf7),
+      BackgroundShadeColor: Color(0xffe4f4ff),
+      BottomNavColor: Color(0xFF023047),
     ),
   ];
 }

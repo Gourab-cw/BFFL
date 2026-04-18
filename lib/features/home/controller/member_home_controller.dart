@@ -47,7 +47,6 @@ class MemberHomeController extends GetxController {
       final user = auth.state;
       if (user == null) return 0;
       final db = await fb.getDB();
-      logG(user.id);
       final resp = await db
           .collection('userSubscription')
           .where('userId', isEqualTo: user.id)

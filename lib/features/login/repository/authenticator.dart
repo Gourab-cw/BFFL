@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:healthandwellness/app/mainstore.dart';
+import 'package:healthandwellness/core/Company/data/company_model.dart';
 import 'package:healthandwellness/core/Theme/theme.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
 import 'package:healthandwellness/features/home/controller/home_controller.dart';
@@ -15,6 +16,7 @@ import '../../../core/utility/firebase_service.dart';
 class Authenticator extends GetxController {
   UserG? state;
 
+  CompanyModel? company;
   BranchModel? branch;
   Stream<User?>? authCheck;
   late FB _firebase;
@@ -29,7 +31,6 @@ class Authenticator extends GetxController {
   Future<bool> checkIfUserLogin() async {
     final auth = await _firebase.getAuth();
     final User? u = await auth.authStateChanges().where((u) => u != null).first.timeout(const Duration(seconds: 5));
-
     if (u != null) {
       User user = u;
       FirebaseFirestore db = await _firebase.getDB();
@@ -39,8 +40,13 @@ class Authenticator extends GetxController {
           await db.collection("User").doc(user.uid).update({"token": _firebase.token});
         }
         state = UserG.fromJSON(makeMapSerialize(querySnapshot.data()));
+
         final branchResp = await db.collection('Branch').doc(state!.branchId).get();
         branch = BranchModel.fromFirestore(branchResp);
+
+        final companyResp = await db.collection('Company').doc(state!.companyId).get();
+        company = CompanyModel.fromJson(makeMapSerialize(companyResp.data()));
+
         MainStore mainStore = Get.find<MainStore>();
         if (state!.userType == UserType.admin) {
           mainStore.theme.value = BergerTheme.themes[1];
@@ -102,11 +108,16 @@ class Authenticator extends GetxController {
           state = UserG.fromJSON(makeMapSerialize(resp.data()));
           final branchResp = await db.collection('Branch').doc(state!.branchId).get();
           branch = BranchModel.fromFirestore(branchResp);
+
+          final companyResp = await db.collection('Company').doc(state!.companyId).get();
+          company = CompanyModel.fromJson(makeMapSerialize(companyResp.data()));
+
           if (state!.userType == UserType.admin) {
             mainStore.theme.value = BergerTheme.themes[1];
           }
           if (state!.userType == UserType.trainer) {
-            mainStore.theme.value = BergerTheme.themes[6];
+            // mainStore.theme.value = BergerTheme.themes[6];
+            mainStore.theme.value = BergerTheme.themes[10];
           }
           if (state!.userType == UserType.receptionist) {
             mainStore.theme.value = BergerTheme.themes[7];
@@ -143,9 +154,11 @@ class Authenticator extends GetxController {
       }
       await auth.signOut();
       final mainStore = Get.find<MainStore>();
+      mainStore.theme.value = BergerTheme.themes[11];
       mainStore.bottomNavBarIndex.value = 0;
       state = null;
       branch = null;
+      company = null;
       update();
       // Get.offAllNamed("/login");
     } catch (e) {
