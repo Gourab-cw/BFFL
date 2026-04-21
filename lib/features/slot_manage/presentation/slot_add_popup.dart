@@ -30,7 +30,7 @@ Future<void> slotAddPopup(
   required SlotController slotController,
   required SubscriptionController subscriptionController,
 }) async {
-  void newSlotSaveFunction(List<Map<String, dynamic>> tableData) {
+  void newSlotSaveFunction(List<Map<String, dynamic>> tableData, void Function(List<Map<String, dynamic>> tableData) updateData) {
     if (tableData.isEmpty) {
       return;
     }
@@ -46,7 +46,6 @@ Future<void> slotAddPopup(
             s.serviceId == tableData[i]['service'] &&
             s.trainerId == tableData[i]['trainer'],
       );
-      print(" index ===== $index");
       if (index == -1) {
         SlotModel s = SlotModel.fromJSON(
           makeMapSerialize({
@@ -64,7 +63,12 @@ Future<void> slotAddPopup(
             'id': "",
           }),
         );
-        slotController.slots.add(s);
+        if (tableData[i]['trainer'] != "" || tableData[i]['trainer'] != null || tableData[i]['service'] != "" || tableData[i]['service'] != null) {
+          slotController.slots.add(s);
+        } else {
+          tableData.removeAt(i);
+          updateData(tableData);
+        }
       }
       i++;
     }
@@ -231,10 +235,11 @@ Future<void> slotAddPopup(
                                     if (tableData.any((t) => t['trainer'] == c['id'] && t['service'] == v.rowValue['service'])) {
                                       showAlert('Trainer already exist for same service', AlertType.error);
                                       return;
+                                    } else {
+                                      int tableDataIndex = tableData.indexWhere((m) => m['uid'] == v.rowValue['uid']);
+                                      tableData[tableDataIndex]['trainer'] = c['id'] ?? '';
+                                      tableData = tableData;
                                     }
-                                    int tableDataIndex = tableData.indexWhere((m) => m['uid'] == v.rowValue['uid']);
-                                    tableData[tableDataIndex]['trainer'] = c['id'] ?? '';
-                                    tableData = tableData;
                                   });
                                 },
                               );
@@ -289,7 +294,11 @@ Future<void> slotAddPopup(
                     ButtonHelperG(
                       width: 80,
                       onTap: () {
-                        newSlotSaveFunction(tableData);
+                        newSlotSaveFunction(tableData, (List<Map<String, dynamic>> tableDat) {
+                          setState(() {
+                            tableData = tableDat;
+                          });
+                        });
                         return;
                         // if (selectedCourses.isEmpty) {
                         //   return;

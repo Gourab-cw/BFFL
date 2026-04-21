@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:healthandwellness/app/mainstore.dart';
 import 'package:healthandwellness/core/Company/data/company_model.dart';
@@ -30,8 +31,11 @@ class Authenticator extends GetxController {
 
   Future<bool> checkIfUserLogin() async {
     final auth = await _firebase.getAuth();
-    final User? u = await auth.authStateChanges().where((u) => u != null).first.timeout(const Duration(seconds: 5));
+    // final User? u = await auth.authStateChanges().where((u) => u != null).first.timeout(const Duration(seconds: 5));
+    final User? u = auth.currentUser;
+    debugPrint("coming here,$u");
     if (u != null) {
+      debugPrint("coming here,$u");
       User user = u;
       FirebaseFirestore db = await _firebase.getDB();
       final querySnapshot = await db.collection("User").doc(user.uid).get();
@@ -81,7 +85,7 @@ class Authenticator extends GetxController {
       if (user == null) {
         return false;
       }
-      final resp = await db.collection("User").doc(user?.uid).get();
+      final resp = await db.collection("User").doc(user.uid).get();
       if (!resp.exists) {
         showAlert("No user found", AlertType.error);
         return false;
@@ -92,49 +96,49 @@ class Authenticator extends GetxController {
         return false;
       }
 
-      if (user != null) {
-        MainStore mainStore = Get.find<MainStore>();
-        final resp = await db.collection("User").doc(user.uid).get();
+      MainStore mainStore = Get.find<MainStore>();
+      final userData = await db.collection("User").doc(user.uid).get();
 
-        if (resp.exists && makeMapSerialize(resp.data())["isActive"] == true) {
-          if (_firebase.token != null) {
-            await db.collection("User").doc(user.uid).update({"token": _firebase.token});
-          }
-          // UserG user0 = UserG.fromJSON(makeMapSerialize(resp.data()));
-          // if (user0.userType == UserType.member && (!user0.isActive || !user0.isApproved)) {
-          //   showAlert("Approval in process – we’ll notify you soon.", AlertType.error);
-          //   return false;
-          // }
-          state = UserG.fromJSON(makeMapSerialize(resp.data()));
-          final branchResp = await db.collection('Branch').doc(state!.branchId).get();
-          branch = BranchModel.fromFirestore(branchResp);
-
-          final companyResp = await db.collection('Company').doc(state!.companyId).get();
-          company = CompanyModel.fromJson(makeMapSerialize(companyResp.data()));
-
-          if (state!.userType == UserType.admin) {
-            mainStore.theme.value = BergerTheme.themes[1];
-          }
-          if (state!.userType == UserType.trainer) {
-            // mainStore.theme.value = BergerTheme.themes[6];
-            mainStore.theme.value = BergerTheme.themes[10];
-          }
-          if (state!.userType == UserType.receptionist) {
-            mainStore.theme.value = BergerTheme.themes[7];
-          }
-          if (state!.userType == UserType.accountant) {
-            mainStore.theme.value = BergerTheme.themes[5];
-          }
-          if (state!.userType == UserType.member) {
-            mainStore.theme.value = BergerTheme.themes[2];
-          }
-          update();
-          return true;
-        } else {
-          showAlert("Unauthorized access!", AlertType.error);
-          return false;
+      if (userData.exists && makeMapSerialize(userData.data())["isActive"] == true) {
+        print("coming here1");
+        if (_firebase.token != null) {
+          await db.collection("User").doc(user.uid).update({"token": _firebase.token});
         }
+        // UserG user0 = UserG.fromJSON(makeMapSerialize(resp.data()));
+        // if (user0.userType == UserType.member && (!user0.isActive || !user0.isApproved)) {
+        //   showAlert("Approval in process – we’ll notify you soon.", AlertType.error);
+        //   return false;
+        // }
+        state = UserG.fromJSON(makeMapSerialize(userData.data()));
+        final branchResp = await db.collection('Branch').doc(state!.branchId).get();
+        branch = BranchModel.fromFirestore(branchResp);
+
+        final companyResp = await db.collection('Company').doc(state!.companyId).get();
+        company = CompanyModel.fromJson(makeMapSerialize(companyResp.data()));
+
+        if (state!.userType == UserType.admin) {
+          mainStore.theme.value = BergerTheme.themes[1];
+        }
+        if (state!.userType == UserType.trainer) {
+          // mainStore.theme.value = BergerTheme.themes[6];
+          mainStore.theme.value = BergerTheme.themes[10];
+        }
+        if (state!.userType == UserType.receptionist) {
+          mainStore.theme.value = BergerTheme.themes[7];
+        }
+        if (state!.userType == UserType.accountant) {
+          mainStore.theme.value = BergerTheme.themes[5];
+        }
+        if (state!.userType == UserType.member) {
+          mainStore.theme.value = BergerTheme.themes[2];
+        }
+        update();
+        return true;
+      } else {
+        showAlert("Unauthorized access!", AlertType.error);
+        return false;
       }
+
       showAlert("No user found", AlertType.error);
       return false;
       // 3️⃣ Update state

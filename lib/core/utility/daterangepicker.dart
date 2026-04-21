@@ -216,6 +216,8 @@ class DateRangePicker extends StatefulHookWidget {
   bool withClear;
   final Widget? leadingIcon;
   bool disable;
+  DateTime? firstDate;
+  DateTime? lastDate;
   DateRangePicker({
     super.key,
     this.selectedDateRange,
@@ -223,6 +225,8 @@ class DateRangePicker extends StatefulHookWidget {
     this.width = 220,
     this.height = 50,
     this.leading,
+    this.firstDate,
+    this.lastDate,
     this.backgroundColor = Colors.white,
     this.fontColor,
     this.withBorder = false,
@@ -324,9 +328,11 @@ class _DateRangePickerState extends State<DateRangePicker> {
                     selectedRangeHighlightColor: getMainStore().theme.value.secondaryColor.withAlpha(40),
                     rangeBidirectional: true,
                     animateToDisplayedMonthDate: true,
-                    calendarType: CalendarDatePicker2Type.range,
+                    calendarType: widget.withSingleSelect ? CalendarDatePicker2Type.single : CalendarDatePicker2Type.range,
                     calendarViewMode: CalendarDatePicker2Mode.day,
                     firstDayOfWeek: 1,
+                    firstDate: widget.firstDate,
+                    lastDate: widget.lastDate,
                   ),
                   value: widget.selectedDateRange != null ? [widget.selectedDateRange!.start, widget.selectedDateRange!.end] : [],
                   onValueChanged: (value) {

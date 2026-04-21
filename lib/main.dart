@@ -7,6 +7,7 @@ import 'package:healthandwellness/core/Binding/init_binding.dart';
 
 import 'app/mainstore.dart';
 import 'app/routes.dart';
+import 'core/utility/app_loader.dart';
 import 'core/utility/firebase_service.dart';
 import 'core/utility/helper.dart';
 import 'features/login/repository/authenticator.dart';
@@ -16,11 +17,14 @@ void main() {
     WidgetsFlutterBinding.ensureInitialized();
     MainStore mainStore = Get.put(MainStore());
     Get.put(FB(), permanent: true);
+    Get.put(AppLoaderController(), permanent: true);
+    final fb = Get.find<FB>();
+    await fb.init();
     Get.put(Authenticator(), permanent: true);
-    // Get.put(AppLoaderController(), permanent: true);
     final auth = Get.find<Authenticator>();
     try {
       await auth.checkIfUserLogin();
+      // debugPrint("coming here 12");
     } catch (e) {
       showAlert("$e", AlertType.error);
     }

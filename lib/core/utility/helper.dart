@@ -1550,8 +1550,8 @@ class _DropDownHelperGState extends State<DropDownHelperG> {
         });
         if (widget.onValueChange != null) {
           widget.onValueChange!(data);
-          dropDownStore.selectedValue.value = makeMapSerialize(data);
-          dropDownStore.textController.value.text = parseString(data: dropDownStore.selectedValue[widget.displayKey], defaultValue: '');
+          // dropDownStore.selectedValue.value = makeMapSerialize(data);
+          // dropDownStore.textController.value.text = parseString(data: dropDownStore.selectedValue[widget.displayKey], defaultValue: '');
         }
       },
       child: widget.customRow != null
@@ -1627,7 +1627,7 @@ class _DropDownHelperGState extends State<DropDownHelperG> {
 
   @override
   void initState() {
-    Timer(const Duration(milliseconds: 600), () {
+    Future(() {
       dropDownStore.list.value = widget.items;
       dropDownStore.filteredList.value = widget.items;
       dropDownStore.selectedList.value = widget.multiSelectValue ?? [];
@@ -1759,7 +1759,7 @@ class _DropDownHelperGState extends State<DropDownHelperG> {
                       label: TextHelper(text: 'Choose option'),
                     )
             : TextBox(
-                leading: widget.leading ?? Icon(MoonIcons.generic_search_24_light),
+                leading: widget.leading == null ? null : widget.leading ?? Icon(MoonIcons.generic_search_24_light),
                 readonly: !widget.isSearchEnable,
                 placeholder: widget.placeHolder,
                 height: widget.height,
@@ -2177,6 +2177,7 @@ class JsonViewerG extends StatelessWidget {
 // HELPER FUNCTIONS ========
 
 showAlert(String content, AlertType alertType, [BuildContext? context, Duration? duration, bool? withUndoBtn, Function? onUndoBtnClick]) {
+  logG("${alertType.name} - $content \n ${StackTrace.current}");
   return AlertService.showAlert(content, alertType, duration: duration, withUndoBtn: withUndoBtn, onUndoBtnClick: onUndoBtnClick);
 }
 

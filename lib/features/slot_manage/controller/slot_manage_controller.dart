@@ -7,7 +7,7 @@ import 'package:healthandwellness/features/holiday/data/holiday.dart';
 import 'package:healthandwellness/features/login/repository/authenticator.dart';
 import 'package:healthandwellness/features/subscriptions/controller/subscription_controller.dart';
 import 'package:intl/intl.dart';
-import 'package:uuid/uuid.dart';
+import 'package:ulid/ulid.dart';
 
 import '../../Service/data/service.dart';
 import '../../login/data/user.dart';
@@ -124,7 +124,18 @@ class SlotController extends GetxController {
     List<SlotModel> fetchedSlots = [];
     for (var element in monthsResp) {
       for (var element0 in element.docs) {
-        final s = SlotModel.fromFirestore(element0);
+        SlotModel s = SlotModel.fromFirestore(element0);
+        s = s.copyWith(
+          id: '',
+          hasComplete: false,
+          completeAt: null,
+          bookingCount: 0,
+          month: DateTime(month!.year, month!.month),
+          totalAttend: 0,
+          trainerRemarks: '',
+          trainerStartTime: null,
+          date: DateTime(month!.year, month!.month, DateFormat('yyyy-MM-dd').parse(s.date).day),
+        );
         fetchedSlots.add(s);
       }
     }
@@ -133,19 +144,7 @@ class SlotController extends GetxController {
         (ss) => ss.startTime == s.startTime && ss.endTime == s.endTime && ss.date == s.date && ss.serviceId == s.serviceId && s.trainerId == s.trainerId,
       );
       if (slotIndex == -1) {
-        slots.add(
-          s.copyWith(
-            id: '',
-            hasComplete: false,
-            completeAt: null,
-            bookingCount: 0,
-            month: DateTime(month!.year, month!.month),
-            totalAttend: 0,
-            trainerRemarks: '',
-            trainerStartTime: null,
-            date: DateTime(month!.year, month!.month, DateFormat('yyyy-MM-dd').parse(s.date).day),
-          ),
-        );
+        slots.add(s);
       }
     }
     update();
@@ -243,13 +242,72 @@ class SlotController extends GetxController {
     update();
   }
 
+  Future<void> slotDataFeelFromSelectedDate({required DateTime from, required DateTime toDate}) async {
+    if (month == null) {
+      showAlert("Select a month to continue!", AlertType.error);
+      return;
+    }
+    if (dailyStart == null) {
+      showAlert("Select start time to continue!", AlertType.error);
+      return;
+    }
+    if (dailyEnd == null) {
+      showAlert("Select end time to continue!", AlertType.error);
+      return;
+    }
+    List<Map<String, dynamic>> slotsFeelData = generateOneHourSlots(
+      DateFormat("HH:mm").format(dailyStart!),
+      DateFormat("HH:mm").format(dailyEnd!),
+      parseInt(data: period.text, defaultInt: 60),
+    );
+
+    final firstDayThisMonth = DateTime(month!.year, month!.month, 1);
+    final firstDayNextMonth = DateTime(month!.year, month!.month + 1, 1);
+    int days = firstDayNextMonth.difference(firstDayThisMonth).inDays;
+
+    for (int i = 0; i < slotsFeelData.length; i++) {
+      for (int j = 0; j < days; j++) {
+        slotsFeelData[i] = makeMapSerialize({...slotsFeelData[i], (j + 1).toString(): slotsFeelData[i][(j + 1).toString()] ?? []});
+      }
+    }
+    slotData = slotsFeelData;
+    final fb = Get.find<FB>();
+    final auth = Get.find<Authenticator>();
+    final db = await fb.getDB();
+
+    List<SlotModel> localSlots = (await db.collection('slots').where('date', isEqualTo: DateFormat("yyyy-MM-dd").format(from)).get()).docs.map((m) {
+      SlotModel s = SlotModel.fromFirestore(m);
+      return s.copyWith(
+        id: '',
+        hasComplete: false,
+        completeAt: null,
+        bookingCount: 0,
+        month: DateTime(toDate.year, toDate.month),
+        totalAttend: 0,
+        trainerRemarks: '',
+        trainerStartTime: null,
+        date: toDate,
+      );
+    }).toList();
+
+    for (SlotModel s in localSlots) {
+      int slotIndex = slots.indexWhere(
+        (ss) => ss.startTime == s.startTime && ss.endTime == s.endTime && ss.date == s.date && ss.serviceId == s.serviceId && s.trainerId == s.trainerId,
+      );
+      if (slotIndex == -1) {
+        slots.add(s);
+      }
+    }
+    update();
+  }
+
   Future<void> saveSlots(FirebaseFirestore db, UserG user) async {
     // List<Map<String, dynamic>> data = [];
     final auth = Get.find<Authenticator>();
     final batch = db.batch();
     for (final SlotModel s in slots) {
       final data = makeMapSerialize(s.toFirestore());
-      String uid = Uuid().v4();
+      String uid = Ulid().toString();
       if (data['id'] != "" || data['id'].length > 5) {
         uid = data['id'];
       } else {
@@ -264,6 +322,7 @@ class SlotController extends GetxController {
 
       bool isLunchBreak = startTime >= lunchStartTime && endTime <= lunchEndTime;
       if (!isLunchBreak) {
+        // logG(data);
         batch.set(docRef, data);
       }
     }

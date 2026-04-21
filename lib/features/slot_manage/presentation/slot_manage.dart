@@ -52,7 +52,7 @@ class _SlotManageState extends State<SlotManage> {
           backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           child: SizedBox(
-            height: 130,
+            height: 180,
             width: 200,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -61,6 +61,18 @@ class _SlotManageState extends State<SlotManage> {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   ButtonHelperG(
+                    onTap: () async {
+                      try {
+                        loader.startLoading();
+                        await slotController.slotDataFeelFromLastMonth();
+                        subscriptionController.update();
+                        goBack(context);
+                      } catch (e) {
+                        showAlert('$e', AlertType.error);
+                      } finally {
+                        loader.stopLoading();
+                      }
+                    },
                     height: 35,
                     width: 180,
                     label: TextHelper(text: 'Fill Slots From Last Month', color: mainStore.theme.value.BackgroundColor),
@@ -73,6 +85,15 @@ class _SlotManageState extends State<SlotManage> {
                     height: 35,
                     width: 180,
                     label: TextHelper(text: 'Fill Slots From Last Weeks', color: mainStore.theme.value.BackgroundColor),
+                  ),
+                  ButtonHelperG(
+                    onTap: () async {
+                      goBack(context);
+                      await slotAddPopupByDate(context);
+                    },
+                    height: 35,
+                    width: 180,
+                    label: TextHelper(text: 'Fill Slots From a Date', color: mainStore.theme.value.BackgroundColor),
                   ),
                 ],
               ),

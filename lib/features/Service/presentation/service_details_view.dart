@@ -358,22 +358,38 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView> {
                                           service.selectedSlot = m;
                                           service.update();
                                         },
-                                        child: Container(
-                                          width: 100,
-                                          height: 30,
-                                          decoration: BoxDecoration(
-                                            color: service.selectedSlot?.id == m.id
-                                                ? getMainStore().theme.value.mediumShadeColor.withAlpha(130)
-                                                : mainStore.theme.value.BackgroundShadeColor,
-                                            border: Border.all(
-                                              color: service.availableSlot(m, withRescheduleData: service.selectedReschedule) == null
-                                                  ? Colors.red
-                                                  : service.selectedSlot?.id == m.id
-                                                  ? getMainStore().theme.value.mediumShadeColor
-                                                  : Colors.transparent,
+                                        child: Stack(
+                                          clipBehavior: Clip.none,
+                                          children: [
+                                            Container(
+                                              width: 100,
+                                              height: 30,
+                                              decoration: BoxDecoration(
+                                                color: service.selectedSlot?.id == m.id
+                                                    ? getMainStore().theme.value.mediumShadeColor.withAlpha(130)
+                                                    : mainStore.theme.value.BackgroundShadeColor,
+                                                border: Border.all(
+                                                  color: service.availableSlot(m, withRescheduleData: service.selectedReschedule) == null
+                                                      ? Colors.red
+                                                      : service.selectedSlot?.id == m.id
+                                                      ? getMainStore().theme.value.mediumShadeColor
+                                                      : Colors.transparent,
+                                                ),
+                                              ),
+                                              child: TextHelper(text: "${m.startTime} - ${m.endTime}", width: 100, textalign: TextAlign.center),
                                             ),
-                                          ),
-                                          child: TextHelper(text: "${m.startTime} - ${m.endTime}", width: 100, textalign: TextAlign.center),
+                                            Positioned(
+                                              bottom: -5,
+                                              left: 5,
+                                              child: TextHelper(
+                                                text: parseString(data: m.trainerName, defaultValue: ""),
+                                                textalign: TextAlign.center,
+                                                fontsize: 10,
+                                                color: mainStore.theme.value.secondaryColor.withAlpha(230),
+                                                fontweight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     );
@@ -398,22 +414,38 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView> {
                                           service.selectedSlot = m;
                                           service.update();
                                         },
-                                        child: Container(
-                                          width: 100,
-                                          height: 30,
-                                          decoration: BoxDecoration(
-                                            color: service.selectedSlot?.id == m.id
-                                                ? getMainStore().theme.value.mediumShadeColor.withAlpha(130)
-                                                : mainStore.theme.value.BackgroundShadeColor,
-                                            border: Border.all(
-                                              color: service.availableSlot(m, withRescheduleData: service.selectedReschedule) == null
-                                                  ? Colors.red
-                                                  : service.selectedSlot?.id == m.id
-                                                  ? getMainStore().theme.value.mediumShadeColor
-                                                  : Colors.transparent,
+                                        child: Stack(
+                                          clipBehavior: Clip.none,
+                                          children: [
+                                            Container(
+                                              width: 100,
+                                              height: 30,
+                                              decoration: BoxDecoration(
+                                                color: service.selectedSlot?.id == m.id
+                                                    ? getMainStore().theme.value.mediumShadeColor.withAlpha(130)
+                                                    : mainStore.theme.value.BackgroundShadeColor,
+                                                border: Border.all(
+                                                  color: service.availableSlot(m, withRescheduleData: service.selectedReschedule) == null
+                                                      ? Colors.red
+                                                      : service.selectedSlot?.id == m.id
+                                                      ? getMainStore().theme.value.mediumShadeColor
+                                                      : Colors.transparent,
+                                                ),
+                                              ),
+                                              child: TextHelper(text: "${m.startTime} - ${m.endTime}", width: 100, textalign: TextAlign.center),
                                             ),
-                                          ),
-                                          child: TextHelper(text: "${m.startTime} - ${m.endTime}", width: 100, textalign: TextAlign.center),
+                                            Positioned(
+                                              bottom: -5,
+                                              left: 5,
+                                              child: TextHelper(
+                                                text: parseString(data: m.trainerName, defaultValue: ""),
+                                                textalign: TextAlign.center,
+                                                fontsize: 10,
+                                                color: mainStore.theme.value.secondaryColor.withAlpha(230),
+                                                fontweight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     );
@@ -438,22 +470,38 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView> {
                                           service.selectedSlot = m;
                                           service.update();
                                         },
-                                        child: Container(
-                                          width: 100,
-                                          height: 30,
-                                          decoration: BoxDecoration(
-                                            color: service.selectedSlot?.id == m.id
-                                                ? getMainStore().theme.value.mediumShadeColor.withAlpha(130)
-                                                : mainStore.theme.value.BackgroundShadeColor,
-                                            border: Border.all(
-                                              color: service.availableSlot(m, withRescheduleData: service.selectedReschedule) == null
-                                                  ? Colors.red
-                                                  : service.selectedSlot?.id == m.id
-                                                  ? getMainStore().theme.value.mediumShadeColor
-                                                  : Colors.transparent,
+                                        child: Stack(
+                                          clipBehavior: Clip.none,
+                                          children: [
+                                            Container(
+                                              width: 100,
+                                              height: 30,
+                                              decoration: BoxDecoration(
+                                                color: service.selectedSlot?.id == m.id
+                                                    ? getMainStore().theme.value.mediumShadeColor.withAlpha(130)
+                                                    : mainStore.theme.value.BackgroundShadeColor,
+                                                border: Border.all(
+                                                  color: service.availableSlot(m, withRescheduleData: service.selectedReschedule) == null
+                                                      ? Colors.red
+                                                      : service.selectedSlot?.id == m.id
+                                                      ? getMainStore().theme.value.mediumShadeColor
+                                                      : Colors.transparent,
+                                                ),
+                                              ),
+                                              child: TextHelper(text: "${m.startTime} - ${m.endTime}", width: 100, textalign: TextAlign.center),
                                             ),
-                                          ),
-                                          child: TextHelper(text: "${m.startTime} - ${m.endTime}", width: 100, textalign: TextAlign.center),
+                                            Positioned(
+                                              bottom: -5,
+                                              left: 5,
+                                              child: TextHelper(
+                                                text: parseString(data: m.trainerName, defaultValue: ""),
+                                                textalign: TextAlign.center,
+                                                fontsize: 10,
+                                                color: mainStore.theme.value.secondaryColor.withAlpha(230),
+                                                fontweight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     );

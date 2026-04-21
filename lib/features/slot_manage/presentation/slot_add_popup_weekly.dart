@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:healthandwellness/core/utility/app_loader.dart';
+import 'package:healthandwellness/core/utility/daterangepicker.dart';
 import 'package:healthandwellness/features/slot_manage/controller/slot_manage_controller.dart';
 import 'package:intl/intl.dart';
 
@@ -145,6 +146,153 @@ Future<void> slotAddPopupWeekly(BuildContext context) async {
                           Loader.startLoading();
                           await slotController.slotDataFeelFromSelectedWeek(year, month, week, weekCount: 4);
                           goBack(context);
+                        } catch (e) {
+                          showAlert("$e", AlertType.error);
+                        } finally {
+                          Loader.stopLoading();
+                        }
+                      },
+                      width: 90,
+                      height: 35,
+                      label: TextHelper(text: 'Fill the slots', color: getMainStore().theme.value.BackgroundColor),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      );
+    },
+    context: context,
+  );
+}
+
+Future<void> slotAddPopupByDate(BuildContext context) async {
+  final slotController = Get.find<SlotController>();
+  await showAdaptiveDialog(
+    builder: (_) {
+      DateTime? fromDate;
+      DateTime? toDate;
+      return StatefulBuilder(
+        builder: (context, setState) {
+          return Dialog(
+            backgroundColor: Colors.white,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxHeight: 450, minHeight: 200, maxWidth: 450, minWidth: 450),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  spacing: 10,
+                  children: [
+                    TextHelper(text: "Slot manage", fontweight: FontWeight.w600, fontsize: 14),
+                    Divider(),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        TextHelper(text: 'From Date : ', width: 80),
+                        Expanded(
+                          child: Wrap(
+                            spacing: 10,
+                            runSpacing: 10,
+                            children: [
+                              DateRangePicker(
+                                height: 35,
+                                withSingleSelect: true,
+                                withBorder: true,
+                                placeholder: "Select Copied From Date",
+                                selectedDateRange: fromDate == null ? null : DateTimeRange(start: fromDate!, end: fromDate!),
+                                onValueChange: (v) {
+                                  if (v != null) {
+                                    setState(() {
+                                      fromDate = v.end;
+                                    });
+                                  }
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        TextHelper(text: "To Date : ", width: 80),
+                        Expanded(
+                          child: Wrap(
+                            spacing: 10,
+                            runSpacing: 10,
+                            children: [
+                              DateRangePicker(
+                                height: 35,
+                                withSingleSelect: true,
+                                selectedDateRange: toDate == null ? null : DateTimeRange(start: toDate!, end: toDate!),
+                                onValueChange: (v) {
+                                  if (v != null) {
+                                    setState(() {
+                                      toDate = v.end;
+                                    });
+                                  }
+                                },
+                                firstDate: DateTime(slotController.month!.year, slotController.month!.month, 1),
+                                lastDate: DateTime(slotController.month!.year, slotController.month!.month + 1, 0),
+                                withBorder: true,
+                                placeholder: "Select To Fill Date",
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    // Row(
+                    //   crossAxisAlignment: CrossAxisAlignment.center,
+                    //   children: [
+                    //     TextHelper(text: 'Fill for next : ', width: 100),
+                    //     Expanded(
+                    //       child: Wrap(
+                    //         crossAxisAlignment: WrapCrossAlignment.center,
+                    //         spacing: 10,
+                    //         runSpacing: 10,
+                    //         children: [
+                    //           SizedBox(
+                    //             width: 90,
+                    //             child: DropDownHelperG(
+                    //               height: 35,
+                    //               uniqueKey: UniqueKey().toString(),
+                    //               items: weekCountList,
+                    //               leading: null,
+                    //               showClearText: false,
+                    //               showLabelAlways: true,
+                    //               labelText: 'Count ',
+                    //               value: weekCountList.firstWhereOrNull((w) => w['id'] == weekCount) ?? {},
+                    //               onValueChange: (v) {
+                    //                 setState(() {
+                    //                   weekCount = v['id'];
+                    //                 });
+                    //               },
+                    //             ),
+                    //           ),
+                    //           TextHelper(text: 'weeks', width: 50),
+                    //         ],
+                    //       ),
+                    //     ),
+                    //   ],
+                    // ),
+                    Divider(),
+
+                    ButtonHelperG(
+                      onTap: () async {
+                        try {
+                          Loader.startLoading();
+                          if (fromDate != null && toDate != null) {
+                            await slotController.slotDataFeelFromSelectedDate(from: fromDate!, toDate: toDate!);
+                            goBack(context);
+                          } else {
+                            showAlert("Select the dates to continue", AlertType.error);
+                          }
                         } catch (e) {
                           showAlert("$e", AlertType.error);
                         } finally {

@@ -55,6 +55,14 @@ abstract class FirebaseBaseService extends GetxService {
 
   @override
   void onInit() async {
+    // await initialize();
+    // await getAuth();
+    // await getDB();
+    // super.onInit();
+  }
+
+  Future<void> init() async {
+    await initialize();
     await getAuth();
     await getDB();
     super.onInit();
@@ -72,9 +80,6 @@ abstract class FirebaseBaseService extends GetxService {
   // Constructor to initialize Firebase
   Future<void> initialize({bool getFCMToken = true}) async {
     try {
-      // if(GetPlatform.isAndroid){
-      // flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.requestNotificationsPermission();
-      // }
       debugPrint(">>>>>>>>>>>>>>>> coming for firebase initialize <<<<<<<<<<<<<");
       _firebaseApp = await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
@@ -82,17 +87,14 @@ abstract class FirebaseBaseService extends GetxService {
         _firebaseMessaging = FirebaseMessaging.instance;
         // Request for iOS notification permissions
         await _firebaseMessaging.requestPermission();
-
         // Configure Firebase Messaging
         _configureFirebaseMessaging();
-
         // Initialize Local Notifications (for background and terminated state)
         _initializeLocalNotifications();
-
         // Get the FCM token (to send push notifications)
         if (getFCMToken) {
           token = await _firebaseMessaging.getToken();
-          debugPrint("================= > FCM Token: $token <=========================");
+          // logG("================= > FCM Token: $token <=========================");
         }
       }
     } catch (e) {
@@ -116,7 +118,9 @@ abstract class FirebaseBaseService extends GetxService {
     });
 
     // Handle background notifications
-    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+    if (GetPlatform.isAndroid || GetPlatform.isIOS) {
+      FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+    }
   }
 
   // Initialize Local Notifications for background and terminated states

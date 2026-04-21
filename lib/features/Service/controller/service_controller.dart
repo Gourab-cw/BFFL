@@ -242,12 +242,14 @@ class ServiceController extends GetxController {
     userSubscription = null;
     userSubscription = userSubs1[0];
     final String currentMonth = DateFormat('yyyy-MM').format(DateTime.now());
+    final String currentDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
     final resp = await db
         .collection('slots')
         .where('branchId', isEqualTo: branchId)
         .where('serviceId', isEqualTo: serviceId)
         .where('isActive', isEqualTo: true)
         .where('month', isGreaterThanOrEqualTo: currentMonth)
+        .where('date', isGreaterThanOrEqualTo: currentDate)
         .orderBy('month')
         .get();
 
@@ -255,8 +257,16 @@ class ServiceController extends GetxController {
       slots = resp.docs.map((doc) {
         return SlotModel.fromFirestore(doc);
       }).toList();
-      update();
+      List<String> trainerIds = slots.map((m) => m.trainerId).toSet().toList();
+      if (trainerIds.isNotEmpty) {
+        final resp1 = await db.collection('User').where('isActive', isEqualTo: true).where('id', whereIn: trainerIds).get();
+        trainers = resp1.docs.map((m) => UserG.fromJSON(makeMapSerialize(m.data()))).toList();
+        slots = slots.map((m) {
+          return m.copyWith(trainerName: trainers.firstWhereOrNull((s) => s.id == m.trainerId)?.name ?? '');
+        }).toList();
+      }
     }
+    update();
   }
 
   DateTime? _formatHour(String hour, String date) {

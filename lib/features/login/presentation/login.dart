@@ -126,62 +126,89 @@ class _LoginState extends State<Login> {
                                 fontweight: FontWeight.w600,
                                 fontsize: 21,
                               ),
-                              Column(
-                                spacing: 10,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  if (isCreateAccount)
+                              Form(
+                                child: Column(
+                                  spacing: 10,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    if (isCreateAccount)
+                                      Column(
+                                        spacing: 6,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          TextHelper(text: "Name", fontweight: FontWeight.w600),
+                                          TextBox(
+                                            controller: nameController,
+                                            leading: Icon(Icons.account_circle_rounded, size: 20, color: Colors.blueGrey.shade400),
+                                            borderRadius: 30,
+                                            backgroundColor: getMainStore().theme.value.BackgroundColor,
+                                          ),
+                                        ],
+                                      ),
                                     Column(
                                       spacing: 6,
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        TextHelper(text: "Name", fontweight: FontWeight.w600),
-                                        TextBox(
-                                          controller: nameController,
-                                          leading: Icon(Icons.account_circle_rounded, size: 20, color: Colors.blueGrey.shade400),
-                                          borderRadius: 30,
-                                          backgroundColor: getMainStore().theme.value.BackgroundColor,
+                                        TextHelper(text: "Email", fontweight: FontWeight.w600),
+                                        FormField(
+                                          autovalidateMode: AutovalidateMode.always,
+                                          builder: (formFieldState) {
+                                            return TextBox(
+                                              controller: emailController,
+                                              onValueChange: (v) {
+                                                formFieldState.didChange;
+                                              },
+                                              keyboard: TextInputType.emailAddress,
+                                              autofillHints: [AutofillHints.email],
+                                              leading: Icon(Icons.mail, size: 20, color: mainStore.theme.value.HeadColor.withAlpha(200)),
+                                              borderRadius: 30,
+                                              backgroundColor: mainStore.theme.value.BackgroundColor,
+                                            );
+                                          },
                                         ),
                                       ],
                                     ),
-                                  Column(
-                                    spacing: 6,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      TextHelper(text: "Email", fontweight: FontWeight.w600),
-                                      TextBox(
-                                        controller: emailController,
-                                        leading: Icon(Icons.mail, size: 20, color: mainStore.theme.value.HeadColor.withAlpha(200)),
-                                        borderRadius: 30,
-                                        backgroundColor: mainStore.theme.value.BackgroundColor,
-                                      ),
-                                    ],
-                                  ),
-                                  Column(
-                                    spacing: 6,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      TextHelper(text: "Password", fontweight: FontWeight.w600),
-                                      TextBox(
-                                        controller: passwordController,
-                                        leading: Icon(Icons.password, size: 20, color: mainStore.theme.value.HeadColor.withAlpha(200)),
-                                        borderRadius: 30,
-                                        obscureText: !showPassword,
-                                        backgroundColor: mainStore.theme.value.BackgroundColor,
-                                        trailing: ButtonHelperG(
-                                          onTap: () {
-                                            setState(() {
-                                              showPassword = !showPassword;
-                                            });
+                                    Column(
+                                      spacing: 6,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        TextHelper(text: "Password", fontweight: FontWeight.w600),
+
+                                        FormField(
+                                          autovalidateMode: AutovalidateMode.always,
+                                          builder: (formFieldState) {
+                                            return TextBox(
+                                              controller: passwordController,
+                                              leading: Icon(Icons.password, size: 20, color: mainStore.theme.value.HeadColor.withAlpha(200)),
+                                              borderRadius: 30,
+                                              autofillHints: [AutofillHints.password],
+                                              obscureText: !showPassword,
+                                              backgroundColor: mainStore.theme.value.BackgroundColor,
+                                              keyboard: TextInputType.visiblePassword,
+                                              onValueChange: (v) {
+                                                formFieldState.didChange;
+                                              },
+                                              trailing: ButtonHelperG(
+                                                onTap: () {
+                                                  setState(() {
+                                                    showPassword = !showPassword;
+                                                  });
+                                                },
+                                                background: Colors.transparent,
+                                                width: 25,
+                                                icon: Icon(
+                                                  showPassword ? Icons.visibility : Icons.visibility_off_rounded,
+                                                  size: 18,
+                                                  color: Colors.blueGrey.shade400,
+                                                ),
+                                              ),
+                                            );
                                           },
-                                          background: Colors.transparent,
-                                          width: 25,
-                                          icon: Icon(showPassword ? Icons.visibility : Icons.visibility_off_rounded, size: 18, color: Colors.blueGrey.shade400),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
                               ButtonHelperG(
                                 onTap: () async {
@@ -199,9 +226,10 @@ class _LoginState extends State<Login> {
                                   } else {
                                     try {
                                       bool redirect = await user.emailLogin(email: emailController.text.trim(), password: passwordController.text.trim());
-                                      // if(redirect){
-                                      //   Get.offAllNamed("/home");
-                                      // }
+                                      if (redirect) {
+                                        // Get.offAllNamed("/home");
+                                        Get.offAllNamed("/");
+                                      }
                                     } catch (e) {
                                       showAlert("$e", AlertType.error);
                                     } finally {
