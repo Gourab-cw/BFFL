@@ -105,7 +105,8 @@ class CalenderReportController extends GetxController {
     List<SlotModel> sList = slots.where((s) => s.date == date).toList();
     List<String> serviceIds = slots.where((s) => s.date == date).map((m) => m.serviceId).toList();
     int bCount = sList.map((m) => m.bookingCount).fold(0, (a, b) => a + b);
-    int maxCount = sc.list.where((w) => serviceIds.contains(w.id)).map((sc) => sc.maxBooking).fold(0, (a, b) => a + b);
+    // int maxCount = sc.list.where((w) => serviceIds.contains(w.id)).map((sc) => sc.maxBooking).fold(0, (a, b) => a + b);
+    int maxCount = getDayDetails(dateSelected: DateTime.parse(date)).map((m) => m.maxBookingSlot).fold(0, (a, b) => a + b);
 
     return CalenderDayResult(
       booked: bCount,
@@ -117,8 +118,8 @@ class CalenderReportController extends GetxController {
     );
   }
 
-  List<CalenderDayDetails> getDayDetails() {
-    String date = DateFormat("yyyy-MM-dd").format(selectedDate);
+  List<CalenderDayDetails> getDayDetails({DateTime? dateSelected}) {
+    String date = DateFormat("yyyy-MM-dd").format(dateSelected ?? selectedDate);
     List<SlotModel> sList = slots.where((s) => s.date == date).toList();
     List<String> serviceIds = slots.where((s) => s.date == date).map((m) => m.serviceId).toList();
     List<ServiceModel> serviceList = sc.list.where((w) => serviceIds.contains(w.id)).toList();
