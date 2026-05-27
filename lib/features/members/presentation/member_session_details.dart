@@ -36,8 +36,9 @@ class _MemberSessionDetailsState extends State<MemberSessionDetails> {
     if (booking == null) {
       return false;
     }
-    return parseInt(data: booking.endTime.replaceAll(':', ''), defaultInt: 0) <
-        parseInt(data: DateFormat('HH:mm').format(DateTime.now()).replaceAll(':', ''), defaultInt: 0);
+    int todayDate = parseInt(data: DateFormat("yyyyMMddHHmm").format(DateTime.now()));
+    int bookingDate = parseInt(data: booking.date.replaceAll('-', '') + booking.endTime.replaceAll(':', ''));
+    return todayDate > bookingDate;
   }
 
   @override
@@ -51,7 +52,7 @@ class _MemberSessionDetailsState extends State<MemberSessionDetails> {
             appBar: AppBar(
               title: Text("Session Details"),
               actions: [
-                if (mhc.selectedBooking != null && !mhc.selectedBooking!.hasAttend && hasSessionEnd() && auth.state!.userType == UserType.member)
+                if (mhc.selectedBooking != null && !mhc.selectedBooking!.hasAttend && !hasSessionEnd() && auth.state!.userType == UserType.member)
                   ButtonHelperG(
                     width: 100,
                     onTap: () async {
@@ -110,7 +111,7 @@ class _MemberSessionDetailsState extends State<MemberSessionDetails> {
                           Expanded(
                             child: TextHelper(text: booking.serviceName ?? "", fontweight: FontWeight.w600, fontsize: 16),
                           ),
-                          if (hasSessionEnd() && auth.state!.userType == UserType.member)
+                          if (hasSessionEnd())
                             Container(
                               decoration: BoxDecoration(color: mainStore.theme.value.HeadColor.withAlpha(100), borderRadius: BorderRadius.circular(4)),
                               padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 8),

@@ -58,7 +58,7 @@ class MyApp extends StatelessWidget {
             leadingWidth: 50,
             backgroundColor: mainStore.theme.value.BottomNavColor,
             iconTheme: IconThemeData(color: mainStore.theme.value.BackgroundShadeColor, size: 20),
-            titleTextStyle: TextStyle(color: mainStore.theme.value.BackgroundShadeColor, fontSize: 16, fontWeight: FontWeight.w600),
+            titleTextStyle: TextStyle(color: mainStore.theme.value.BackgroundShadeColor, fontSize: 17, fontWeight: FontWeight.w600),
           ),
           bottomAppBarTheme: BottomAppBarThemeData(color: mainStore.theme.value.BottomNavColor),
           useMaterial3: true,

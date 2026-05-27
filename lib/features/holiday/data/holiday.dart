@@ -21,6 +21,15 @@ class HolidayModel {
     );
   }
 
+  HolidayModel copyWith({String? id, String? branchId, String? companyId, String? holidayName, String? holidayDate, bool? isActive}) => HolidayModel(
+    id: id ?? this.id,
+    branchId: branchId ?? this.branchId,
+    companyId: companyId ?? this.companyId,
+    holidayName: holidayName ?? this.holidayName,
+    holidayDate: holidayDate ?? this.holidayDate,
+    isActive: isActive ?? this.isActive,
+  );
+
   Map<String, dynamic> toJson() {
     return makeMapSerialize({'branchId': branchId, 'companyId': companyId, 'holidayName': holidayName, 'holidayDate': holidayDate, 'isActive': isActive});
   }

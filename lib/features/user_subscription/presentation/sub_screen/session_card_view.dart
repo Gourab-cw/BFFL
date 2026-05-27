@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:healthandwellness/app/mainstore.dart';
+import 'package:healthandwellness/core/utility/app_loader.dart';
 import 'package:healthandwellness/core/utility/firebase_service.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
 import 'package:healthandwellness/features/Service/data/session_model.dart';
@@ -11,6 +12,7 @@ import 'package:healthandwellness/features/subscriptions/controller/subscription
 
 import '../../../Service/data/service.dart';
 import '../../../members/controller/member_controller.dart';
+import '../../controller/user_subscription_details_controller.dart';
 
 class SessionCardView extends StatefulWidget {
   final SessionModel sessionModel;
@@ -29,6 +31,8 @@ class _SessionCardViewState extends State<SessionCardView> {
   final sc = Get.find<SubscriptionController>();
   final memberHomeController = Get.find<MemberHomeController>();
   final memberController = Get.find<MemberController>();
+  final loader = Get.find<AppLoaderController>();
+  final userSubscriptionDetailsController = Get.find<UserSubscriptionDetailsController>();
 
   @override
   Widget build(BuildContext context) {
@@ -37,8 +41,25 @@ class _SessionCardViewState extends State<SessionCardView> {
       onTap: () async {
         // if (auth.state != null && auth.state!.userType == UserType.member) {
         if (memberController.selectedUser == null) {
-          showAlert("No member selected", AlertType.error);
-          return;
+          if (userSubscriptionDetailsController.selectedSubscription == null || userSubscriptionDetailsController.selectedSubscription!.user == null) {
+            try {
+              loader.startLoading();
+              final fb = Get.find<FB>();
+              final db = await fb.getDB();
+              final userSnap = await db.collection('User').doc(userSubscriptionDetailsController.selectedSubscription!.userId).get();
+              if (userSnap.exists) {
+                memberController.selectedUser = UserG.fromJSON(makeMapSerialize(userSnap.data()));
+              }
+            } catch (e) {
+              showAlert("$e", AlertType.error);
+            } finally {
+              loader.stopLoading();
+            }
+          } else {
+            memberController.selectedUser = userSubscriptionDetailsController.selectedSubscription!.user;
+          }
+          // showAlert("No member selected", AlertType.error);
+          // return;
         }
         final db = await fb.getDB();
         final trainerSnap = await db.collection('User').doc(session.trainerId).get();
@@ -87,7 +108,7 @@ class _SessionCardViewState extends State<SessionCardView> {
               Row(
                 spacing: 4,
                 children: [
-                  TextHelper(text: 'Service:', width: 50),
+                  TextHelper(text: 'Service:', width: 50, fontsize: 12),
                   TextHelper(
                     text: sc.list.firstWhereOrNull((f) => f.id == session.serviceId)?.name ?? "",
                     fontsize: 12,
@@ -97,9 +118,8 @@ class _SessionCardViewState extends State<SessionCardView> {
                 ],
               ),
               Row(
-                spacing: 4,
                 children: [
-                  TextHelper(text: 'Session Time:', width: 95),
+                  TextHelper(text: 'Session Time:', width: 95, fontsize: 12),
                   TextHelper(
                     text: parseDateToString(data: session.startTime, formatDate: 'HH:mm', predefinedDateFormat: 'HH:mm', defaultValue: ''),
                     fontsize: 12,
@@ -117,12 +137,12 @@ class _SessionCardViewState extends State<SessionCardView> {
               Container(
                 decoration: BoxDecoration(color: mainStore.theme.value.BottomNavColor.withAlpha(150), borderRadius: BorderRadius.circular(10)),
                 padding: EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                child: TextHelper(text: session.hasAttend ? 'Attended' : 'Not Attended', fontsize: 11, color: mainStore.theme.value.DarkTextColor),
+                child: TextHelper(text: session.hasAttend ? 'Attended' : 'Not Attended', fontsize: 10, color: mainStore.theme.value.DarkTextColor),
               ),
               Row(
                 spacing: 4,
                 children: [
-                  TextHelper(text: 'Booked at: '),
+                  TextHelper(text: 'Booked at: ', fontsize: 12),
                   TextHelper(
                     text: parseDateToString(
                       data: session.createdAt,

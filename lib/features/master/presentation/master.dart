@@ -131,6 +131,9 @@ class _MasterState extends State<Master> {
                     ),
                   ),
                   CardHelper(
+                    onTap: () {
+                      Get.toNamed('/holidayregister');
+                    },
                     boxShadow: [],
                     backgroundColor: mainStore.theme.value.lowShadeColor.withAlpha(180),
                     height: 50,

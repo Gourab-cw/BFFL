@@ -1,5 +1,6 @@
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:healthandwellness/app/mainstore.dart';
@@ -213,27 +214,27 @@ class DateRangePicker extends StatefulHookWidget {
   final Color backgroundColor;
   Color? fontColor;
   Widget? leading;
+  DateTime? firstDate;
+  DateTime? lastDate;
   bool withClear;
   final Widget? leadingIcon;
   bool disable;
-  DateTime? firstDate;
-  DateTime? lastDate;
   DateRangePicker({
     super.key,
     this.selectedDateRange,
     this.onValueChange,
-    this.width = 220,
+    this.width = 200,
     this.height = 50,
     this.leading,
-    this.firstDate,
-    this.lastDate,
     this.backgroundColor = Colors.white,
-    this.fontColor,
     this.withBorder = false,
     this.disable = false,
+    this.firstDate,
+    this.lastDate,
+    this.fontColor,
     this.withClear = false,
     this.autofocus = false,
-    this.withSingleSelect = true,
+    this.withSingleSelect = false,
     this.leadingIcon = const Icon(MoonIcons.time_calendar_24_regular),
     this.placeholder = "Select Date Range",
     this.dateFormat = "dd-MM-yyyy",
@@ -247,157 +248,245 @@ class _DateRangePickerState extends State<DateRangePicker> {
   // String data = "Select Date Range";
   DateTimeRange? selectedDateRange;
   TextEditingController textboxcontroller = TextEditingController();
+  TextEditingController fromDateCtrl = TextEditingController();
+  TextEditingController toDateCtrl = TextEditingController();
 
   @override
   void initState() {
     // TODO: implement initState
-    if (widget.selectedDateRange != null) {
+    if (widget.selectedDateRange == null) {
+    } else {
       setState(() {
         if (DateFormat('dd-MM-yyyy').format(widget.selectedDateRange!.start) == DateFormat('dd-MM-yyyy').format(widget.selectedDateRange!.end)) {
           textboxcontroller.text = DateFormat(widget.dateFormat).format(widget.selectedDateRange!.end);
+          fromDateCtrl.text = DateFormat("dd-MM-yyyy").format(widget.selectedDateRange!.end);
+          toDateCtrl.text = DateFormat("dd-MM-yyyy").format(widget.selectedDateRange!.end);
         } else {
           textboxcontroller.text =
               "${DateFormat(widget.dateFormat).format(widget.selectedDateRange!.start)}   -   ${DateFormat(widget.dateFormat).format(widget.selectedDateRange!.end)}";
+          fromDateCtrl.text = DateFormat("dd-MM-yyyy").format(widget.selectedDateRange!.start);
+          toDateCtrl.text = DateFormat("dd-MM-yyyy").format(widget.selectedDateRange!.end);
         }
       });
     }
+    // if (widget.placeholder != null) {
+    //   setState(() {
+    //     data = widget.placeholder!;
+    //   });
+    // }
     super.initState();
-  }
-
-  // @override
-  // void initState() {
-  //   // TODO: implement initState
-  //   if (widget.selectedDateRange != null) {
-  //     setState(() {
-  //       if (DateFormat('dd-MM-yyyy').format(widget.selectedDateRange!.start) == DateFormat('dd-MM-yyyy').format(widget.selectedDateRange!.end)) {
-  //         textboxcontroller.text = DateFormat(widget.dateFormat).format(widget.selectedDateRange!.end);
-  //       } else {
-  //         textboxcontroller.text =
-  //             "${DateFormat(widget.dateFormat).format(widget.selectedDateRange!.start)}   -   ${DateFormat(widget.dateFormat).format(widget.selectedDateRange!.end)}";
-  //       }
-  //     });
-  //   }
-  //   // if (widget.placeholder != null) {
-  //   //   setState(() {
-  //   //     data = widget.placeholder!;
-  //   //   });
-  //   // }
-  //   super.initState();
-  // }
-
-  @override
-  void didUpdateWidget(covariant DateRangePicker oldWidget) {
-    if (widget.selectedDateRange != null) {
-      setState(() {
-        if (DateFormat('dd-MM-yyyy').format(widget.selectedDateRange!.start) == DateFormat('dd-MM-yyyy').format(widget.selectedDateRange!.end)) {
-          textboxcontroller.text = DateFormat(widget.dateFormat).format(widget.selectedDateRange!.end);
-        } else {
-          textboxcontroller.text =
-              "${DateFormat(widget.dateFormat).format(widget.selectedDateRange!.start)}   -   ${DateFormat(widget.dateFormat).format(widget.selectedDateRange!.end)}";
-        }
-      });
-    }
-    // TODO: implement didUpdateWidget
-    super.didUpdateWidget(oldWidget);
   }
 
   showDatePicker(BuildContext context) {
     return showDialog(
       context: context,
-      builder: (context) => Center(
-        child: Material(
-          borderRadius: BorderRadius.circular(10),
-          child: Container(
-            decoration: BoxDecoration(
-              // color: Colors.black,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) {
+          return Center(
+            child: Material(
               borderRadius: BorderRadius.circular(10),
-            ),
-            constraints: BoxConstraints(minHeight: 300, maxHeight: 500),
-            width: 350,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const SizedBox(height: 10),
-                const Text("Select Date Range", style: TextStyle(fontSize: 16)),
-                CalendarDatePicker2(
-                  config: CalendarDatePicker2Config(
-                    allowSameValueSelection: true,
-                    dynamicCalendarRows: true,
-                    daySplashColor: getMainStore().theme.value.secondaryColor.withAlpha(10),
-                    selectedDayHighlightColor: getMainStore().theme.value.secondaryColor,
-                    selectedRangeHighlightColor: getMainStore().theme.value.secondaryColor.withAlpha(40),
-                    rangeBidirectional: true,
-                    animateToDisplayedMonthDate: true,
-                    calendarType: widget.withSingleSelect ? CalendarDatePicker2Type.single : CalendarDatePicker2Type.range,
-                    calendarViewMode: CalendarDatePicker2Mode.day,
-                    firstDayOfWeek: 1,
-                    firstDate: widget.firstDate,
-                    lastDate: widget.lastDate,
-                  ),
-                  value: widget.selectedDateRange != null ? [widget.selectedDateRange!.start, widget.selectedDateRange!.end] : [],
-                  onValueChanged: (value) {
-                    if (widget.withSingleSelect) {
-                      if (value.length > 1) {
-                        setState(() {
-                          selectedDateRange = DateTimeRange(start: DateTime.parse(value[0].toString()), end: DateTime.parse(value[1].toString()));
-                        });
-                      } else {
-                        setState(() {
-                          selectedDateRange = DateTimeRange(start: DateTime.parse(value[0].toString()), end: DateTime.parse(value[0].toString()));
-                        });
-                      }
-                    } else {
-                      if (value.length > 1) {
-                        setState(() {
-                          selectedDateRange = DateTimeRange(start: DateTime.parse(value[0].toString()), end: DateTime.parse(value[1].toString()));
-                        });
-                      }
-                    }
-                  },
+              child: Container(
+                decoration: BoxDecoration(
+                  // color: Colors.black,
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                constraints: const BoxConstraints(minHeight: 300, maxHeight: 500),
+                width: 350,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    MoonTextButton(
-                      onTap: () {
-                        if (widget.onValueChange != null) {
-                          setState(() {
-                            widget.selectedDateRange = DateTimeRange(start: DateTime.now(), end: DateTime.now());
-                          });
-                          // print(DateTimeRange(start: DateTime.now(), end: DateTime.now()));
-                          widget.onValueChange!(DateTimeRange(start: DateTime.now(), end: DateTime.now()));
+                    const SizedBox(height: 10),
+                    const Text("Select Date Range", style: TextStyle(fontSize: 16)),
+                    const Divider(),
+                    const SizedBox(height: 5),
+                    if (!widget.withSingleSelect)
+                      Row(
+                        spacing: 18,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          TextBox(
+                            controller: fromDateCtrl,
+                            width: 120,
+                            labelText: "From Date",
+                            selectTextOnFocus: true,
+                            height: 35,
+                            showAlwaysLabel: true,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.allow(RegExp(r'[0-9-]')),
+                              // SmartDateFormatter(),
+                            ],
+                            leading: const Icon(Icons.calendar_month, color: Colors.blueGrey, size: 16),
+                            onValueChange: (v) {
+                              if (v.length == 10) {
+                                DateTime toDate = parseStringToDate(data: toDateCtrl.text, predefinedDateFormat: "dd-MM-yyyy", defaultValue: DateTime.now());
+                                DateTime fromDate = parseStringToDate(
+                                  data: fromDateCtrl.text,
+                                  predefinedDateFormat: "dd-MM-yyyy",
+                                  defaultValue: DateTime.now(),
+                                );
+
+                                if (toDate.difference(fromDate).isNegative) {
+                                  showAlert("Start date must be on or before end date.", AlertType.error);
+                                  fromDateCtrl.text = DateFormat("dd-MM-yyyy").format(toDate.subtract(const Duration(days: 1)));
+                                  fromDate = toDate.subtract(const Duration(days: 1));
+                                }
+
+                                setState(() {
+                                  selectedDateRange = DateTimeRange(start: fromDate, end: toDate);
+                                });
+                              }
+                            },
+                          ),
+                          const SizedBox(width: 10, child: Divider()),
+                          TextBox(
+                            width: 120,
+                            controller: toDateCtrl,
+                            // backgroundColor: Colors.white,
+                            labelText: "To Date",
+                            height: 35,
+                            selectTextOnFocus: true,
+                            showAlwaysLabel: true,
+                            inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9-]'))],
+                            onValueChange: (v) {
+                              if (v.length == 10) {
+                                DateTime toDate = parseStringToDate(data: toDateCtrl.text, predefinedDateFormat: "dd-MM-yyyy", defaultValue: DateTime.now());
+                                DateTime fromDate = parseStringToDate(
+                                  data: fromDateCtrl.text,
+                                  predefinedDateFormat: "dd-MM-yyyy",
+                                  defaultValue: DateTime.now(),
+                                );
+
+                                if (toDate.difference(fromDate).isNegative) {
+                                  showAlert("Start date must be on or before end date.", AlertType.error);
+                                  toDateCtrl.text = DateFormat("dd-MM-yyyy").format(fromDate.add(const Duration(days: 1)));
+                                  toDate = fromDate.add(const Duration(days: 1));
+                                }
+
+                                setState(() {
+                                  selectedDateRange = DateTimeRange(start: fromDate, end: toDate);
+                                });
+                              }
+                            },
+                            leading: const Icon(Icons.calendar_month, color: Colors.blueGrey, size: 16),
+                          ),
+                        ],
+                      ),
+                    const SizedBox(height: 5),
+                    CalendarDatePicker2(
+                      config: CalendarDatePicker2Config(
+                        allowSameValueSelection: true,
+                        dynamicCalendarRows: true,
+                        daySplashColor: getMainStore().theme.value.HeadColor.withAlpha(100),
+                        selectedDayHighlightColor: getMainStore().theme.value.secondaryColor.withAlpha(100),
+                        selectedRangeHighlightColor: getMainStore().theme.value.secondaryColor.withAlpha(100),
+                        rangeBidirectional: true,
+                        animateToDisplayedMonthDate: true,
+                        calendarType: CalendarDatePicker2Type.range,
+                        calendarViewMode: CalendarDatePicker2Mode.day,
+                        firstDayOfWeek: 1,
+                        firstDate: widget.firstDate,
+                        lastDate: widget.lastDate,
+                        // dayTextStyle: TextStyle(color: widget.fontColor),
+                      ),
+                      // value: widget.selectedDateRange != null ? [widget.selectedDateRange!.start, widget.selectedDateRange!.end] : [DateTime.now()],
+                      value: selectedDateRange != null ? [selectedDateRange!.start, selectedDateRange!.end] : [DateTime.now()],
+                      onValueChanged: (value) {
+                        if (widget.withSingleSelect) {
+                          if (value.length > 1) {
+                            setState(() {
+                              selectedDateRange = DateTimeRange(start: DateTime.parse(value[0].toString()), end: DateTime.parse(value[1].toString()));
+                            });
+                            fromDateCtrl.text = DateFormat("dd-MM-yyyy").format(value[0]);
+                            toDateCtrl.text = DateFormat("dd-MM-yyyy").format(value[1]);
+                          } else {
+                            setState(() {
+                              selectedDateRange = DateTimeRange(start: DateTime.parse(value[0].toString()), end: DateTime.parse(value[0].toString()));
+                            });
+                            fromDateCtrl.text = DateFormat("dd-MM-yyyy").format(value[0]);
+                            toDateCtrl.text = DateFormat("dd-MM-yyyy").format(value[0]);
+                          }
+                        } else {
+                          if (value.length > 1) {
+                            setState(() {
+                              selectedDateRange = DateTimeRange(start: DateTime.parse(value[0].toString()), end: DateTime.parse(value[1].toString()));
+                            });
+                            fromDateCtrl.text = DateFormat("dd-MM-yyyy").format(value[0]);
+                            toDateCtrl.text = DateFormat("dd-MM-yyyy").format(value[1]);
+                          }
                         }
-                        goBack(context);
                       },
-                      label: const Text("Select Today"),
                     ),
-                    MoonTextButton(
-                      onTap: () {
-                        if (selectedDateRange != null && widget.onValueChange != null) {
-                          setState(() {
-                            widget.selectedDateRange = selectedDateRange;
-                          });
-                          widget.onValueChange!(selectedDateRange!);
-                        }
-                        goBack(context);
-                      },
-                      label: const Text("Ok"),
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        MoonTextButton(
+                          onTap: () {
+                            if (widget.onValueChange != null) {
+                              setState(() {
+                                widget.selectedDateRange = DateTimeRange(start: DateTime.now(), end: DateTime.now());
+                              });
+                              // print(DateTimeRange(start: DateTime.now(), end: DateTime.now()));
+                              widget.onValueChange!(DateTimeRange(start: DateTime.now(), end: DateTime.now()));
+                            }
+                            goBack(context);
+                          },
+                          label: const Text("Select Today"),
+                        ),
+                        Row(
+                          children: [
+                            MoonTextButton(
+                              onTap: () {
+                                if (selectedDateRange != null && widget.onValueChange != null) {
+                                  setState(() {
+                                    widget.selectedDateRange = selectedDateRange;
+                                  });
+                                  widget.onValueChange!(selectedDateRange!);
+                                }
+                                goBack(context);
+                              },
+                              label: const Text("Ok"),
+                            ),
+                            MoonTextButton(onTap: () => goBack(context), label: const Text("Cancel")),
+                          ],
+                        ),
+                      ],
                     ),
-                    MoonTextButton(onTap: () => goBack(context), label: const Text("Cancel")),
+                    const SizedBox(height: 10),
                   ],
                 ),
-                const SizedBox(height: 10),
-              ],
+              ),
             ),
-          ),
-        ),
+          );
+        },
       ),
-    );
+    ).whenComplete(() {
+      fromDateCtrl.text = DateFormat("dd-MM-yyyy").format(widget.selectedDateRange!.start);
+      toDateCtrl.text = DateFormat("dd-MM-yyyy").format(widget.selectedDateRange!.end);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    useEffect(() {
+      selectedDateRange = widget.selectedDateRange;
+      if (widget.selectedDateRange == null) {
+      } else {
+        setState(() {
+          if (DateFormat('dd-MM-yyyy').format(widget.selectedDateRange!.start) == DateFormat('dd-MM-yyyy').format(widget.selectedDateRange!.end)) {
+            textboxcontroller.text = DateFormat(widget.dateFormat).format(widget.selectedDateRange!.end);
+            fromDateCtrl.text = DateFormat("dd-MM-yyyy").format(widget.selectedDateRange!.end);
+            toDateCtrl.text = DateFormat("dd-MM-yyyy").format(widget.selectedDateRange!.end);
+          } else {
+            textboxcontroller.text =
+                "${DateFormat(widget.dateFormat).format(widget.selectedDateRange!.start)} - ${DateFormat(widget.dateFormat).format(widget.selectedDateRange!.end)}";
+            fromDateCtrl.text = DateFormat("dd-MM-yyyy").format(widget.selectedDateRange!.start);
+            toDateCtrl.text = DateFormat("dd-MM-yyyy").format(widget.selectedDateRange!.end);
+          }
+        });
+      }
+      return null;
+    }, [widget.selectedDateRange]);
     return Row(
       children: [
         widget.leading ?? Container(),
@@ -416,9 +505,9 @@ class _DateRangePickerState extends State<DateRangePicker> {
             onTap: () {
               if (!widget.disable) showDatePicker(context);
             },
-            fontColor: widget.fontColor,
             autofocus: widget.autofocus,
             readonly: true,
+            fontColor: widget.fontColor,
             fontWeight: FontWeight.w600,
             selectTextOnFocus: false,
             backgroundColor: widget.backgroundColor,

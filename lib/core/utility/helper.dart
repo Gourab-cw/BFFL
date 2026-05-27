@@ -345,6 +345,7 @@ class TextBox extends StatefulWidget {
   final Color? backgroundColor;
   final Color? fontColor;
   final Function? onTap;
+  final List<TextInputFormatter>? inputFormatters;
   final bool selectTextOnFocus;
   final bool autofocus;
   final bool withDebounce;
@@ -369,6 +370,8 @@ class TextBox extends StatefulWidget {
     this.fontWeight = FontWeight.w400,
     this.onlyBottomBorder = false,
     this.readonly = false,
+    this.inputFormatters,
+
     this.withBorder = true,
     this.withDebounce = true,
     this.showAlwaysLabel = false,
@@ -461,7 +464,10 @@ class _TextBoxState extends State<TextBox> {
             style: TextStyle(color: widget.fontColor, fontSize: widget.fontSize, fontWeight: widget.fontWeight),
             padding: EdgeInsets.only(left: widget.leftPadding),
 
-            inputFormatters: <TextInputFormatter>[if (widget.keyboard == TextInputType.number) FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))],
+            inputFormatters: <TextInputFormatter>[
+              if (widget.keyboard == TextInputType.number) FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+              if (widget.inputFormatters != null) ...widget.inputFormatters!,
+            ],
             onTap: () {
               if (widget.selectTextOnFocus && widget.controller.selection.end < widget.controller.value.text.length) {
                 widget.controller.selection = TextSelection(baseOffset: 0, extentOffset: widget.controller.value.text.length);
@@ -1661,33 +1667,37 @@ class _DropDownHelperGState extends State<DropDownHelperG> {
   void didUpdateWidget(covariant DropDownHelperG oldWidget) {
     // TODO: implement didUpdateWidget
 
-    if (JsonEncoder().convert(oldWidget.items) != JsonEncoder().convert(widget.items)) {
-      dropDownStore.list.value = widget.items;
-      dropDownStore.filteredList.value = widget.items;
-      dropDownStore.selectedList.value = widget.multiSelectValue ?? [];
+    dropDownStore.list.value = widget.items;
+    dropDownStore.filteredList.value = widget.items;
+    dropDownStore.selectedList.value = widget.multiSelectValue ?? [];
 
-      if (mounted) {
-        if (dropDownStore.init.value) {
-          dropDownStore.textController.value.text = makeMapSerialize(widget.value).isEmpty
-              ? ''
-              : parseString(
-                  data: widget.items.firstWhereOrNull((t) => t[widget.valueKey] == widget.value![widget.valueKey])?[widget.displayKey],
-                  defaultValue: '',
-                );
-        }
+    if (mounted) {
+      if (dropDownStore.init.value) {
+        dropDownStore.textController.value.text = makeMapSerialize(widget.value).isEmpty
+            ? ''
+            : parseString(
+                data: widget.items.firstWhereOrNull((t) => t[widget.valueKey] == widget.value![widget.valueKey])?[widget.displayKey],
+                defaultValue: '',
+              );
       }
     }
 
-    if (JsonEncoder().convert(oldWidget.value) != JsonEncoder().convert(widget.value)) {
+    if (makeMapSerialize(oldWidget.value)[oldWidget.valueKey] != makeMapSerialize(widget.value)[widget.valueKey]) {
       if (mounted) {
-        if (dropDownStore.init.value) {
-          dropDownStore.textController.value.text = makeMapSerialize(widget.value).isEmpty
-              ? ''
-              : parseString(
-                  data: widget.items.firstWhereOrNull((t) => t[widget.valueKey] == widget.value![widget.valueKey])?[widget.displayKey],
-                  defaultValue: '',
-                );
-        }
+        dropDownStore.textController.value.text = makeMapSerialize(widget.value).isEmpty
+            ? ''
+            : parseString(
+                data: widget.items.firstWhereOrNull((t) => t[widget.valueKey] == widget.value![widget.valueKey])?[widget.displayKey],
+                defaultValue: '',
+              );
+        // if (dropDownStore.init.value) {
+        //   dropDownStore.textController.value.text = makeMapSerialize(widget.value).isEmpty
+        //       ? ''
+        //       : parseString(
+        //           data: widget.items.firstWhereOrNull((t) => t[widget.valueKey] == widget.value![widget.valueKey])?[widget.displayKey],
+        //           defaultValue: '',
+        //         );
+        // }
       }
     }
 
@@ -2178,7 +2188,7 @@ class JsonViewerG extends StatelessWidget {
 
 showAlert(String content, AlertType alertType, [BuildContext? context, Duration? duration, bool? withUndoBtn, Function? onUndoBtnClick]) {
   logG("${alertType.name} - $content \n ${StackTrace.current}");
-  return AlertService.showAlert(content, alertType, duration: duration, withUndoBtn: withUndoBtn, onUndoBtnClick: onUndoBtnClick);
+  return AlertService.showAlert(content.replaceAll("Exception: ", ""), alertType, duration: duration, withUndoBtn: withUndoBtn, onUndoBtnClick: onUndoBtnClick);
 }
 
 class AlertService {
@@ -2236,12 +2246,12 @@ class AlertService {
               duration: const Duration(milliseconds: 700),
               bottom: start + (index * 55),
               // right: 20,
-              left: (MediaQuery.of(context).size.width - 380) / 2,
+              left: (MediaQuery.of(context).size.width - (GetPlatform.isMobile ? 350 : 450)) / 2,
               child: Material(
                 color: Colors.transparent,
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  width: 380,
+                  width: GetPlatform.isMobile ? 350 : 450,
                   decoration: BoxDecoration(
                     color: getBackgroundColor(),
                     borderRadius: BorderRadius.circular(14),
@@ -2249,57 +2259,69 @@ class AlertService {
                     boxShadow: [BoxShadow(blurRadius: 4, spreadRadius: 1, color: Colors.grey.shade100)],
                   ),
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Icon(alertType == AlertType.success ? Icons.check_circle : Icons.info, size: 18, color: getTextColor()),
-                      const SizedBox(width: 10),
                       Expanded(
-                        child: Column(
+                        child: Row(
                           mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            TextHelper(
-                              text:
-                                  (alertType == AlertType.success
-                                          ? "Success"
-                                          : alertType == AlertType.info
-                                          ? "Info"
-                                          : "Error")
-                                      .toUpperCase(),
-                              color: getTextColor(),
-                              fontsize: 11,
-                              fontweight: FontWeight.w600,
-                            ),
-                            TextHelper(
-                              text: content,
-                              isWrap: true,
-                              fontsize: 12,
-                              color: Colors.grey.shade800,
-                              fontweight: FontWeight.w600,
-                              textalign: TextAlign.left,
+                            Icon(alertType == AlertType.success ? Icons.check_circle : Icons.info, size: 18, color: getTextColor()),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  TextHelper(
+                                    text:
+                                        (alertType == AlertType.success
+                                                ? "Success"
+                                                : alertType == AlertType.info
+                                                ? "Info"
+                                                : "Error")
+                                            .toUpperCase(),
+                                    color: getTextColor(),
+                                    fontsize: 11,
+                                    fontweight: FontWeight.w600,
+                                  ),
+                                  TextHelper(
+                                    text: content,
+                                    isWrap: true,
+                                    fontsize: 12,
+                                    color: Colors.grey.shade800,
+                                    fontweight: FontWeight.w600,
+                                    textalign: TextAlign.left,
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
                       ),
-                      const Spacer(),
-                      if (withUndoBtn == true)
-                        TextButton(
-                          onPressed: () {
-                            onUndoBtnClick?.call();
-                            remove(entry);
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.all(5),
-                            decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Colors.white),
-                            child: TextHelper(text: "Undo", fontsize: 12, fontweight: FontWeight.w600),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (withUndoBtn == true)
+                            TextButton(
+                              onPressed: () {
+                                onUndoBtnClick?.call();
+                                remove(entry);
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(5),
+                                decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Colors.white),
+                                child: TextHelper(text: "Undo", fontsize: 12, fontweight: FontWeight.w600),
+                              ),
+                            ),
+                          GestureDetector(
+                            onTap: () => remove(entry),
+                            child: Container(
+                              padding: const EdgeInsets.all(5),
+                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Colors.white),
+                              child: Icon(Icons.close, size: 15, color: getBorderColor(isDark: true)),
+                            ),
                           ),
-                        ),
-                      GestureDetector(
-                        onTap: () => remove(entry),
-                        child: Container(
-                          padding: const EdgeInsets.all(5),
-                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Colors.white),
-                          child: Icon(Icons.close, size: 15, color: getBorderColor(isDark: true)),
-                        ),
+                        ],
                       ),
                     ],
                   ),

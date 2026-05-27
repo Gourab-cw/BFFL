@@ -48,12 +48,12 @@ class _ParentScreenState extends State<ParentScreen> {
     {"Schedule": Icon(MoonIcons.time_calendar_24_regular)},
     {"Attendance": Icon(Icons.badge_outlined, size: 20)},
     {"Overview": Icon(MoonIcons.shop_card_24_regular)},
-    {"Master": Icon(Icons.admin_panel_settings_rounded, size: 20)},
+    {"Admin": Icon(Icons.admin_panel_settings_rounded, size: 20)},
   ];
   List<Map<String, Icon>> adminMenus = [
     {"Home": Icon(Icons.home_filled, size: 20)},
     {"Overview": Icon(Icons.calendar_month, size: 20)},
-    {"Master": Icon(Icons.admin_panel_settings_rounded, size: 20)},
+    {"Admin": Icon(Icons.admin_panel_settings_rounded, size: 20)},
     {"Attendance": Icon(Icons.account_circle, size: 20)},
   ];
   List<Map<String, Icon>> trainerMenus = [

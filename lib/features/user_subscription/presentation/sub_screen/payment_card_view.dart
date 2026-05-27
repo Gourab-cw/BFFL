@@ -38,13 +38,13 @@ class _PaymentCardViewState extends State<PaymentCardView> {
             children: [
               TextHelper(
                 text: "Payment ID: ${payment.voucherNumber}",
-                fontsize: 12,
+                fontsize: 11,
                 fontweight: FontWeight.w600,
                 color: mainStore.theme.value.BottomNavColor.withAlpha(180),
               ),
               TextHelper(
                 text: DateFormat('dd-MM-yyyy HH:mm a').format(payment.createdAt.toDate()),
-                fontsize: 12,
+                fontsize: 11,
                 fontweight: FontWeight.w600,
                 color: mainStore.theme.value.LightTextColor.withAlpha(180),
               ),
@@ -66,7 +66,7 @@ class _PaymentCardViewState extends State<PaymentCardView> {
                   TextHelper(text: 'Paid By', fontsize: 11.5, fontweight: FontWeight.w600, color: mainStore.theme.value.LightTextColor.withAlpha(160)),
                   TextHelper(
                     text: payment.paymentModeName,
-                    fontsize: 12,
+                    fontsize: 11,
                     fontweight: FontWeight.w600,
                     color: mainStore.theme.value.BottomNavColor.withAlpha(180),
                   ),

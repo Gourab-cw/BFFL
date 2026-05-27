@@ -129,9 +129,13 @@ class AdminHomeController extends GetxController {
   Future<List<ChartData>> getDashboardDataRevenueGraph() async {
     try {
       final db = await fb.getDB();
-      final now = DateTime.now();
-      int daysCount = revenueDateRange.duration.inDays;
-      List<DateTime> days = List.generate(daysCount, (index) => dashboardDate.end.subtract(Duration(days: index)));
+      final start = DateTime(revenueDateRange.start.year, revenueDateRange.start.month, revenueDateRange.start.day);
+
+      final end = DateTime(revenueDateRange.end.year, revenueDateRange.end.month, revenueDateRange.end.day);
+
+      final daysCount = end.difference(start).inDays + 1;
+
+      List<DateTime> days = List.generate(daysCount, (index) => start.add(Duration(days: index)));
       int count = 0;
       List<ChartData> data = [];
       final allResp = await Future.wait(

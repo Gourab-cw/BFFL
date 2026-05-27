@@ -155,6 +155,9 @@ class _HomeAdminState extends State<HomeAdmin> {
                                     content = parseString(data: asyncSnapshot.data, defaultValue: '0');
                                   }
                                   return AdminDashboardCard(
+                                    onTap: () {
+                                      Get.toNamed('/memberbookinghistory', parameters: {"withAppBar": "1"});
+                                    },
                                     icon: Icon(FontAwesomeIcons.certificate, size: 12, color: Colors.blue.shade600),
                                     enabled: waiting,
                                     iconBgColor: Colors.blue.shade50,
@@ -209,7 +212,7 @@ class _HomeAdminState extends State<HomeAdmin> {
                                   }
                                   return AdminDashboardCard(
                                     onTap: () {
-                                      Get.toNamed('/memberlist');
+                                      Get.toNamed('/serviceview');
                                     },
                                     icon: Icon(FontAwesomeIcons.ticket, size: 16, color: Colors.blueAccent.shade700),
                                     enabled: waiting,

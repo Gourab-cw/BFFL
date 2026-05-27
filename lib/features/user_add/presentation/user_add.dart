@@ -169,6 +169,8 @@ class _UserAddState extends State<UserAdd> {
                                     }
                                     c.update();
                                   },
+                                  firstDate: DateTime(1900),
+                                  lastDate: DateTime.now(),
                                 ),
                               ],
                             ),

@@ -7,6 +7,7 @@ import 'package:healthandwellness/features/subscriptions/controller/subscription
 import 'package:healthandwellness/features/user_subscription/controller/user_subscription_details_controller.dart';
 import 'package:healthandwellness/features/user_subscription/presentation/sub_screen/payment_card_view.dart';
 import 'package:healthandwellness/features/user_subscription/presentation/sub_screen/session_card_view.dart';
+import 'package:intl/intl.dart';
 
 class UserSubscriptionDetails extends StatefulWidget {
   const UserSubscriptionDetails({super.key});
@@ -113,6 +114,12 @@ class _UserSubscriptionDetailsState extends State<UserSubscriptionDetails> with 
                               fontweight: FontWeight.w600,
                             )
                           : SizedBox.shrink(),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      TextHelper(text: 'Booked At :', width: width),
+                      TextHelper(text: DateFormat("dd-MM-yyyy HH:mm a").format(userSubscription.createdAt)),
                     ],
                   ),
                   Divider(),

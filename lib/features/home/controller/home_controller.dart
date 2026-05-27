@@ -108,13 +108,13 @@ class HomeController extends GetxController {
       }
       final db = await fb.getDB();
       QuerySnapshot<Map<String, dynamic>> resp;
-      if (auth.state!.userType == UserType.receptionist) {
+      if (auth.state!.userType == UserType.receptionist || auth.state!.userType == UserType.branchManager || auth.state!.userType == UserType.admin) {
         resp = await db
             .collection('slots')
             .where('branchId', isEqualTo: auth.state!.branchId)
             .where('isActive', isEqualTo: true)
             .where('date', isGreaterThanOrEqualTo: DateFormat('yyyy-MM-dd').format(DateTime.now()))
-            .limit(4)
+            .limit(10)
             .get();
       } else if (auth.state!.userType == UserType.trainer) {
         resp = await db

@@ -73,7 +73,7 @@ class NewUserFormController extends GetxController {
       int userHave = (await db.collection('User').where('mobile', isEqualTo: mobile.text.trim()).count().get()).count ?? 0;
 
       if (userHave > 0) {
-        throw Exception("User already exist!");
+        throw Exception("Different member with same phone number already exist!");
       }
       String password = generateRandomPassword(length: 6);
       final userCred = await auth.createUserWithEmailAndPassword(email: email.text, password: password);

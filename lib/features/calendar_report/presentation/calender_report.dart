@@ -75,25 +75,43 @@ class _CalenderReportState extends State<CalenderReport> {
                         child: TextHelper(text: "Monthly overview", fontsize: 15, fontweight: FontWeight.w600),
                       ),
                       SizedBox(
-                        width: 130,
+                        width: 180,
                         child: GetBuilder<BranchController>(
                           init: branchController,
                           autoRemove: false,
                           builder: (branchController) {
-                            return DropDownHelperG(
-                              uniqueKey: UniqueKey().toString(),
-                              trailing: SizedBox.shrink(),
-                              height: 35,
-                              labelText: 'Branch',
-                              showLabelAlways: true,
-                              fontSize: 12,
-                              onValueChange: (v) async {
-                                calenderReportController.selectedBranch = v;
-                                await loadData();
-                                calenderReportController.update();
-                              },
-                              value: calenderReportController.selectedBranch,
-                              items: branchController.list.map((m) => m.toJson()).toList(),
+                            return Row(
+                              children: [
+                                ButtonHelperG(
+                                  background: mainStore.theme.value.BackgroundColor,
+                                  shadow: [],
+                                  icon: Icon(Icons.refresh, color: mainStore.theme.value.LightTextColor),
+                                  onTap: () async {
+                                    try {
+                                      await loadData();
+                                    } catch (e) {
+                                      showAlert('$e', AlertType.error);
+                                    }
+                                  },
+                                ),
+                                Expanded(
+                                  child: DropDownHelperG(
+                                    uniqueKey: UniqueKey().toString(),
+                                    trailing: SizedBox.shrink(),
+                                    height: 35,
+                                    labelText: 'Branch',
+                                    showLabelAlways: true,
+                                    fontSize: 12,
+                                    onValueChange: (v) async {
+                                      calenderReportController.selectedBranch = v;
+                                      await loadData();
+                                      calenderReportController.update();
+                                    },
+                                    value: calenderReportController.selectedBranch,
+                                    items: branchController.list.map((m) => m.toJson()).toList(),
+                                  ),
+                                ),
+                              ],
                             );
                           },
                         ),
@@ -146,6 +164,15 @@ class _CalenderReportState extends State<CalenderReport> {
                           },
                     ),
                     value: [calenderReportController.selectedDate],
+                    onDisplayedMonthChanged: (v) async {
+                      calenderReportController.selectedDate = v;
+                      try {
+                        await loadData();
+                      } catch (e) {
+                        showAlert('$e', AlertType.error);
+                      }
+                      calenderReportController.update();
+                    },
                     onValueChanged: (v) {
                       if (v.isNotEmpty) {
                         calenderReportController.selectedDate = v[0];

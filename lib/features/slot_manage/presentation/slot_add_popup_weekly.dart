@@ -33,7 +33,23 @@ Future<void> slotAddPopupWeekly(BuildContext context) async {
                   mainAxisSize: MainAxisSize.min,
                   spacing: 10,
                   children: [
-                    TextHelper(text: "Slot manage", fontweight: FontWeight.w600, fontsize: 14),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        TextHelper(text: "Slot manage", fontweight: FontWeight.w600, fontsize: 14),
+                        ButtonHelperG(
+                          margin: 0,
+                          padding: EdgeInsets.all(2),
+                          height: 25,
+                          width: 35,
+                          background: getMainStore().theme.value.BackgroundColor,
+                          icon: Icon(Icons.close, color: getMainStore().theme.value.HeadColor, size: 16),
+                          onTap: () {
+                            goBack(context);
+                          },
+                        ),
+                      ],
+                    ),
                     Divider(),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -187,7 +203,23 @@ Future<void> slotAddPopupByDate(BuildContext context) async {
                   mainAxisSize: MainAxisSize.min,
                   spacing: 10,
                   children: [
-                    TextHelper(text: "Slot manage", fontweight: FontWeight.w600, fontsize: 14),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        TextHelper(text: "Slot manage", fontweight: FontWeight.w600, fontsize: 14),
+                        ButtonHelperG(
+                          margin: 0,
+                          padding: EdgeInsets.all(2),
+                          height: 25,
+                          width: 35,
+                          background: getMainStore().theme.value.BackgroundColor,
+                          icon: Icon(Icons.close, color: getMainStore().theme.value.HeadColor, size: 16),
+                          onTap: () {
+                            goBack(context);
+                          },
+                        ),
+                      ],
+                    ),
                     Divider(),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.center,

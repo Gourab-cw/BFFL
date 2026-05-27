@@ -254,21 +254,24 @@ class UserSubscriptionController extends GetxController {
     }
   }
 
-  Future<void> getSubscriptionList(String userId) async {
+  Future<void> getSubscriptionList(String? userId) async {
     try {
       final db = await fb.getDB();
       final auth = Get.find<Authenticator>();
       if (auth.state == null) {
         showAlert("No branch found!", AlertType.error);
       }
-      final resp = await db
+      Query<Map<String, dynamic>> query = db
           .collection('userSubscription')
           .where('branchId', isEqualTo: auth.state!.branchId)
-          .where('userId', isEqualTo: userId)
-          .limit(5)
-          .orderBy('createdAt')
-          .get();
+          .orderBy('createdAt', descending: true);
+      if (userId != null) {
+        query = query.where('userId', isEqualTo: userId);
+      }
+      final resp = await query.get();
+      // .get();
       subscriptionList = resp.docs.map((m) => UserSubscription.fromJSON(makeMapSerialize(m.data()))).toList();
+
       update();
     } catch (e) {
       showAlert("$e", AlertType.error);

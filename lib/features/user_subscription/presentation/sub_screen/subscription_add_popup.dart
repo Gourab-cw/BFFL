@@ -142,6 +142,7 @@ Future subscriptionAddPopup(BuildContext context, UserSubscriptionController sub
       Future<void> addSubscription(GSTDetails? gstDetails) async {
         UserG? user = auth.state;
         String userId = parseString(data: subController.user['id'], defaultValue: '');
+        String branchId = parseString(data: subController.user['branchId'], defaultValue: '');
         String userName = parseString(data: subController.user['name'], defaultValue: '');
         final fb = Get.find<FB>();
         final db = await fb.getDB();
@@ -173,7 +174,7 @@ Future subscriptionAddPopup(BuildContext context, UserSubscriptionController sub
 
         int count = 0;
         if (userSubscription == null) {
-          count = parseInt(data: (await db.collection('userSubscription').where('userId', isEqualTo: userId).count().get()).count);
+          count = parseInt(data: (await db.collection('userSubscription').where('branchId', isEqualTo: branchId).count().get()).count);
         }
 
         final userSubscriptionData = UserSubscription(
@@ -238,9 +239,9 @@ Future subscriptionAddPopup(BuildContext context, UserSubscriptionController sub
                       labelText: "Select Service",
                       showLabelAlways: true,
                       showClearText: false,
-                      uniqueKey: UniqueKey().toString(),
+                      uniqueKey: "serviceCreationDropdown",
                       onValueChange: (v) {
-                        // logG(v);
+                        logG(v);
                         setState(() {
                           selectedService = sc.list.firstWhereOrNull((m) => m.id == v['id']);
                         });

@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:healthandwellness/app/mainstore.dart';
 import 'package:healthandwellness/core/utility/app_loader.dart';
-import 'package:healthandwellness/core/utility/daterangepicker.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
 import 'package:healthandwellness/features/slot_details_trainer/controller/slot_details_controller.dart';
 import 'package:healthandwellness/features/slot_register/controller/slot_register_controller.dart';
 import 'package:healthandwellness/features/subscriptions/controller/subscription_controller.dart';
 import 'package:moon_design/moon_design.dart';
 
+import '../../../core/utility/daterangepicker.dart';
 import '../../slot_manage/data/slot_making_model.dart';
 
 class SlotRegister extends StatefulWidget {
@@ -26,6 +26,7 @@ class _SlotRegisterState extends State<SlotRegister> {
   final mainStore = Get.find<MainStore>();
 
   bool showSearch = false;
+  bool showFilter = false;
 
   @override
   void initState() {
@@ -43,22 +44,33 @@ class _SlotRegisterState extends State<SlotRegister> {
     super.initState();
   }
 
-  List<SlotModel> filteredRegister(String searchText) {
-    String text = searchText.replaceAll(',', '').replaceAll(' ', '');
-
+  List<SlotModel> filteredRegister(String searchText, showFilter) {
+    String text = searchText.replaceAll(',', '').replaceAll(' ', '').toLowerCase();
+    List<SlotModel> list = [];
     if (text.isEmpty) {
-      return slotRegisterController.register;
+      list = slotRegisterController.register;
+    } else {
+      list = slotRegisterController.register.where((w) {
+        String serviceName = (sc.list.firstWhereOrNull((f) => f.id == w.serviceId)?.name ?? "").replaceAll(',', '').replaceAll(' ', '').toLowerCase();
+        String date = parseDateToString(
+          data: w.date,
+          formatDate: 'EEE, dd-MM-yyyy',
+          predefinedDateFormat: 'yyyy-MM-dd',
+          defaultValue: '',
+        ).replaceAll(',', '').replaceAll(' ', '');
+        return (date.contains(text) ||
+            serviceName.toLowerCase().contains(text) ||
+            w.startTime.contains(text) ||
+            w.endTime.contains(text) ||
+            "${w.startTime}-${w.endTime}".contains(text));
+      }).toList();
     }
-    return slotRegisterController.register.where((w) {
-      String serviceName = (sc.list.firstWhereOrNull((f) => f.id == w.serviceId)?.name ?? "").replaceAll(',', '').replaceAll(' ', '').toLowerCase();
-      String date = parseDateToString(
-        data: w.date,
-        formatDate: 'EEE, dd-MM-yyyy',
-        predefinedDateFormat: 'yyyy-MM-dd',
-        defaultValue: '',
-      ).replaceAll(',', '').replaceAll(' ', '');
-      return (date.contains(text) || serviceName.toLowerCase().contains(text) || w.startTime.contains(text) || w.endTime.contains(text));
-    }).toList();
+
+    if (showFilter) {
+      return list.where((s) => s.bookingCount > 0).toList();
+    } else {
+      return list;
+    }
   }
 
   @override
@@ -72,8 +84,30 @@ class _SlotRegisterState extends State<SlotRegister> {
             appBar: AppBar(
               title: Text('Register'),
               actions: [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Transform.scale(
+                      scale: 0.8,
+                      child: MoonSwitch(
+                        value: showFilter,
+                        activeTrackColor: mainStore.theme.value.mediumShadeColor,
+                        onChanged: (v) {
+                          setState(() {
+                            showFilter = !showFilter;
+                          });
+                          slotRegisterController.update();
+                        },
+                      ),
+                    ),
+                    TextHelper(text: "Booking only", fontweight: FontWeight.w500, color: mainStore.theme.value.BackgroundColor),
+                  ],
+                ),
                 ButtonHelperG(
                   shadow: [],
+                  background: mainStore.theme.value.mediumShadeColor,
+                  width: 35,
+                  height: 35,
                   onTap: () async {
                     try {
                       Loader.startLoading();
@@ -84,28 +118,7 @@ class _SlotRegisterState extends State<SlotRegister> {
                       Loader.stopLoading();
                     }
                   },
-                  icon: Icon(Icons.refresh),
-                ),
-                DateRangePicker(
-                  height: 40,
-                  fontColor: mainStore.theme.value.BackgroundColor,
-                  backgroundColor: mainStore.theme.value.HeadColor.withAlpha(180),
-                  withBorder: false,
-                  onValueChange: (v) async {
-                    if (slotRegisterController.selectedDate != v) {
-                      slotRegisterController.selectedDate = v;
-                      try {
-                        Loader.startLoading();
-                        await slotRegisterController.fetchRegister();
-                      } catch (e) {
-                        showAlert('$e', AlertType.error);
-                      } finally {
-                        Loader.stopLoading();
-                      }
-                      slotRegisterController.update();
-                    }
-                  },
-                  selectedDateRange: slotRegisterController.selectedDate,
+                  icon: Icon(Icons.refresh, color: mainStore.theme.value.LightTextColor),
                 ),
               ],
             ),
@@ -127,7 +140,7 @@ class _SlotRegisterState extends State<SlotRegister> {
                         ),
                       ),
                     ButtonHelperG(
-                      background: mainStore.theme.value.mediumShadeColor,
+                      background: mainStore.theme.value.mediumShadeColor.withAlpha(100),
                       onTap: () {
                         setState(() {
                           showSearch = !showSearch;
@@ -137,7 +150,29 @@ class _SlotRegisterState extends State<SlotRegister> {
                           }
                         });
                       },
-                      icon: showSearch ? Icon(Icons.close) : Icon(Icons.search),
+                      icon: showSearch ? Icon(Icons.close) : Icon(MoonIcons.generic_search_24_regular),
+                    ),
+                    DateRangePicker(
+                      height: 40,
+                      // fontColor: mainStore.theme.value.BackgroundColor,
+                      backgroundColor: mainStore.theme.value.mediumShadeColor.withAlpha(100),
+                      // withBorder: true,
+                      width: 210,
+                      onValueChange: (v) async {
+                        if (slotRegisterController.selectedDate != v) {
+                          slotRegisterController.selectedDate = v;
+                          try {
+                            Loader.startLoading();
+                            await slotRegisterController.fetchRegister();
+                          } catch (e) {
+                            showAlert('$e', AlertType.error);
+                          } finally {
+                            Loader.stopLoading();
+                          }
+                          slotRegisterController.update();
+                        }
+                      },
+                      selectedDateRange: slotRegisterController.selectedDate,
                     ),
 
                     const SizedBox(width: 10),
@@ -146,7 +181,7 @@ class _SlotRegisterState extends State<SlotRegister> {
                 Expanded(
                   child: Builder(
                     builder: (context) {
-                      final list = filteredRegister(slotRegisterController.searchTerm);
+                      final list = filteredRegister(slotRegisterController.searchTerm, showFilter);
                       return ListView.builder(
                         itemCount: list.length,
                         itemBuilder: (_, index) {

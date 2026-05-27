@@ -12,9 +12,11 @@ import '../features/Service/presentation/service_details_view.dart';
 import '../features/Service/presentation/service_view.dart';
 import '../features/accountant/history/presentation/accountant_history.dart';
 import '../features/accountant/subscription/presentation/acc_subscription_details.dart';
+import '../features/holiday/presentation/holiday_register.dart';
 import '../features/member_approve/presentation/member_approve_register.dart';
 import '../features/members/controller/member_controller.dart';
 import '../features/members/presentation/member_session_details.dart';
+import '../features/members/presentation/sub_presentation/member_booking_history.dart';
 import '../features/receptionist/schedule/presentation/daily_schedule.dart';
 import '../features/slot_details_recptionist/presentation/slot_details_receptionist.dart';
 import '../features/slot_details_trainer/presentation/slot_details_register.dart';
@@ -49,8 +51,10 @@ final List<GetPage<dynamic>> routes = [
   GetPage(name: "/staffregister", page: () => StaffRegister()),
   GetPage(name: "/dailyschedule", page: () => DailySchedule()),
   GetPage(name: "/memberapproveregister", page: () => MemberApproveRegister()),
+  GetPage(name: "/memberbookinghistory", page: () => MemberBookingHistory()),
   GetPage(name: "/paymentDetails", page: () => PaymentDetails()),
   GetPage(name: "/staff", page: () => Staff()),
+  GetPage(name: "/holidayregister", page: () => HolidayRegister()),
   GetPage(name: "/accountantHistory", page: () => AccountantHistory()),
   GetPage(name: "/userSubscriptionDetails", page: () => UserSubscriptionDetails()),
 ];

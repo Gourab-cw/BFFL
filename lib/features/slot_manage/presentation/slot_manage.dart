@@ -147,7 +147,7 @@ class _SlotManageState extends State<SlotManage> {
                   Row(
                     spacing: 5,
                     children: [
-                      TextHelper(text: "Select Month :", fontweight: FontWeight.w500, width: 110),
+                      TextHelper(text: "Select Month :", fontweight: FontWeight.w500, width: 90),
                       Expanded(
                         child: TextBox(
                           height: 35,
@@ -169,42 +169,49 @@ class _SlotManageState extends State<SlotManage> {
                           initialValue: slotController.month == null ? "" : DateFormat('MMM, yyyy').format(slotController.month!),
                         ),
                       ),
-                      ButtonHelperG(
-                        onTap: () async {
-                          await handleFillSlotClick();
-                          return;
-                          // try {
-                          //   loader.startLoading();
-                          //   await slotController.slotDataFeelFromLastMonth();
-                          // } catch (e) {
-                          //   showAlert("$e", AlertType.error);
-                          // } finally {
-                          //   loader.stopLoading();
-                          // }
-                        },
-                        height: 35,
-                        shadow: [BoxShadow(spreadRadius: 0.6, blurRadius: 0.1, color: Colors.grey.shade200)],
-                        icon: Icon(Icons.calendar_month, size: 16),
-                        type: ButtonHelperTypeG.outlined,
-                        label: TextHelper(text: "Fill Slots", fontsize: 12),
-                        width: 80,
-                        borderColor: mainStore.theme.value.mediumShadeColor,
-                      ),
-                      ButtonHelperG(
-                        onTap: () async {
-                          try {
-                            loader.startLoading();
-                            await slotController.slotDataFeel();
-                          } catch (e) {
-                            showAlert("$e", AlertType.error);
-                          } finally {
-                            loader.stopLoading();
-                          }
-                        },
-                        height: 35,
-                        icon: Icon(Icons.cloud_download, color: Colors.white, size: 16),
-                        label: TextHelper(text: "Slots", color: Colors.white, fontsize: 12),
-                        width: 80,
+                      Row(
+                        spacing: 5,
+                        children: [
+                          ButtonHelperG(
+                            margin: 3,
+                            onTap: () async {
+                              await handleFillSlotClick();
+                              return;
+                              // try {
+                              //   loader.startLoading();
+                              //   await slotController.slotDataFeelFromLastMonth();
+                              // } catch (e) {
+                              //   showAlert("$e", AlertType.error);
+                              // } finally {
+                              //   loader.stopLoading();
+                              // }
+                            },
+                            height: 35,
+                            shadow: [BoxShadow(spreadRadius: 0.6, blurRadius: 0.1, color: Colors.grey.shade200)],
+                            icon: Icon(Icons.calendar_month, size: 16),
+                            type: ButtonHelperTypeG.outlined,
+                            label: TextHelper(text: "Fill Slots", fontsize: 12),
+                            width: 80,
+                            borderColor: mainStore.theme.value.mediumShadeColor,
+                          ),
+                          ButtonHelperG(
+                            margin: 3,
+                            onTap: () async {
+                              try {
+                                loader.startLoading();
+                                await slotController.slotDataFeel();
+                              } catch (e) {
+                                showAlert("$e", AlertType.error);
+                              } finally {
+                                loader.stopLoading();
+                              }
+                            },
+                            height: 35,
+                            icon: Icon(Icons.cloud_download, color: Colors.white, size: 16),
+                            label: TextHelper(text: "Slots", color: Colors.white, fontsize: 12),
+                            width: 65,
+                          ),
+                        ],
                       ),
                     ],
                   ),

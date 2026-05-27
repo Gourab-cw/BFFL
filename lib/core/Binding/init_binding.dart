@@ -8,6 +8,7 @@ import '../../features/Service/controller/service_controller.dart';
 import '../../features/accountant/history/controller/accountant_history_controller.dart';
 import '../../features/accountant/subscription/controller/acc_subscription_controller.dart';
 import '../../features/calendar_report/controller/calendar_report_controller.dart';
+import '../../features/holiday/controller/holiday_controller.dart';
 import '../../features/home/controller/admin_home_controller.dart';
 import '../../features/home/controller/member_home_controller.dart';
 import '../../features/member_approve/controller/member_approve_controller.dart';
@@ -45,5 +46,6 @@ class InitBindings extends Bindings {
     Get.lazyPut(() => StaffController(), fenix: true);
     Get.lazyPut(() => UserSubscriptionDetailsController(), fenix: true);
     Get.lazyPut(() => StaffRegisterController(), fenix: true);
+    Get.lazyPut(() => HolidayController(), fenix: true);
   }
 }
