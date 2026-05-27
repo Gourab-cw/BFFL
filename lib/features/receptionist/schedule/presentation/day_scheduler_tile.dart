@@ -120,44 +120,41 @@ class _DaySchedulerTileState extends State<DaySchedulerTile> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      spacing: 8,
-                      children: [
-                        TextHelper(text: session.memberName ?? "", fontweight: FontWeight.w600, fontsize: 11),
-                        // TextHelper(text: session.memberContact1 == "" ? "" : ' ( ${session.memberContact1} ) ', fontsize: 11),
-                      ],
-                    ),
+                    Expanded(child: TextHelper(text: session.memberName ?? "", fontweight: FontWeight.w600, fontsize: 11,isWrap: true,)),
 
-                    Row(
-                      spacing: 8,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          padding: EdgeInsets.symmetric(vertical: 2, horizontal: 3),
-                          decoration: BoxDecoration(color: mainStore.theme.value.HeadColor.withAlpha(10), borderRadius: BorderRadius.circular(5)),
-                          child: TextHelper(
-                            text: session.hasAttend ? "Attended" : "Not Attended",
-                            fontsize: 10,
-                            fontweight: session.hasAttend ? FontWeight.w600 : FontWeight.w400,
-                            color: session.hasAttend ? mainStore.theme.value.HeadColor : null,
+                    SizedBox(
+                      width: 99.5,
+                      child: Row(
+                        spacing: 2,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            padding: EdgeInsets.symmetric(vertical: 2, horizontal: 3),
+                            decoration: BoxDecoration(color: mainStore.theme.value.HeadColor.withAlpha(10), borderRadius: BorderRadius.circular(5)),
+                            child: TextHelper(
+                              text: session.hasAttend ? "Attended" : "Not Attended",
+                              fontsize: 9,
+                              fontweight: session.hasAttend ? FontWeight.w600 : FontWeight.w400,
+                              color: session.hasAttend ? mainStore.theme.value.HeadColor : null,
+                            ),
                           ),
-                        ),
-                        if (session.memberContact1 != null && session.memberContact1 != "")
-                          ButtonHelperG(
-                            onTap: () async {
-                              try {
-                                await makePhoneCall(session.memberContact1!, context);
-                              } catch (e) {
-                                showAlert("$e", AlertType.error);
-                              }
-                            },
-                            background: mainStore.theme.value.mediumShadeColor,
-                            margin: 0,
-                            height: 30,
-                            width: 30,
-                            icon: Icon(Icons.call, size: 15),
-                          ),
-                      ],
+                          if (session.memberContact1 != null && session.memberContact1 != "")
+                            ButtonHelperG(
+                              onTap: () async {
+                                try {
+                                  await makePhoneCall(session.memberContact1!, context);
+                                } catch (e) {
+                                  showAlert("$e", AlertType.error);
+                                }
+                              },
+                              background: mainStore.theme.value.mediumShadeColor,
+                              margin: 0,
+                              height: 30,
+                              width: 30,
+                              icon: Icon(Icons.call, size: 15),
+                            ),
+                        ],
+                      ),
                     ),
                   ],
                 ),

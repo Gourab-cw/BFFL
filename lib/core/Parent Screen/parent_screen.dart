@@ -38,7 +38,7 @@ class _ParentScreenState extends State<ParentScreen> {
   final Authenticator userRef = Get.find<Authenticator>();
   late final EdgeInsets safePadding = MediaQuery.paddingOf(context);
   final List<Widget> _pages = [Home(), DailySchedule(), Members(), Attendance(), StaffRegister(), Home()];
-  final List<Widget> _branchManagerPages = [Home(), DailySchedule(), StaffRegister(), CalenderReport(), Master()];
+  final List<Widget> _branchManagerPages = [Home(), DailySchedule(), Attendance(), CalenderReport(), Master()];
   final List<Widget> _trainerPages = [HomeTrainer(), SlotDetailsRegister(), Attendance(), HomeTrainer()];
   final List<Widget> _memberPages = [HomeMember(), ServiceView(), MemberDetails()];
   final List<Widget> _adminPages = [HomeAdmin(), CalenderReport(), Master(), Attendance()];

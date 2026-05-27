@@ -36,7 +36,7 @@ class HomeController extends GetxController {
     if (auth.state == null) {
       return;
     }
-    if (auth.state!.userType == UserType.receptionist) {
+    if (auth.state!.userType == UserType.receptionist || auth.state!.userType == UserType.branchManager || auth.state!.userType == UserType.admin) {
       final db = await fb.getDB();
       if (ss == null) {
         ss = db.collection('slots').where('date', isEqualTo: DateFormat('yyyy-MM-dd').format(DateTime.now())).snapshots().listen((d) {

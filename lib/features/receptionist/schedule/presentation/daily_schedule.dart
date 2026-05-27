@@ -97,10 +97,11 @@ class _DailyScheduleState extends State<DailySchedule> {
           autoRemove: false,
           builder: (mainStore) {
             return Scaffold(
-              appBar: AppBar(title: Text("Daily Status")),
+              // appBar: AppBar(title: Text("Daily Status")),
               body: Column(
                 spacing: 6,
                 children: [
+                  TextHelper(text: "Daily Status",fontsize: 18,fontweight: FontWeight.w600,),
                   Row(
                     children: [
                       ButtonHelperG(
