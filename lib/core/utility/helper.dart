@@ -1454,6 +1454,8 @@ class _DropDownHelperGState extends State<DropDownHelperG> {
   late DropDownStore dropDownStore = Get.put(DropDownStore(), tag: widget.uniqueKey);
   MainStore mainStore = Get.find();
 
+  final ScrollController _scrollController = ScrollController();
+
   Widget multiSelectWidget(Map<String, dynamic> data) {
     return Obx(
       () => GestureDetector(
@@ -1548,17 +1550,24 @@ class _DropDownHelperGState extends State<DropDownHelperG> {
   Widget singleSelectWidget(Map<String, dynamic> data, int index) {
     return GestureDetector(
       onTap: () {
-        Timer(const Duration(milliseconds: 200), () {
-          dropDownStore.showList.value = false;
-          if (widget.onHiding != null) {
-            widget.onHiding!();
+        // Timer(const Duration(milliseconds: 200), () {
+        //   dropDownStore.showList.value = false;
+        //   if (widget.onHiding != null) {
+        //     widget.onHiding!();
+        //   }
+        // });
+        dropDownStore.showList.value = false;
+        if (widget.onHiding != null) {
+          widget.onHiding!();
+        }
+
+        Future(() {
+          if (widget.onValueChange != null) {
+            widget.onValueChange!(data);
+            // dropDownStore.selectedValue.value = makeMapSerialize(data);
+            // dropDownStore.textController.value.text = parseString(data: dropDownStore.selectedValue[widget.displayKey], defaultValue: '');
           }
         });
-        if (widget.onValueChange != null) {
-          widget.onValueChange!(data);
-          // dropDownStore.selectedValue.value = makeMapSerialize(data);
-          // dropDownStore.textController.value.text = parseString(data: dropDownStore.selectedValue[widget.displayKey], defaultValue: '');
-        }
       },
       child: widget.customRow != null
           ? widget.customRow!(makeMapSerialize(data))
@@ -1567,7 +1576,9 @@ class _DropDownHelperGState extends State<DropDownHelperG> {
               margin: EdgeInsets.symmetric(vertical: 2),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
-                color: index.isOdd
+                color: data[widget.valueKey] == widget.value?[widget.valueKey]
+                    ? mainStore.theme.value.secondaryColor
+                    : index.isOdd
                     ? mainStore.isDarkEnable.value
                           ? Colors.grey[900]
                           : Colors.grey[50]
@@ -1577,7 +1588,12 @@ class _DropDownHelperGState extends State<DropDownHelperG> {
               ),
               child: SizedBox(
                 height: widget.rowHeight,
-                child: TextHelper(isWrap: true, fontsize: widget.fontSize, text: data[widget.displayKey]),
+                child: TextHelper(
+                  isWrap: true,
+                  fontsize: widget.fontSize,
+                  color: data[widget.valueKey] == widget.value?[widget.valueKey] ? mainStore.theme.value.BackgroundColor : Colors.grey.shade800,
+                  text: data[widget.displayKey],
+                ),
               ),
             ),
     );
@@ -1639,11 +1655,11 @@ class _DropDownHelperGState extends State<DropDownHelperG> {
       dropDownStore.selectedList.value = widget.multiSelectValue ?? [];
       if (widget.value != null && widget.isMultiSelect == false && dropDownStore.init.value == false) {
         dropDownStore.textController.value.text = parseString(data: widget.value![widget.displayKey], defaultValue: '');
-        Timer(const Duration(milliseconds: 700), () {
+        Timer(const Duration(milliseconds: 300), () {
           dropDownStore.init.value = true;
         });
       }
-      Timer(const Duration(milliseconds: 500), () {
+      Timer(const Duration(milliseconds: 100), () {
         if (widget.manageRawStore != null) {
           widget.manageRawStore!(dropDownStore);
         }
@@ -1670,36 +1686,32 @@ class _DropDownHelperGState extends State<DropDownHelperG> {
     dropDownStore.list.value = widget.items;
     dropDownStore.filteredList.value = widget.items;
     dropDownStore.selectedList.value = widget.multiSelectValue ?? [];
+    // if (mounted) {
+    // if (dropDownStore.init.value) {
+    dropDownStore.textController.value.text = makeMapSerialize(widget.value).isEmpty
+        ? ''
+        : parseString(data: widget.items.firstWhereOrNull((t) => t[widget.valueKey] == widget.value![widget.valueKey])?[widget.displayKey], defaultValue: '');
+    // }
+    // }
 
-    if (mounted) {
-      if (dropDownStore.init.value) {
-        dropDownStore.textController.value.text = makeMapSerialize(widget.value).isEmpty
-            ? ''
-            : parseString(
-                data: widget.items.firstWhereOrNull((t) => t[widget.valueKey] == widget.value![widget.valueKey])?[widget.displayKey],
-                defaultValue: '',
-              );
-      }
-    }
-
-    if (makeMapSerialize(oldWidget.value)[oldWidget.valueKey] != makeMapSerialize(widget.value)[widget.valueKey]) {
-      if (mounted) {
-        dropDownStore.textController.value.text = makeMapSerialize(widget.value).isEmpty
-            ? ''
-            : parseString(
-                data: widget.items.firstWhereOrNull((t) => t[widget.valueKey] == widget.value![widget.valueKey])?[widget.displayKey],
-                defaultValue: '',
-              );
-        // if (dropDownStore.init.value) {
-        //   dropDownStore.textController.value.text = makeMapSerialize(widget.value).isEmpty
-        //       ? ''
-        //       : parseString(
-        //           data: widget.items.firstWhereOrNull((t) => t[widget.valueKey] == widget.value![widget.valueKey])?[widget.displayKey],
-        //           defaultValue: '',
-        //         );
-        // }
-      }
-    }
+    // if (makeMapSerialize(oldWidget.value)[oldWidget.valueKey] != makeMapSerialize(widget.value)[widget.valueKey]) {
+    //   if (mounted) {
+    //     dropDownStore.textController.value.text = makeMapSerialize(widget.value).isEmpty
+    //         ? ''
+    //         : parseString(
+    //             data: widget.items.firstWhereOrNull((t) => t[widget.valueKey] == widget.value![widget.valueKey])?[widget.displayKey],
+    //             defaultValue: '',
+    //           );
+    //     // if (dropDownStore.init.value) {
+    //     //   dropDownStore.textController.value.text = makeMapSerialize(widget.value).isEmpty
+    //     //       ? ''
+    //     //       : parseString(
+    //     //           data: widget.items.firstWhereOrNull((t) => t[widget.valueKey] == widget.value![widget.valueKey])?[widget.displayKey],
+    //     //           defaultValue: '',
+    //     //         );
+    //     // }
+    //   }
+    // }
 
     super.didUpdateWidget(oldWidget);
   }
@@ -1709,6 +1721,7 @@ class _DropDownHelperGState extends State<DropDownHelperG> {
     // TODO: implement dispose
     dropDownStore.init.value = false;
     Get.delete<DropDownStore>(tag: widget.uniqueKey);
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -1737,6 +1750,7 @@ class _DropDownHelperGState extends State<DropDownHelperG> {
                 children: [TextHelper(text: "No Data", fontweight: FontWeight.w400)],
               )
             : ListView.builder(
+                controller: _scrollController,
                 padding: const EdgeInsets.all(2),
                 itemCount: listMaker(dropDownStore.filteredList.value).length,
                 itemBuilder: (context, index) => widget.isMultiSelect
@@ -1800,16 +1814,24 @@ class _DropDownHelperGState extends State<DropDownHelperG> {
                 },
                 onTap: () {
                   dropDownStore.showList.value = true;
+                  int index = dropDownStore.filteredList.value.indexWhere((t) => t[widget.valueKey] == widget.value![widget.valueKey]);
+                  if (index > -1) {
+                    Future.delayed(const Duration(milliseconds: 200), () {
+                      _scrollController.animateTo(
+                        index * (widget.rowHeight + 20),
+                        duration: const Duration(milliseconds: 600),
+                        curve: Curves.fastEaseInToSlowEaseOut,
+                      );
+                    });
+                  }
                 },
                 onValueChange: (v) {
-                  EasyDebounce.debounce(widget.uniqueKey, const Duration(milliseconds: 700), () {
-                    if (v == '') {
-                      dropDownStore.filteredList.value = dropDownStore.list.value;
-                      return;
-                    }
-                    List<Map<String, dynamic>> list = dropDownStore.list.value;
-                    dropDownStore.filteredList.value = list.where((t) => t[widget.displayKey].toString().toLowerCase().contains(v.toLowerCase())).toList();
-                  });
+                  if (v == '') {
+                    dropDownStore.filteredList.value = dropDownStore.list.value;
+                    return;
+                  }
+                  List<Map<String, dynamic>> list = dropDownStore.list.value;
+                  dropDownStore.filteredList.value = list.where((t) => t[widget.displayKey].toString().toLowerCase().contains(v.toLowerCase())).toList();
                 },
                 withBorder: widget.showBorder,
                 backgroundColor: widget.lightModeBackgroundColor,

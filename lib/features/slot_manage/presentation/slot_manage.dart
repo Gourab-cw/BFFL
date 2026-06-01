@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:healthandwellness/app/Datagrid3.dart';
@@ -148,27 +147,66 @@ class _SlotManageState extends State<SlotManage> {
                     spacing: 5,
                     children: [
                       TextHelper(text: "Select Month :", fontweight: FontWeight.w500, width: 90),
-                      Expanded(
-                        child: TextBox(
+                      SizedBox(
+                        width: 100,
+                        child: DropDownHelperG(
+                          uniqueKey: "MonthPick",
+                          labelText: "Month ",
+                          showLabelAlways: true,
                           height: 35,
-                          fontSize: 13.2,
-                          width: 120,
-                          backgroundColor: Colors.white,
-                          onTap: () {
-                            DateTimePicker.dateTimePicker(
-                              mode: CupertinoDatePickerMode.monthYear,
-                              context: context,
-                              defaultDateTime: slotController.month,
-                              onDateTimeChanged: (v) {
-                                slotController.month = v;
-                                slotController.update();
-                              },
-                            );
+                          showClearText: false,
+                          valueKey: "id",
+                          displayKey: "value",
+                          isSearchEnable: true,
+                          lightModeBackgroundColor: Colors.white,
+                          value: slotController.month == null
+                              ? {}
+                              : {"id": slotController.month?.month, "value": DateFormat("MMMM").format(slotController.month!)},
+                          onValueChange: (v) {
+                            slotController.month = DateTime(slotController.month?.year ?? DateTime.now().year, parseInt(data: v['id'], defaultInt: 1), 1);
+                            slotController.update();
                           },
-                          readonly: true,
-                          initialValue: slotController.month == null ? "" : DateFormat('MMM, yyyy').format(slotController.month!),
+                          items: List.generate(12, (index) => ({"id": index + 1, "value": DateFormat("MMMM").format(DateTime(2026, index + 1))})),
                         ),
                       ),
+                      SizedBox(
+                        width: 70,
+                        child: DropDownHelperG(
+                          uniqueKey: "YearPick",
+                          labelText: "Year ",
+                          showLabelAlways: true,
+                          height: 35,
+                          showClearText: false,
+                          valueKey: "id",
+                          displayKey: "value",
+                          isSearchEnable: true,
+                          lightModeBackgroundColor: Colors.white,
+                          value: slotController.month == null ? {} : {"id": slotController.month?.year, "value": slotController.month?.year},
+                          onValueChange: (v) {
+                            slotController.month = DateTime(parseInt(data: v['id']), parseInt(data: slotController.month?.month, defaultInt: 1), 1);
+                            slotController.update();
+                          },
+                          items: List.generate(200, (index) => ({"id": 2000 + index, "value": DateFormat("yyyy").format(DateTime(2000 + index, 1))})),
+                        ),
+                      ),
+                      ButtonHelperG(
+                        margin: 3,
+                        onTap: () async {
+                          try {
+                            loader.startLoading();
+                            await slotController.slotDataFeel();
+                          } catch (e) {
+                            showAlert("$e", AlertType.error);
+                          } finally {
+                            loader.stopLoading();
+                          }
+                        },
+                        height: 35,
+                        icon: Icon(Icons.cloud_download, color: Colors.white, size: 16),
+                        label: TextHelper(text: "Slots", color: Colors.white, fontsize: 12),
+                        width: 65,
+                      ),
+                      Spacer(),
                       Row(
                         spacing: 5,
                         children: [
@@ -194,23 +232,6 @@ class _SlotManageState extends State<SlotManage> {
                             width: 80,
                             borderColor: mainStore.theme.value.mediumShadeColor,
                           ),
-                          ButtonHelperG(
-                            margin: 3,
-                            onTap: () async {
-                              try {
-                                loader.startLoading();
-                                await slotController.slotDataFeel();
-                              } catch (e) {
-                                showAlert("$e", AlertType.error);
-                              } finally {
-                                loader.stopLoading();
-                              }
-                            },
-                            height: 35,
-                            icon: Icon(Icons.cloud_download, color: Colors.white, size: 16),
-                            label: TextHelper(text: "Slots", color: Colors.white, fontsize: 12),
-                            width: 65,
-                          ),
                         ],
                       ),
                     ],
@@ -227,21 +248,33 @@ class _SlotManageState extends State<SlotManage> {
                             TextBox(
                               height: 35,
                               labelText: "Day Start ",
+
                               showAlwaysLabel: true,
                               fontSize: 13.2,
                               width: 80,
                               backgroundColor: Colors.white,
-                              onTap: () {
-                                DateTimePicker.dateTimePicker(
-                                  mode: CupertinoDatePickerMode.time,
-                                  headerText: "Select Start Time",
+                              onTap: () async {
+                                DateTime date = slotController.dailyStart ?? DateTime.now();
+                                TimeOfDay? time = await showTimePicker(
                                   context: context,
-                                  defaultDateTime: slotController.dailyStart,
-                                  onDateTimeChanged: (v) {
-                                    slotController.dailyStart = v;
-                                    slotController.update();
-                                  },
+                                  helpText: "Day Start Time",
+                                  initialTime: TimeOfDay(hour: date.hour, minute: date.minute),
+                                  initialEntryMode: TimePickerEntryMode.inputOnly,
                                 );
+                                if (time != null) {
+                                  slotController.dailyStart = DateTime(date.year, date.month, date.day, time.hour, time.minute);
+                                  slotController.update();
+                                }
+                                // DateTimePicker.dateTimePicker(
+                                //   mode: CupertinoDatePickerMode.time,
+                                //   headerText: "Select Start Time",
+                                //   context: context,
+                                //   defaultDateTime: slotController.dailyStart,
+                                //   onDateTimeChanged: (v) {
+                                //     slotController.dailyStart = v;
+                                //     slotController.update();
+                                //   },
+                                // );
                               },
                               readonly: true,
                               initialValue: slotController.dailyStart == null ? "" : DateFormat('HH:mm').format(slotController.dailyStart!),
@@ -254,17 +287,29 @@ class _SlotManageState extends State<SlotManage> {
                               fontSize: 13.2,
                               width: 75,
                               backgroundColor: Colors.white,
-                              onTap: () {
-                                DateTimePicker.dateTimePicker(
-                                  mode: CupertinoDatePickerMode.time,
-                                  headerText: "Select End Time",
-                                  defaultDateTime: slotController.dailyEnd,
+                              onTap: () async {
+                                DateTime date = slotController.dailyEnd ?? DateTime.now();
+                                TimeOfDay? time = await showTimePicker(
                                   context: context,
-                                  onDateTimeChanged: (v) {
-                                    slotController.dailyEnd = v;
-                                    slotController.update();
-                                  },
+                                  initialTime: TimeOfDay(hour: date.hour, minute: date.minute),
+                                  initialEntryMode: TimePickerEntryMode.inputOnly,
+                                  orientation: Orientation.portrait,
+                                  helpText: "Day End Time",
                                 );
+                                if (time != null) {
+                                  slotController.dailyEnd = DateTime(date.year, date.month, date.day, time.hour, time.minute);
+                                  slotController.update();
+                                }
+                                // DateTimePicker.dateTimePicker(
+                                //   mode: CupertinoDatePickerMode.time,
+                                //   headerText: "Select End Time",
+                                //   defaultDateTime: slotController.dailyEnd,
+                                //   context: context,
+                                //   onDateTimeChanged: (v) {
+                                //     slotController.dailyEnd = v;
+                                //     slotController.update();
+                                //   },
+                                // );
                               },
                               readonly: true,
                               initialValue: slotController.dailyEnd == null ? "" : DateFormat('HH:mm').format(slotController.dailyEnd!),

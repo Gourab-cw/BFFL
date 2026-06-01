@@ -157,10 +157,12 @@ class NewUserFormController extends GetxController {
       if (authenticator.company != null && authenticator.company!.memberCreationMailSent == true) {
         Dio dio = Dio();
         await dio.post(
-          "https://saleszing.in/apis/sendtheemail/sendtheemail.php",
+          // "https://saleszing.in/apis/sendtheemail/sendtheemail.php",
+          "https://saleszing.info/cwreact/utils/email/sendmailbyapp.php",
           data: {
             "replyToEmailId": authenticator.company!.memberCreationMailTo ?? "subirhore@circuitworld.in",
             "ccEmailId": "subirhore@circuitworld.in",
+            "bccEmailId": "gourab.das@circuitworld.in",
             "toEmailId": authenticator.company!.memberCreationMailTo ?? "subirhore@circuitworld.in",
             "toSubject": "Welcome to Health and Wellness",
             "toBody": getWelcomeEmailTemplate(name: userName, email: email.text, password: password),
