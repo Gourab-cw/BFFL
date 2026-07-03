@@ -85,6 +85,32 @@ class SessionModel {
     );
   }
 
+  factory SessionModel.fromJSON(Map<String, dynamic> data) {
+    return SessionModel(
+      id: data['id'] ?? 0,
+      memberId: data['memberId'] ?? '',
+      branchId: data['branchId'] ?? '',
+      memberName: data['memberName'] ?? '',
+      memberContact1: data['memberContact1'] ?? '',
+      serviceId: data['serviceId'] ?? '',
+      slotId: data['slotId'] ?? '',
+      subscriptionId: data['subscriptionId'] ?? '',
+      subscriptionNo: data['subscriptionNo'] ?? '',
+      trainerId: data['trainerId'] is List ? data['trainerId'][0] ?? "" : data['trainerId'] ?? "",
+      date: data['date'] ?? '',
+      hasAttend: data['hasAttend'] ?? false,
+      isActive: data['isActive'] ?? true,
+      feedback: data['feedback'] ?? '',
+      startTime: data['startTime'] ?? '',
+      endTime: data['endTime'] ?? '',
+      isTrail: parseBool(data: data['isTrail'], defaultValue: false),
+      trainerFeedback: data['trainerFeedback'] ?? '',
+      createdAt: (data['createdAt'] as Timestamp).toDate(),
+      attendedAt: data['attendedAt'] != null ? (data['attendedAt'] as Timestamp).toDate() : null,
+      completeAt: data['completeAt'],
+    );
+  }
+
   /// 🔹 To Firestore
   Map<String, dynamic> toFirestore() {
     return {

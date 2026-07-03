@@ -3,8 +3,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:healthandwellness/core/utility/firebase_service.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
+import 'package:healthandwellness/features/Service/data/session_model.dart';
 import 'package:healthandwellness/features/holiday/data/holiday.dart';
 import 'package:healthandwellness/features/login/repository/authenticator.dart';
+import 'package:healthandwellness/features/members/controller/member_controller.dart';
 import 'package:healthandwellness/features/subscriptions/controller/subscription_controller.dart';
 import 'package:intl/intl.dart';
 import 'package:ulid/ulid.dart';
@@ -27,6 +29,7 @@ class SlotController extends GetxController {
   DateTime? dailyEnd;
   List<Map<String, dynamic>> slotData = <Map<String, dynamic>>[];
 
+  MemberController memberController = Get.find<MemberController>();
   List<SlotModel> slots = [];
 
   List<HolidayModel> holidayList = [];
@@ -50,6 +53,41 @@ class SlotController extends GetxController {
       }
       return m;
     }).toList();
+  }
+
+  Future<void> bookedMemberFill() async {
+    if (month == null) {
+      showAlert("Select a month to continue!", AlertType.error);
+      return;
+    }
+    final fb = Get.find<FB>();
+    final db = await fb.getDB();
+
+    Map<String, List<String>> dateWiseDate = {};
+    for (SlotModel s in slots) {
+      dateWiseDate.putIfAbsent(s.date, () => []);
+      dateWiseDate[s.date]!.add(s.startTime);
+    }
+    List<SessionModel> sessions = [];
+    if (dateWiseDate.isNotEmpty) {
+      await Future.wait(
+        dateWiseDate.entries.map((e) async {
+          final sessionResp = await db.collection('session').where('date', isEqualTo: e.key).where('startTime', whereIn: List.of(e.value.toSet())).get();
+          sessions = [...sessions, ...sessionResp.docs.map((m) => SessionModel.fromFirestore(m))];
+        }),
+      );
+    }
+
+    slots = slots.map((s) => s.copyWith(sessions: sessions.where((m) => m.slotId == s.id).toList())).toList();
+    List<String> memberIds = slots.map((m) => m.sessions.map((s) => s.memberId).toList()).expand((element) => element).toList();
+    final members = memberIds.isEmpty ? [] : await memberController.getMembersById(List.of(Set.of(memberIds)), db);
+
+    slots = slots
+        .map(
+          (s) => s.copyWith(sessions: s.sessions.map((m) => m.copyWith(memberName: members.firstWhereOrNull((e) => e.id == m.memberId)?.name ?? "")).toList()),
+        )
+        .toList();
+    update();
   }
 
   Future<void> slotDataFeel() async {
@@ -89,7 +127,7 @@ class SlotController extends GetxController {
     slots = (await db.collection('slots').where('date', isGreaterThanOrEqualTo: startDate).where('date', isLessThan: endDate).get()).docs
         .map((m) => SlotModel.fromFirestore(m))
         .toList();
-    update();
+    await bookedMemberFill();
   }
 
   Future<void> slotDataFeelFromLastMonth() async {

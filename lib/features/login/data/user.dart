@@ -73,6 +73,12 @@ class UserG {
   String referredById;
   String referredByName;
 
+  String referredByMail;
+  String referredByContact;
+
+  double balance;
+  String token;
+  List<dynamic> documents;
   UserG({
     required this.id,
     required this.isApproved,
@@ -90,7 +96,7 @@ class UserG {
     required this.userType,
     required this.memberType,
     required this.withGST,
-
+    required this.balance,
     // new
     required this.dob,
     required this.age,
@@ -115,6 +121,11 @@ class UserG {
     required this.referredById,
     required this.referredByName,
     required this.profileImage,
+
+    required this.documents,
+    required this.token,
+    this.referredByMail = '',
+    this.referredByContact = '',
   });
 
   factory UserG.fromJSON(Map<String, dynamic> data) {
@@ -152,15 +163,20 @@ class UserG {
       nationality: parseString(data: data["nationality"], defaultValue: ""),
       country: parseString(data: data["country"], defaultValue: ""),
       profession: parseString(data: data["profession"], defaultValue: ""),
-      maritalStatusId: parseString(data: data["maritialStatus"], defaultValue: ""),
+      maritalStatusId: parseString(data: data["maritalStatusId"], defaultValue: ""),
       services: (data["services"] as List?)?.map((e) => e.toString()).toList() ?? [],
       medicalCondition: parseString(data: data["medicalCondition"], defaultValue: ""),
       medication: parseString(data: data["medication"], defaultValue: ""),
       physicalExercise: parseString(data: data["physicalExercise"], defaultValue: ""),
       diet: parseString(data: data["diet"], defaultValue: ""),
-      referredById: parseString(data: data["referredBy"], defaultValue: ""),
-      referredByName: parseString(data: data["referredByname"], defaultValue: ""),
+      referredById: parseString(data: data["referredById"], defaultValue: ""),
+      referredByName: parseString(data: data["referredByName"], defaultValue: ""),
       profileImage: parseString(data: data["profileImage"], defaultValue: ""),
+      referredByContact: parseString(data: data['referredByContact'], defaultValue: ''),
+      referredByMail: parseString(data: data['referredByMail'], defaultValue: ''),
+      token: parseString(data: data['token'], defaultValue: ''),
+      balance: parseDouble(data: data['balance'], defaultValue: 0),
+      documents: (data["documents"] as List?)?.map((e) => e).toList() ?? [],
     );
   }
 
@@ -205,6 +221,11 @@ class UserG {
     String? referredByName,
     String? profileImage,
     bool? withGST,
+    String? referredByMail,
+    String? referredByContact,
+    String? token,
+    List<dynamic>? documents,
+    double? balance,
   }) {
     return UserG(
       id: id ?? this.id,
@@ -246,6 +267,11 @@ class UserG {
       referredByName: referredByName ?? this.referredByName,
       profileImage: profileImage ?? this.profileImage,
       withGST: withGST ?? this.withGST,
+      referredByMail: referredByMail ?? this.referredByMail,
+      referredByContact: referredByContact ?? this.referredByContact,
+      token: token ?? this.token,
+      documents: documents ?? this.documents,
+      balance: balance ?? this.balance,
     );
   }
 
@@ -292,6 +318,11 @@ class UserG {
       "referredBy": referredById,
       "referredByname": referredByName,
       "profileImage": profileImage,
+      "documents": documents,
+      "referredByMail": referredByMail,
+      "referredByContact": referredByContact,
+      "token": token,
+      "balance": balance,
     };
     if (userType == UserType.chargesLedger) {
       data['withGST'] = withGST;

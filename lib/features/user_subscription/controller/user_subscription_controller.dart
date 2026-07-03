@@ -203,6 +203,7 @@ class UserSubscriptionController extends GetxController {
         'updatedAt': now,
       });
 
+      batch.update(db.collection('User').doc(f.userId), {'balance': FieldValue.increment(-f.netAmount)});
       batch.set(ref.doc(f.id), {...f.toJSON(), 'companyId': auth.state!.companyId, 'createdBy': auth.state!.id});
     }
     // int count = ((await db.collection('userSubscription').count().get()).count) ?? 0;

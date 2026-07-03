@@ -109,7 +109,19 @@ class _HomeState extends State<Home> {
                                 ),
                               ],
                             ),
-                            ButtonHelperG(background: Colors.transparent, icon: Icon(Icons.search)),
+                            ButtonHelperG(
+                              onTap: () async {
+                                // try {
+                                //   final fb = Get.find<FB>();
+                                //   await fb.sendNotification("Test", "Test body");
+                                //   showAlert("Notification sent", AlertType.success);
+                                // } catch (e) {
+                                //   showAlert('$e', AlertType.error);
+                                // }
+                              },
+                              background: Colors.transparent,
+                              icon: Icon(Icons.search),
+                            ),
                           ],
                         ),
                         Expanded(

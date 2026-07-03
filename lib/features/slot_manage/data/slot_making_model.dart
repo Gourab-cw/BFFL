@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
+import 'package:healthandwellness/features/Service/data/session_model.dart';
 import 'package:intl/intl.dart';
 
 class SlotModel {
@@ -22,6 +23,8 @@ class SlotModel {
   final Timestamp createdAt;
   final Timestamp? trainerStartTime;
 
+  final List<SessionModel> sessions;
+
   const SlotModel({
     required this.id,
     required this.serviceId,
@@ -41,7 +44,8 @@ class SlotModel {
     required this.completeAt,
     required this.createdAt,
     this.trainerStartTime,
-  });
+    List<SessionModel>? sessions,
+  }) : sessions = sessions ?? const [];
 
   /// 🔹 From Firestore
   factory SlotModel.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
@@ -65,6 +69,7 @@ class SlotModel {
       createdAt: data['createdAt'] ?? Timestamp.now(),
       trainerStartTime: data['trainerStartTime'],
       trainerRemarks: data['trainerRemarks'],
+      sessions: [],
     );
   }
 
@@ -88,6 +93,7 @@ class SlotModel {
       createdAt: data['createdAt'] ?? Timestamp.now(),
       trainerStartTime: data['trainerStartTime'],
       trainerRemarks: data['trainerRemarks'],
+      sessions: makeListSerialize(data['sessions']).map((m) => SessionModel.fromJSON(m)).toList(),
     );
   }
 
@@ -110,6 +116,7 @@ class SlotModel {
     DateTime? completeAt,
     DateTime? createdAt,
     DateTime? trainerStartTime,
+    List<SessionModel>? sessions,
   }) {
     return SlotModel(
       id: id ?? this.id,
@@ -130,6 +137,7 @@ class SlotModel {
       trainerStartTime: trainerStartTime == null ? this.trainerStartTime : Timestamp.fromDate(trainerStartTime!),
       createdAt: createdAt == null ? this.createdAt : Timestamp.fromDate(createdAt),
       trainerRemarks: trainerRemarks ?? this.trainerRemarks,
+      sessions: sessions ?? this.sessions,
     );
   }
 
@@ -154,6 +162,31 @@ class SlotModel {
       'createdAt': createdAt,
       'trainerStartTime': trainerStartTime,
       'trainerRemarks': trainerRemarks,
+    };
+  }
+
+  /// To JSON
+  Map<String, dynamic> toJSON() {
+    return {
+      'id': id,
+      'branchId': branchId,
+      'companyId': companyId,
+      'serviceId': serviceId,
+      'date': date,
+      'month': month,
+      'startTime': startTime,
+      'endTime': endTime,
+      'trainerId': trainerId,
+      'trainerName': trainerName,
+      'bookingCount': bookingCount,
+      'totalAttend': totalAttend,
+      'hasComplete': hasComplete,
+      'completeAt': completeAt,
+      'isActive': isActive,
+      'createdAt': createdAt,
+      'trainerStartTime': trainerStartTime,
+      'trainerRemarks': trainerRemarks,
+      'session': sessions.map((m) => m.toFirestore()).toList(),
     };
   }
 }

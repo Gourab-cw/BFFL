@@ -12,6 +12,8 @@ import 'package:healthandwellness/features/login/repository/authenticator.dart';
 import 'package:healthandwellness/features/slot_manage/data/slot_making_model.dart';
 import 'package:intl/intl.dart';
 
+import '../../Service/data/service.dart';
+
 class SlotDetailsController extends GetxController {
   SlotModel? slot;
   List<SessionModel> sessions = [];
@@ -208,6 +210,61 @@ class SlotDetailsController extends GetxController {
       users[makeMapSerialize(f.data())['id'] ?? ""] = makeMapSerialize(f.data())['name'] ?? "";
     });
     sessions = sessions.map((m) => m.copyWith(memberName: users[m.memberId])).toList();
+  }
+
+  Future<List<UserG>> getOtherTrainers(SlotModel s) async {
+    final fb = Get.find<FB>();
+    final db = await fb.getDB();
+    String serviceId = s.serviceId;
+    final serviceResp = await db.collection('Subscription').doc(serviceId).get();
+    final serviceData = makeMapSerialize(serviceResp.data());
+    if (serviceData.isEmpty) {
+      return [];
+    }
+    final service = ServiceModel.fromJson(serviceData);
+    final trainerIds = service.trainerId.where((t) => t != s.trainerId);
+    if (trainerIds.isEmpty) {
+      return [];
+    }
+    final resp1 = await db.collection("User").where('id', whereIn: trainerIds.toList()).where('isActive', isEqualTo: true).get();
+    List<UserG> users = [];
+    for (var f in resp1.docs) {
+      users.add(UserG.fromJSON(makeMapSerialize(f.data())));
+    }
+    return users;
+  }
+
+  Future<void> updateSlotData(SlotModel s, String serviceName, String trainerId, String trainerName, String trainerToken) async {
+    final fb = Get.find<FB>();
+    final db = await fb.getDB();
+    await db.collection('slots').doc(s.id).update({'trainerId': trainerId});
+    slot = SlotModel.fromFirestore(await db.collection('slots').doc(s.id).get());
+    update();
+
+    final users = await db
+        .collection("User")
+        .where("userType", whereIn: ["Fj3WvG9DjgG6ve0Xw3SF", "qeTcMMfWb1zzLwsNZDZW"])
+        .where('isActive', isEqualTo: true)
+        .get();
+    List<String> tokens = [];
+    List<String> memberTokens = [];
+    for (var user in users.docs) {
+      tokens.add(makeMapSerialize(user.data())["token"]);
+    }
+    final sessionData = await db.collection('session').where('slotId', isEqualTo: s.id).where('isActive', isEqualTo: true).get();
+    final bookedMemberIds = sessionData.docs.map((m) => SessionModel.fromFirestore(m)).map((m) => m.memberId).toList();
+    if (bookedMemberIds.isNotEmpty) {
+      final memberData = await db.collection('User').where('id', whereIn: bookedMemberIds).where('isActive', isEqualTo: true).get();
+      memberTokens = memberData.docs.map((m) => makeMapSerialize(m.data())["token"]).whereType<String>().toList();
+    }
+
+    await Future.wait(
+      <String>{...tokens, ...memberTokens}.toList().map((t) async {
+        return fb.sendNotification(t, "New Trainer Assigned", "$trainerName has been assigned to ${s.date} ${s.startTime}-${s.endTime} slot ( $serviceName )");
+      }),
+    );
+
+    await fb.sendNotification(trainerToken, "New Slot Assigned", "You have been assigned to ${s.date} ${s.startTime}-${s.endTime} slot ( $serviceName )");
   }
 
   @override

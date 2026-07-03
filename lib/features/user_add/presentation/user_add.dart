@@ -8,6 +8,7 @@ import 'package:healthandwellness/core/Picklist/picklist_provider.dart';
 import 'package:healthandwellness/core/utility/app_loader.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
 import 'package:healthandwellness/features/user_add/controller/new_user_form_controller.dart';
+import 'package:healthandwellness/features/user_add/presentation/user_add_document_section.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:moon_design/moon_design.dart';
@@ -108,8 +109,8 @@ class _UserAddState extends State<UserAdd> {
                             borderRadius: BorderRadius.circular(14),
                             clipBehavior: Clip.hardEdge,
                             child: Container(
-                              width: 150,
-                              height: 150,
+                              width: 120,
+                              height: 120,
                               decoration: BoxDecoration(color: Colors.green.shade50),
                               child: c.image == null
                                   ? Center(
@@ -117,16 +118,21 @@ class _UserAddState extends State<UserAdd> {
                                         mainAxisSize: MainAxisSize.min,
                                         crossAxisAlignment: CrossAxisAlignment.center,
                                         children: [
-                                          Icon(Icons.camera_alt, color: Colors.grey[700]),
-                                          TextHelper(text: "Click to select image", textalign: TextAlign.center),
+                                          Icon(Icons.camera_alt, color: Colors.grey[700], size: 20),
+                                          TextHelper(text: "Click to select image", textalign: TextAlign.center, fontsize: 10),
                                         ],
                                       ),
                                     )
-                                  : Image.file(File(c.image!.path), fit: BoxFit.cover),
+                                  : c.image is String
+                                  ? Image.network(c.image!, fit: BoxFit.cover)
+                                  : c.image is XFile
+                                  ? Image.file(File(c.image!.path), fit: BoxFit.cover)
+                                  : SizedBox.shrink(),
                             ),
                           ),
                         ),
                         Divider(color: Colors.blueGrey.shade100),
+                        DocumentSection(),
                         MoonAccordion(
                           autofocus: false,
                           hasContentOutside: true,
@@ -170,7 +176,7 @@ class _UserAddState extends State<UserAdd> {
                                     c.update();
                                   },
                                   firstDate: DateTime(1900),
-                                  lastDate: DateTime.now(),
+                                  lastDate: DateTime(DateTime.now().year - 5, DateTime.now().month, DateTime.now().day),
                                 ),
                               ],
                             ),

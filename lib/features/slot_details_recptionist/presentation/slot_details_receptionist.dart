@@ -3,13 +3,21 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:healthandwellness/app/mainstore.dart';
+import 'package:healthandwellness/core/utility/app_loader.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
+import 'package:healthandwellness/features/Service/controller/service_controller.dart';
 import 'package:healthandwellness/features/Service/data/service.dart';
+import 'package:healthandwellness/features/login/data/user.dart';
+import 'package:healthandwellness/features/login/repository/authenticator.dart';
+import 'package:healthandwellness/features/slot_details_recptionist/presentation/trainer_change_popup.dart';
 import 'package:healthandwellness/features/slot_details_trainer/controller/slot_details_controller.dart';
 import 'package:healthandwellness/features/slot_manage/data/slot_making_model.dart';
 import 'package:healthandwellness/features/subscriptions/controller/subscription_controller.dart';
 import 'package:intl/intl.dart';
 import 'package:moon_design/moon_design.dart';
+
+import '../../../core/utility/firebase_service.dart';
+import '../../Service/data/session_model.dart';
 
 class SlotDetailsReceptionist extends StatefulWidget {
   const SlotDetailsReceptionist({super.key});
@@ -22,6 +30,35 @@ class _SlotDetailsReceptionistState extends State<SlotDetailsReceptionist> {
   final mainStore = Get.find<MainStore>();
   final slotDetailsController = Get.find<SlotDetailsController>();
   final sc = Get.find<SubscriptionController>();
+
+  final ServiceController serviceController = Get.find<ServiceController>();
+
+  final auth = Get.find<Authenticator>();
+
+  final fb = Get.find<FB>();
+
+  Future<void> getSessions() async {}
+
+  Future<void> goForReschedule(SessionModel booking) async {
+    final db = await fb.getDB();
+    serviceController.selectedReschedule = booking;
+    serviceController.selectedMember = {"id": booking.memberId, "name": booking.memberName};
+    await serviceController.getServiceDetails(booking.serviceId, auth.state!.branchId, isReschedule: true);
+    ServiceModel sv = ServiceModel.fromJson(makeMapSerialize((await db.collection('Subscription').doc(booking.serviceId).get()).data()));
+    serviceController.selectedService = sv;
+    if (!serviceController.services.any((s) => s.id == sv.id)) {
+      serviceController.services.add(sv);
+    }
+    List<String> trainers = serviceController.selectedService!.trainerId;
+    final resp1 = await db.collection("User").where('id', whereIn: trainers).get();
+    List<UserG> trainser_users = resp1.docs.map((m) => UserG.fromJSON(makeMapSerialize(m.data()))).toList();
+    for (var f in trainser_users) {
+      if (!serviceController.trainers.any((a) => a.id == f.id)) {
+        serviceController.trainers.add(f);
+      }
+    }
+    Get.toNamed('/servicedetailsview?isReschedule=1', arguments: getSessions);
+  }
 
   @override
   void initState() {
@@ -40,7 +77,6 @@ class _SlotDetailsReceptionistState extends State<SlotDetailsReceptionist> {
         slotDetailsController.sessionListener = null;
       }
     });
-
     super.dispose();
   }
 
@@ -117,276 +153,354 @@ class _SlotDetailsReceptionistState extends State<SlotDetailsReceptionist> {
       autoRemove: false,
       init: slotDetailsController,
       builder: (slotDetailsController) {
-        return Scaffold(
-          appBar: AppBar(title: Text("Details")),
-          body: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10),
-            child: Column(
-              spacing: 1,
-              children: [
-                Builder(
-                  builder: (context) {
-                    ServiceModel? s = sc.list.firstWhereOrNull((f) => f.id == slotDetailsController.slot!.serviceId);
-                    if (s == null) {
-                      return Text("No service found");
-                    }
-                    return Row(
-                      spacing: 15,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        getServiceLogo(slotDetailsController.slot!.serviceId),
-                        Expanded(
-                          child: Column(
-                            spacing: 1,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              TextHelper(text: s.name, fontsize: 18, fontweight: FontWeight.w700),
-                              Column(
-                                spacing: 3,
-                                children: [
-                                  Row(
-                                    spacing: 10,
-                                    children: [
-                                      Icon(Icons.calendar_month, color: mainStore.theme.value.HeadColor.withAlpha(160), size: 16),
-                                      TextHelper(
-                                        color: mainStore.theme.value.HeadColor.withAlpha(200),
-                                        fontweight: FontWeight.w600,
-                                        fontsize: 12,
-                                        text: parseDateToString(
-                                          data: slotDetailsController.slot!.date,
-                                          formatDate: 'EEE, dd-MM-yyyy',
-                                          predefinedDateFormat: 'yyyy-MM-dd',
-                                          defaultValue: '',
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Row(
-                                    spacing: 10,
-                                    children: [
-                                      Icon(Icons.watch_later, color: mainStore.theme.value.HeadColor.withAlpha(160), size: 16),
-                                      TextHelper(
-                                        color: mainStore.theme.value.HeadColor.withAlpha(200),
-                                        fontweight: FontWeight.w600,
-                                        fontsize: 12,
-                                        text: '${slotDetailsController.slot!.startTime} - ${slotDetailsController.slot!.endTime}',
-                                      ),
-                                    ],
-                                  ),
-                                  Row(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    spacing: 10,
-                                    children: [
-                                      Icon(FontAwesomeIcons.userDoctor, color: mainStore.theme.value.HeadColor.withAlpha(160), size: 16),
-                                      TextHelper(
-                                        color: mainStore.theme.value.HeadColor.withAlpha(200),
-                                        fontweight: FontWeight.w600,
-                                        text: slotDetailsController.slot!.trainerName ?? "",
-                                        fontsize: 12,
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ],
+        bool showTrainerChange = true;
+        if (slotDetailsController.slot == null) {
+          showTrainerChange = false;
+          return AppLoader(
+            child: Scaffold(
+              appBar: AppBar(
+                title: Text("Details"),
+                actions: [
+                  if (showTrainerChange)
+                    ButtonHelperG(
+                      onTap: () async {
+                        await trainerChangePopup(
+                          context: context,
+                          slot: slotDetailsController.slot!,
+                          serviceName: parseString(
+                            data: sc.list.firstWhereOrNull((f) => f.id == slotDetailsController.slot!.serviceId)?.name,
+                            defaultValue: "",
                           ),
-                        ),
-                      ],
-                    );
-                  },
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Container(
-                      width: 150,
-                      padding: EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: mainStore.theme.value.lowShadeColor,
-                        border: Border.all(color: mainStore.theme.value.mediumShadeColor),
-                      ),
-                      child: Column(
-                        spacing: 5,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          TextHelper(text: 'Started At', fontsize: 11.5),
-                          Row(
-                            spacing: 10,
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Icon(Icons.watch_later_rounded, size: 15),
-                              TextHelper(
-                                text: slotDetailsController.slot!.trainerStartTime == null
-                                    ? "__:__"
-                                    : DateFormat('HH:mm').format(slotDetailsController.slot!.trainerStartTime!.toDate()),
-                                textalign: TextAlign.right,
-                                fontsize: 17,
-                                fontweight: FontWeight.w600,
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
+                        );
+                      },
+                      icon: Icon(Icons.refresh),
+                      label: TextHelper(text: "Change Trainer", color: mainStore.theme.value.BackgroundColor),
+                      width: 140,
+                      shadow: [],
                     ),
-                    Container(
-                      width: 150,
-                      padding: EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: mainStore.theme.value.lowShadeColor,
-                        border: Border.all(color: mainStore.theme.value.mediumShadeColor),
-                      ),
-                      child: Column(
-                        spacing: 5,
-                        mainAxisSize: MainAxisSize.min,
+                ],
+              ),
+              body: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10),
+                child: TextHelper(text: "No slot found!", textalign: TextAlign.center),
+              ),
+            ),
+          );
+        }
+        int endTime = parseInt(data: (slotDetailsController.slot!.date + slotDetailsController.slot!.endTime).replaceAll('-', '').replaceAll(':', ''));
+        if (endTime <= parseInt(data: DateFormat('yyyyMMddHHmm').format(DateTime.now()))) {
+          showTrainerChange = false;
+        }
+        return AppLoader(
+          child: Scaffold(
+            appBar: AppBar(
+              title: Text("Details"),
+              actions: [
+                if (showTrainerChange)
+                  ButtonHelperG(
+                    onTap: () async {
+                      await trainerChangePopup(
+                        context: context,
+                        slot: slotDetailsController.slot!,
+                        serviceName: parseString(data: sc.list.firstWhereOrNull((f) => f.id == slotDetailsController.slot!.serviceId)?.name, defaultValue: ""),
+                      );
+                    },
+                    icon: Icon(Icons.refresh),
+                    label: TextHelper(text: "Change Trainer", color: mainStore.theme.value.BackgroundColor),
+                    width: 140,
+                    shadow: [],
+                  ),
+              ],
+            ),
+            body: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10),
+              child: Column(
+                spacing: 1,
+                children: [
+                  Builder(
+                    builder: (context) {
+                      ServiceModel? s = sc.list.firstWhereOrNull((f) => f.id == slotDetailsController.slot!.serviceId);
+                      if (s == null) {
+                        return Text("No service found");
+                      }
+                      return Row(
+                        spacing: 15,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          TextHelper(text: 'Completed At', fontsize: 11.5),
-                          Row(
-                            spacing: 10,
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Icon(Icons.watch_later_rounded, size: 15),
-                              TextHelper(
-                                text: slotDetailsController.slot!.completeAt == null
-                                    ? "__:__"
-                                    : DateFormat('HH:mm').format(slotDetailsController.slot!.completeAt!.toDate()),
-                                textalign: TextAlign.right,
-                                fontsize: 17,
-                                fontweight: FontWeight.w600,
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                Divider(),
-                Row(
-                  children: [TextHelper(text: "Booking List", fontsize: 15, fontweight: FontWeight.w600)],
-                ),
-                Expanded(
-                  child: Container(
-                    color: mainStore.theme.value.lowShadeColor,
-                    padding: EdgeInsets.all(8),
-                    child: ListView.builder(
-                      itemCount: slotDetailsController.sessions.length,
-                      itemBuilder: (_, index) {
-                        final s = slotDetailsController.sessions[index];
-                        return Container(
-                          margin: EdgeInsets.symmetric(vertical: 8),
-                          padding: EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: mainStore.theme.value.mediumShadeColor),
-                          ),
-                          child: Column(
-                            spacing: 10,
-                            children: [
-                              Row(
-                                spacing: 10,
-                                children: [
-                                  getNameIcon(s.memberName ?? "", color: mainStore.theme.value.mediumShadeColor),
-                                  Column(
-                                    spacing: 5,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      TextHelper(text: s.memberName ?? "", fontweight: FontWeight.w600, fontsize: 13),
-                                      Row(
-                                        children: [
-                                          Container(
-                                            padding: EdgeInsets.symmetric(horizontal: 6),
-                                            decoration: BoxDecoration(
-                                              color: s.hasAttend ? Colors.green.shade50 : Colors.red.shade50,
-                                              borderRadius: BorderRadius.circular(10),
-                                            ),
-                                            child: Row(
-                                              crossAxisAlignment: CrossAxisAlignment.center,
-                                              spacing: 3,
-                                              children: [
-                                                Icon(
-                                                  s.hasAttend ? Icons.check_circle : Icons.close_rounded,
-                                                  size: 11.5,
-                                                  color: s.hasAttend ? Colors.green.shade700 : Colors.red,
-                                                ),
-                                                TextHelper(
-                                                  text: s.hasAttend ? "Attended" : "Not Attended",
-                                                  fontsize: 9.5,
-                                                  color: s.hasAttend ? Colors.green.shade700 : Colors.red.shade400,
-                                                  fontweight: FontWeight.w600,
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          const SizedBox(width: 10),
-                                          TextHelper(
-                                            text: s.attendedAt == null ? '' : DateFormat('HH:mm a').format(s.attendedAt!),
-                                            fontsize: 11,
-                                            fontweight: FontWeight.w600,
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              Container(
-                                padding: EdgeInsets.symmetric(vertical: 8, horizontal: 15),
-                                margin: EdgeInsets.all(5),
-                                decoration: BoxDecoration(
-                                  border: Border(left: BorderSide(color: mainStore.theme.value.HeadColor, width: 4)),
-                                  borderRadius: BorderRadius.circular(7),
-                                  color: mainStore.theme.value.BackgroundShadeColor,
-                                ),
-                                child: Column(
-                                  spacing: 10,
+                          getServiceLogo(slotDetailsController.slot!.serviceId),
+                          Expanded(
+                            child: Column(
+                              spacing: 1,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                TextHelper(text: s.name, fontsize: 18, fontweight: FontWeight.w700),
+                                Column(
+                                  spacing: 3,
                                   children: [
-                                    TextHelper(
-                                      text: "Feedback",
-                                      fontweight: FontWeight.w600,
-                                      fontsize: 11,
-                                      color: mainStore.theme.value.HeadColor.withAlpha(180),
-                                    ),
                                     Row(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      spacing: 10,
                                       children: [
-                                        SizedBox(width: 28, child: Icon(MoonIcons.generic_user_24_regular, size: 20)),
-                                        Expanded(
-                                          child: Container(
-                                            padding: EdgeInsets.all(3),
-                                            color: mainStore.theme.value.BackgroundColor,
-                                            child: TextHelper(text: s.feedback, fontsize: 11, fontweight: FontWeight.w600, isWrap: true),
+                                        Icon(Icons.calendar_month, color: mainStore.theme.value.HeadColor.withAlpha(160), size: 16),
+                                        TextHelper(
+                                          color: mainStore.theme.value.HeadColor.withAlpha(200),
+                                          fontweight: FontWeight.w600,
+                                          fontsize: 12,
+                                          text: parseDateToString(
+                                            data: slotDetailsController.slot!.date,
+                                            formatDate: 'EEE, dd-MM-yyyy',
+                                            predefinedDateFormat: 'yyyy-MM-dd',
+                                            defaultValue: '',
                                           ),
                                         ),
                                       ],
                                     ),
                                     Row(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      spacing: 10,
                                       children: [
-                                        SizedBox(width: 28, child: Icon(FontAwesomeIcons.userDoctor, size: 16)),
-                                        Expanded(
-                                          child: Container(
-                                            padding: EdgeInsets.all(3),
-                                            color: mainStore.theme.value.BackgroundColor,
-                                            child: TextHelper(text: s.trainerFeedback, fontsize: 11, fontweight: FontWeight.w600, isWrap: true),
-                                          ),
+                                        Icon(Icons.watch_later, color: mainStore.theme.value.HeadColor.withAlpha(160), size: 16),
+                                        TextHelper(
+                                          color: mainStore.theme.value.HeadColor.withAlpha(200),
+                                          fontweight: FontWeight.w600,
+                                          fontsize: 12,
+                                          text: '${slotDetailsController.slot!.startTime} - ${slotDetailsController.slot!.endTime}',
+                                        ),
+                                      ],
+                                    ),
+                                    Row(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      spacing: 10,
+                                      children: [
+                                        Icon(FontAwesomeIcons.userDoctor, color: mainStore.theme.value.HeadColor.withAlpha(160), size: 16),
+                                        TextHelper(
+                                          color: mainStore.theme.value.HeadColor.withAlpha(200),
+                                          fontweight: FontWeight.w600,
+                                          text: slotDetailsController.slot!.trainerName ?? "",
+                                          fontsize: 12,
                                         ),
                                       ],
                                     ),
                                   ],
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        );
-                      },
+                        ],
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Container(
+                        width: 150,
+                        padding: EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: mainStore.theme.value.lowShadeColor,
+                          border: Border.all(color: mainStore.theme.value.mediumShadeColor),
+                        ),
+                        child: Column(
+                          spacing: 5,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            TextHelper(text: 'Started At', fontsize: 11.5),
+                            Row(
+                              spacing: 10,
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Icon(Icons.watch_later_rounded, size: 15),
+                                TextHelper(
+                                  text: slotDetailsController.slot!.trainerStartTime == null
+                                      ? "__:__"
+                                      : DateFormat('HH:mm').format(slotDetailsController.slot!.trainerStartTime!.toDate()),
+                                  textalign: TextAlign.right,
+                                  fontsize: 17,
+                                  fontweight: FontWeight.w600,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        width: 150,
+                        padding: EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: mainStore.theme.value.lowShadeColor,
+                          border: Border.all(color: mainStore.theme.value.mediumShadeColor),
+                        ),
+                        child: Column(
+                          spacing: 5,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            TextHelper(text: 'Completed At', fontsize: 11.5),
+                            Row(
+                              spacing: 10,
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Icon(Icons.watch_later_rounded, size: 15),
+                                TextHelper(
+                                  text: slotDetailsController.slot!.completeAt == null
+                                      ? "__:__"
+                                      : DateFormat('HH:mm').format(slotDetailsController.slot!.completeAt!.toDate()),
+                                  textalign: TextAlign.right,
+                                  fontsize: 17,
+                                  fontweight: FontWeight.w600,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  Divider(),
+                  Row(
+                    children: [TextHelper(text: "Booking List", fontsize: 15, fontweight: FontWeight.w600)],
+                  ),
+                  Expanded(
+                    child: Container(
+                      color: mainStore.theme.value.lowShadeColor,
+                      padding: EdgeInsets.all(8),
+                      child: ListView.builder(
+                        itemCount: slotDetailsController.sessions.length,
+                        itemBuilder: (_, index) {
+                          final s = slotDetailsController.sessions[index];
+                          return Container(
+                            margin: EdgeInsets.symmetric(vertical: 8),
+                            padding: EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: mainStore.theme.value.mediumShadeColor),
+                            ),
+                            child: Column(
+                              spacing: 10,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      spacing: 10,
+                                      children: [
+                                        getNameIcon(s.memberName ?? "", color: mainStore.theme.value.mediumShadeColor),
+                                        Column(
+                                          spacing: 5,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            TextHelper(text: s.memberName ?? "", fontweight: FontWeight.w600, fontsize: 13),
+                                            Row(
+                                              children: [
+                                                Container(
+                                                  padding: EdgeInsets.symmetric(horizontal: 6),
+                                                  decoration: BoxDecoration(
+                                                    color: s.hasAttend ? Colors.green.shade50 : Colors.red.shade50,
+                                                    borderRadius: BorderRadius.circular(10),
+                                                  ),
+                                                  child: Row(
+                                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                                    spacing: 3,
+                                                    children: [
+                                                      Icon(
+                                                        s.hasAttend ? Icons.check_circle : Icons.close_rounded,
+                                                        size: 11.5,
+                                                        color: s.hasAttend ? Colors.green.shade700 : Colors.red,
+                                                      ),
+                                                      TextHelper(
+                                                        text: s.hasAttend ? "Attended" : "Not Attended",
+                                                        fontsize: 9.5,
+                                                        color: s.hasAttend ? Colors.green.shade700 : Colors.red.shade400,
+                                                        fontweight: FontWeight.w600,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 10),
+                                                TextHelper(
+                                                  text: s.attendedAt == null ? '' : DateFormat('HH:mm a').format(s.attendedAt!),
+                                                  fontsize: 11,
+                                                  fontweight: FontWeight.w600,
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    if (!slotDetailsController.slot!.hasComplete && !s.hasAttend)
+                                      ButtonHelperG(
+                                        onTap: () async {
+                                          try {
+                                            await goForReschedule(s);
+                                          } catch (e) {
+                                            showAlert(e.toString(), AlertType.error);
+                                          }
+                                        },
+                                        height: 25,
+                                        width: 100,
+                                        shadow: [],
+                                        background: mainStore.theme.value.secondaryColor,
+                                        label: TextHelper(text: "Reschedule", color: mainStore.theme.value.BackgroundColor),
+                                      ),
+                                  ],
+                                ),
+                                Container(
+                                  padding: EdgeInsets.symmetric(vertical: 8, horizontal: 15),
+                                  margin: EdgeInsets.all(5),
+                                  decoration: BoxDecoration(
+                                    border: Border(left: BorderSide(color: mainStore.theme.value.HeadColor, width: 4)),
+                                    borderRadius: BorderRadius.circular(7),
+                                    color: mainStore.theme.value.BackgroundShadeColor,
+                                  ),
+                                  child: Column(
+                                    spacing: 10,
+                                    children: [
+                                      TextHelper(
+                                        text: "Feedback",
+                                        fontweight: FontWeight.w600,
+                                        fontsize: 11,
+                                        color: mainStore.theme.value.HeadColor.withAlpha(180),
+                                      ),
+                                      Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          SizedBox(width: 28, child: Icon(MoonIcons.generic_user_24_regular, size: 20)),
+                                          Expanded(
+                                            child: Container(
+                                              padding: EdgeInsets.all(3),
+                                              color: mainStore.theme.value.BackgroundColor,
+                                              child: TextHelper(text: s.feedback, fontsize: 11, fontweight: FontWeight.w600, isWrap: true),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          SizedBox(width: 28, child: Icon(FontAwesomeIcons.userDoctor, size: 16)),
+                                          Expanded(
+                                            child: Container(
+                                              padding: EdgeInsets.all(3),
+                                              color: mainStore.theme.value.BackgroundColor,
+                                              child: TextHelper(text: s.trainerFeedback, fontsize: 11, fontweight: FontWeight.w600, isWrap: true),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );

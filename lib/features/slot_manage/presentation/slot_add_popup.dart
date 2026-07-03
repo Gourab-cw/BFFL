@@ -56,6 +56,7 @@ Future<void> slotAddPopup(
             'endTime': data.endTime,
             'serviceId': tableData[i]['service'],
             'trainerId': tableData[i]['trainer'],
+            'trainerName': tableData[i]['trainerName'],
             'bookingCount': 0,
             'createdAt': Timestamp.now(),
             'month': DateFormat('yyyy-MM').format(data.date),
@@ -88,7 +89,14 @@ Future<void> slotAddPopup(
       List<Map<String, dynamic>> tableData = slotsInThePeriod.map((s) {
         return {'service': s.serviceId, 'trainer': s.trainerId, 'id': s.id, 'uid': Uuid().v4()};
       }).toList();
+      List<Map<String, dynamic>> bookedMember = slotsInThePeriod
+          .map((s) {
+            return s.sessions.map((m) => m.toFirestore()).toList();
+          })
+          .expand((e) => e)
+          .toList();
       List<Map<String, dynamic>> subscriptionDataInJson = subscriptionController.list.map((m) => m.toJson()).toList();
+      bool showService = true;
       return StatefulBuilder(
         builder: (context, setState) {
           return Dialog(
@@ -96,7 +104,7 @@ Future<void> slotAddPopup(
             backgroundColor: Colors.white,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
             child: ConstrainedBox(
-              constraints: BoxConstraints(maxHeight: 450, minHeight: 200, maxWidth: 450, minWidth: 450),
+              constraints: BoxConstraints(maxHeight: 500, minHeight: 200, maxWidth: 450, minWidth: 450),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
@@ -120,149 +128,229 @@ Future<void> slotAddPopup(
                       ],
                     ),
                     Divider(),
-                    SizedBox(
-                      height: 300,
-                      child: DataGridHelper3(
-                        headerColor: getMainStore().theme.value.lowShadeColor,
-                        showAlternateColor: true,
-                        withBorder: true,
-                        fontSize: 12,
-                        dataSource: tableData,
-                        columnList: [
-                          DataGridColumnModel3(
-                            dataField: 'service',
-                            title: 'Service',
-                            dataType: CellDataType3.string,
-                            customCell: (v) {
-                              if (v.rowValue['id'] != '') {
-                                return TextHelper(
-                                  text: subscriptionController.getServiceById(v.cellValue)?.name ?? '',
-                                  fontsize: 12,
-                                  textalign: TextAlign.center,
-                                );
-                              }
-                              return Row(
-                                children: [
-                                  ButtonHelperG(
-                                    onTap: () {
-                                      setState(() {
-                                        slotController.slots.removeWhere(
-                                          (r) =>
-                                              r.startTime == data.startTime &&
-                                              r.endTime == data.endTime &&
-                                              r.date == DateFormat("yyyy-MM-dd").format(data.date) &&
-                                              r.serviceId == v.rowValue['service'] &&
-                                              r.trainerId == v.rowValue['trainer'],
-                                        );
-                                        tableData.removeWhere((t) => t['uid'] == v.rowValue['uid']);
-                                        slotController.update();
-                                      });
-                                    },
-                                    width: 30,
-                                    margin: 0,
-                                    icon: Icon(Icons.delete, size: 15),
-                                    background: getMainStore().theme.value.lowShadeColor,
-                                  ),
-                                  Expanded(
-                                    child: DropDownHelperG(
-                                      leading: SizedBox.shrink(),
-                                      trailing: Icon(Icons.arrow_drop_down, color: Colors.grey),
-                                      height: 30,
-                                      fontSize: 12,
-                                      rowHeight: 30,
-                                      showClearText: false,
-                                      showBorder: false,
-                                      uniqueKey: UniqueKey().toString(),
-                                      items: subscriptionDataInJson,
-                                      value: subscriptionController.getServiceById(v.cellValue)?.toJson() ?? {},
-                                      onValueChange: (c) {
+                    Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              showService = true;
+                            });
+                          },
+                          child: Container(
+                            height: 30,
+                            decoration: BoxDecoration(color: showService ? getMainStore().theme.value.HeadColor : getMainStore().theme.value.BackgroundColor),
+                            child: TextHelper(
+                              text: "Service",
+                              fontsize: 12,
+                              textalign: TextAlign.center,
+                              width: 120,
+                              color: !showService ? getMainStore().theme.value.HeadColor : getMainStore().theme.value.BackgroundColor,
+                            ),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              showService = false;
+                            });
+                          },
+                          child: Container(
+                            height: 30,
+                            decoration: BoxDecoration(color: !showService ? getMainStore().theme.value.HeadColor : getMainStore().theme.value.BackgroundColor),
+                            child: TextHelper(
+                              text: "Bookings",
+                              fontsize: 12,
+                              textalign: TextAlign.center,
+                              width: 120,
+                              color: showService ? getMainStore().theme.value.HeadColor : getMainStore().theme.value.BackgroundColor,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    // Service datagrid
+                    if (showService)
+                      SizedBox(
+                        height: 300,
+                        child: DataGridHelper3(
+                          headerColor: getMainStore().theme.value.lowShadeColor,
+                          showAlternateColor: true,
+                          withBorder: true,
+                          fontSize: 12,
+                          dataSource: tableData,
+                          columnList: [
+                            DataGridColumnModel3(
+                              dataField: 'service',
+                              title: 'Service',
+                              dataType: CellDataType3.string,
+                              customCell: (v) {
+                                if (v.rowValue['id'] != '') {
+                                  return TextHelper(
+                                    text: subscriptionController.getServiceById(v.cellValue ?? "")?.name ?? '',
+                                    fontsize: 12,
+                                    textalign: TextAlign.center,
+                                  );
+                                }
+                                return Row(
+                                  children: [
+                                    ButtonHelperG(
+                                      onTap: () {
                                         setState(() {
-                                          if (tableData.any((t) => t['service'] == c['id'])) {
-                                            ServiceModel s = subscriptionController.getServiceById(c['id'])!;
-                                            if (s.trainersData != null && s.trainersData!.length < 2) {
-                                              showAlert('Service already exist', AlertType.error);
-                                              return;
-                                            }
-                                          }
-                                          int tableDataIndex = tableData.indexWhere((m) => m['uid'] == v.rowValue['uid']);
-                                          tableData[tableDataIndex]['service'] = c['id'] ?? '';
-                                          tableData = tableData;
+                                          slotController.slots.removeWhere(
+                                            (r) =>
+                                                r.startTime == data.startTime &&
+                                                r.endTime == data.endTime &&
+                                                r.date == DateFormat("yyyy-MM-dd").format(data.date) &&
+                                                r.serviceId == v.rowValue['service'] &&
+                                                r.trainerId == v.rowValue['trainer'],
+                                          );
+                                          tableData.removeWhere((t) => t['uid'] == v.rowValue['uid']);
+                                          slotController.update();
                                         });
                                       },
+                                      width: 30,
+                                      margin: 0,
+                                      icon: Icon(Icons.delete, size: 15),
+                                      background: getMainStore().theme.value.lowShadeColor,
                                     ),
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
-                          DataGridColumnModel3(
-                            dataField: 'trainer',
-                            title: 'Trainer',
-                            dataType: CellDataType3.string,
-                            customCell: (v) {
-                              if (v.rowValue['id'] != '') {
-                                return TextHelper(
-                                  text:
+                                    Expanded(
+                                      child: DropDownHelperG(
+                                        leading: SizedBox.shrink(),
+                                        trailing: Icon(Icons.arrow_drop_down, color: Colors.grey),
+                                        height: 30,
+                                        fontSize: 12,
+                                        rowHeight: 30,
+                                        showClearText: false,
+                                        showBorder: false,
+                                        uniqueKey: UniqueKey().toString(),
+                                        items: subscriptionDataInJson,
+                                        value: subscriptionController.getServiceById(v.cellValue)?.toJson() ?? {},
+                                        onValueChange: (c) {
+                                          setState(() {
+                                            if (tableData.any((t) => t['service'] == c['id'])) {
+                                              ServiceModel s = subscriptionController.getServiceById(c['id'])!;
+                                              if (s.trainersData != null && s.trainersData!.length < 2) {
+                                                showAlert('Service already exist', AlertType.error);
+                                                return;
+                                              }
+                                            }
+                                            int tableDataIndex = tableData.indexWhere((m) => m['uid'] == v.rowValue['uid']);
+                                            tableData[tableDataIndex]['service'] = c['id'] ?? '';
+                                            tableData = tableData;
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
+                            DataGridColumnModel3(
+                              dataField: 'trainer',
+                              title: 'Trainer',
+                              dataType: CellDataType3.string,
+                              customCell: (v) {
+                                if (v.rowValue['id'] != '') {
+                                  return TextHelper(
+                                    text:
+                                        subscriptionController
+                                            .getServiceById(v.rowValue['service'] ?? "")
+                                            ?.trainersData
+                                            ?.firstWhereOrNull((t) => t.id == v.cellValue)
+                                            ?.name ??
+                                        '',
+                                    fontsize: 12,
+                                    textalign: TextAlign.center,
+                                  );
+                                }
+                                return DropDownHelperG(
+                                  leading: SizedBox.shrink(),
+                                  trailing: Icon(Icons.arrow_drop_down, color: Colors.grey),
+                                  height: 30,
+                                  fontSize: 12,
+                                  rowHeight: 30,
+                                  showClearText: false,
+                                  showBorder: false,
+                                  uniqueKey: UniqueKey().toString(),
+                                  items: subscriptionController.getServiceById(v.rowValue['service'])?.trainersData?.map((m) => m.toJSON()).toList() ?? [],
+                                  value:
                                       subscriptionController
-                                          .getServiceById(v.rowValue['service'])!
-                                          .trainersData
+                                          .getServiceById(v.rowValue['service'])
+                                          ?.trainersData
                                           ?.firstWhereOrNull((t) => t.id == v.cellValue)
-                                          ?.name ??
-                                      '',
-                                  fontsize: 12,
+                                          ?.toJSON() ??
+                                      {},
+                                  onValueChange: (c) {
+                                    setState(() {
+                                      if (tableData.any((t) => t['trainer'] == c['id'] && t['service'] == v.rowValue['service'])) {
+                                        showAlert('Trainer already exist for same service', AlertType.error);
+                                        return;
+                                      } else {
+                                        int tableDataIndex = tableData.indexWhere((m) => m['uid'] == v.rowValue['uid']);
+                                        tableData[tableDataIndex]['trainer'] = c['id'] ?? '';
+                                        tableData[tableDataIndex]['trainerName'] = c['name'] ?? '';
+                                        tableData = tableData;
+                                      }
+                                    });
+                                  },
+                                );
+                              },
+                            ),
+                            DataGridColumnModel3(
+                              width: 57,
+                              dataField: 'id',
+                              title: 'Status',
+                              dataType: CellDataType3.string,
+                              customCell: (v) {
+                                return Container(
+                                  width: 10,
+                                  height: 10,
+                                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: v.cellValue == '' ? Colors.grey : Colors.green),
+                                );
+                              },
+                            ),
+                          ],
+                          uniqueKey: UniqueKey().toString(),
+                          width: 440,
+                        ),
+                      ),
+
+                    // Bookings
+                    if (!showService)
+                      SizedBox(
+                        height: 300,
+                        child: DataGridHelper3(
+                          dataSource: bookedMember,
+                          columnList: [
+                            DataGridColumnModel3(dataField: "memberName", dataType: CellDataType3.string, title: "Name"),
+                            DataGridColumnModel3(
+                              dataField: "serviceName",
+                              dataType: CellDataType3.string,
+                              title: "Service",
+                              customCell: (v) {
+                                return TextHelper(
+                                  text: subscriptionController.getServiceById(v.rowValue["serviceId"] ?? "")?.name ?? '',
+                                  fontsize: 11,
                                   textalign: TextAlign.center,
                                 );
-                              }
-                              return DropDownHelperG(
-                                leading: SizedBox.shrink(),
-                                trailing: Icon(Icons.arrow_drop_down, color: Colors.grey),
-                                height: 30,
-                                fontSize: 12,
-                                rowHeight: 30,
-                                showClearText: false,
-                                showBorder: false,
-                                uniqueKey: UniqueKey().toString(),
-                                items: subscriptionController.getServiceById(v.rowValue['service'])?.trainersData?.map((m) => m.toJSON()).toList() ?? [],
-                                value:
-                                    subscriptionController
-                                        .getServiceById(v.rowValue['service'])
-                                        ?.trainersData
-                                        ?.firstWhereOrNull((t) => t.id == v.cellValue)
-                                        ?.toJSON() ??
-                                    {},
-                                onValueChange: (c) {
-                                  setState(() {
-                                    if (tableData.any((t) => t['trainer'] == c['id'] && t['service'] == v.rowValue['service'])) {
-                                      showAlert('Trainer already exist for same service', AlertType.error);
-                                      return;
-                                    } else {
-                                      int tableDataIndex = tableData.indexWhere((m) => m['uid'] == v.rowValue['uid']);
-                                      tableData[tableDataIndex]['trainer'] = c['id'] ?? '';
-                                      tableData = tableData;
-                                    }
-                                  });
-                                },
-                              );
-                            },
-                          ),
-                          DataGridColumnModel3(
-                            width: 57,
-                            dataField: 'id',
-                            title: 'Status',
-                            dataType: CellDataType3.string,
-                            customCell: (v) {
-                              return Container(
-                                width: 10,
-                                height: 10,
-                                decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: v.cellValue == '' ? Colors.grey : Colors.green),
-                              );
-                            },
-                          ),
-                        ],
-                        uniqueKey: UniqueKey().toString(),
-                        width: 440,
+                              },
+                            ),
+                            DataGridColumnModel3(dataField: "startTime", dataType: CellDataType3.string, title: "Start"),
+                            DataGridColumnModel3(dataField: "endTime", dataType: CellDataType3.string, title: "End"),
+                            DataGridColumnModel3(
+                              dataField: "serviceId",
+                              dataType: CellDataType3.string,
+                              customCell: (v) {
+                                return SizedBox.shrink();
+                              },
+                            ),
+                          ],
+                          uniqueKey: UniqueKey().toString(),
+                          width: 440,
+                          fontSize: 11,
+                        ),
                       ),
-                    ),
+
                     // ListView.builder(
                     //   shrinkWrap: true,
                     //   itemCount: subscriptionController.list.length,
@@ -294,9 +382,9 @@ Future<void> slotAddPopup(
                     ButtonHelperG(
                       width: 80,
                       onTap: () {
-                        newSlotSaveFunction(tableData, (List<Map<String, dynamic>> tableDat) {
+                        newSlotSaveFunction(tableData, (List<Map<String, dynamic>> tableData0) {
                           setState(() {
-                            tableData = tableDat;
+                            tableData = tableData0;
                           });
                         });
                         return;

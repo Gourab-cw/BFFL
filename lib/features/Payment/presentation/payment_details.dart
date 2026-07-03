@@ -118,12 +118,27 @@ class _PaymentDetailsState extends State<PaymentDetails> {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              TextHelper(
-                                text: currenyFormater(value: item.paidAmount, withDrCr: false),
-                                fontweight: FontWeight.w600,
-                                fontsize: 22,
-                                textalign: TextAlign.right,
-                                color: mainStore.theme.value.HeadColor,
+                              Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  TextHelper(
+                                    text: currenyFormater(value: item.paidAmount, withDrCr: false),
+                                    fontweight: FontWeight.w600,
+                                    fontsize: 22,
+                                    textalign: TextAlign.right,
+                                    color: mainStore.theme.value.HeadColor,
+                                  ),
+                                  if (parseDouble(data: item.advanceAmount) > 0)
+                                    TextHelper(
+                                      text: "Advance:  ${currenyFormater(value: item.advanceAmount, withDrCr: false)}",
+                                      fontweight: FontWeight.w600,
+                                      fontsize: 12,
+                                      padding: EdgeInsets.only(right: 5),
+                                      textalign: TextAlign.right,
+                                      color: Colors.blue,
+                                    ),
+                                ],
                               ),
                               Container(
                                 color: mainStore.theme.value.BackgroundColor.withAlpha(100),

@@ -25,8 +25,6 @@ import '../features/slot_manage/presentation/slot_manage.dart';
 import '../features/slot_register/presentation/slot_register.dart';
 import '../features/staff/presentation/staff.dart';
 import '../features/staff_register/presentation/staff_register.dart';
-import '../features/subscriptions/controller/subscription_controller.dart';
-import '../features/user_add/controller/new_user_form_controller.dart';
 import '../features/user_add/presentation/user_add.dart';
 import '../features/user_subscription/presentation/user_subscription_add.dart';
 import '../features/user_subscription/presentation/user_subscription_details.dart';
@@ -38,11 +36,11 @@ final List<GetPage<dynamic>> routes = [
   GetPage(name: "/servicedetailsview", page: () => ServiceDetailsView(), bindings: []),
   GetPage(name: "/membersessiondetails", page: () => MemberSessionDetails(), bindings: []),
   GetPage(name: "/serviceview", page: () => ServiceView(), bindings: []),
-  GetPage(name: "/", page: () => ParentScreen(), bindings: [NewUserFormControllerBinding(), PickListBinding()]),
-  GetPage(name: "/useradd", page: () => UserAdd(), binding: NewUserFormControllerBinding()),
+  GetPage(name: "/", page: () => ParentScreen(), bindings: [PickListBinding()]),
+  GetPage(name: "/useradd", page: () => UserAdd()),
   GetPage(name: "/memberlist", page: () => Members(), binding: MemberControllerBinding()),
   GetPage(name: "/memberdetails", page: () => MemberDetails(), binding: MemberControllerBinding()),
-  GetPage(name: "/slotmanage", page: () => SlotManage(), bindings: [SlotControllerBinding(), SubscriptionControllerBinding()]),
+  GetPage(name: "/slotmanage", page: () => SlotManage(), bindings: [SlotControllerBinding()]),
   GetPage(name: "/usersubscriptionadd", page: () => UserSubscriptionAdd()),
   GetPage(name: "/accsubscriptiondetails", page: () => AccSubscriptionDetails()),
   GetPage(name: "/slotdetailsregister", page: () => SlotDetailsRegister()),

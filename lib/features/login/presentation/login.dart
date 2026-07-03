@@ -45,12 +45,14 @@ class _LoginState extends State<Login> {
   @override
   void initState() {
     // TODO: implement initState
-    Future(() {
+    Future(() async {
       try {
-        // loaderController.startLoading();
-        // user.checkIfUserLogin().whenComplete(() {
-        //   loaderController.stopLoading();
-        // });
+        if (GetPlatform.isWindows) {
+          loaderController.startLoading();
+          await user.checkIfUserLogin().whenComplete(() {
+            loaderController.stopLoading();
+          });
+        }
         Timer(const Duration(milliseconds: 400), () {
           setState(() {
             showNow = true;

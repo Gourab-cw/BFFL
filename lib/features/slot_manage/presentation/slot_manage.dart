@@ -12,6 +12,7 @@ import 'package:intl/intl.dart';
 
 import '../../../core/utility/app_loader.dart';
 import '../../../core/utility/helper.dart';
+import '../../Service/data/service.dart';
 
 class SlotManage extends StatefulWidget {
   const SlotManage({super.key});
@@ -347,7 +348,7 @@ class _SlotManageState extends State<SlotManage> {
                           showAlternateColor: true,
                           headerColor: Colors.green.shade100,
                           columnSpacing: 1,
-                          rowHeight: 80,
+                          rowHeight: 110,
                           columnList: slotController.slotData.isEmpty
                               ? []
                               : slotController.slotData[0].keys.toList().sublist(1).map((k) {
@@ -463,67 +464,161 @@ class _SlotManageState extends State<SlotManage> {
                                             width: double.infinity,
                                             height: double.infinity,
                                             padding: EdgeInsets.all(2),
-                                            child: SingleChildScrollView(
-                                              child: Wrap(
-                                                spacing: 15,
-                                                runSpacing: 5,
-                                                children: slotController
-                                                    .getSelectedService(
-                                                      DateFormat('yyyy-MM-dd').format(
-                                                        DateTime(slotController.month!.year, slotController.month!.month, parseInt(data: k, defaultInt: 1)),
-                                                      ),
-                                                      parseString(data: c.rowValue['startTime'], defaultValue: ""),
-                                                      parseString(data: c.rowValue['endTime'], defaultValue: ""),
-                                                      subscriptionController,
+                                            child: Builder(
+                                              builder: (context) {
+                                                List<ServiceModel> services = slotController.getSelectedService(
+                                                  DateFormat(
+                                                    'yyyy-MM-dd',
+                                                  ).format(DateTime(slotController.month!.year, slotController.month!.month, parseInt(data: k, defaultInt: 1))),
+                                                  parseString(data: c.rowValue['startTime'], defaultValue: ""),
+                                                  parseString(data: c.rowValue['endTime'], defaultValue: ""),
+                                                  subscriptionController,
+                                                );
+                                                List<String> membersName = slotController.slots
+                                                    .where(
+                                                      (w) => w.date == date && w.startTime == c.rowValue['startTime'] && w.endTime == c.rowValue['endTime'],
                                                     )
-                                                    .map<Widget>(
-                                                      (m) => Container(
-                                                        height: 20,
-                                                        decoration: BoxDecoration(color: Colors.blueGrey.shade50, borderRadius: BorderRadius.circular(5)),
-                                                        child: Row(
-                                                          mainAxisAlignment: MainAxisAlignment.center,
-                                                          mainAxisSize: MainAxisSize.min,
-                                                          children: [
-                                                            ConstrainedBox(
-                                                              constraints: BoxConstraints(maxWidth: m.isNewSlot == true ? 60 : 90, minWidth: 20),
-                                                              child: Text(
-                                                                m.name,
-                                                                style: TextStyle(fontSize: 10),
-                                                                overflow: TextOverflow.ellipsis,
-                                                                // fontsize: 10,
-                                                              ),
-                                                            ),
-                                                            if (m.isNewSlot == true)
-                                                              ButtonHelperG(
-                                                                onTap: () {
-                                                                  final start = parseString(data: c.rowValue['startTime'], defaultValue: "");
-                                                                  final end = parseString(data: c.rowValue['endTime'], defaultValue: "");
-                                                                  final date = DateFormat('yyyy-MM-dd').format(
-                                                                    DateTime(
-                                                                      slotController.month!.year,
-                                                                      slotController.month!.month,
-                                                                      parseInt(data: k, defaultInt: 1),
+                                                    .expand((e) => e.sessions.where((s) => s.memberName != null).map((s) => s.memberName!))
+                                                    .toList();
+                                                bool isMoreThenThreeService = services.length > 3;
+                                                bool isMoreThenThreeMembers = membersName.length > 3;
+                                                int leftMembers = membersName.length - 3;
+                                                int leftService = membersName.length - 3;
+                                                services = services.sublist(0, isMoreThenThreeService ? 3 : services.length);
+                                                membersName = membersName.sublist(0, isMoreThenThreeMembers ? 3 : membersName.length);
+                                                return Container(
+                                                  color: Colors.transparent,
+                                                  child: Column(
+                                                    children: [
+                                                      Column(
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                        mainAxisSize: MainAxisSize.min,
+                                                        children: [
+                                                          if (services.isNotEmpty) TextHelper(text: "Services : ", fontsize: 10, fontweight: FontWeight.w600),
+                                                          Row(
+                                                            mainAxisSize: MainAxisSize.min,
+                                                            spacing: 5,
+                                                            children: [
+                                                              ...services
+                                                                  .map<Widget>(
+                                                                    (m) => Container(
+                                                                      height: 25,
+                                                                      width: 25,
+                                                                      decoration: BoxDecoration(
+                                                                        color: Colors.blue.shade100,
+                                                                        borderRadius: BorderRadius.circular(25),
+                                                                      ),
+                                                                      child: Row(
+                                                                        mainAxisAlignment: MainAxisAlignment.center,
+                                                                        mainAxisSize: MainAxisSize.min,
+                                                                        children: [
+                                                                          ConstrainedBox(
+                                                                            constraints: BoxConstraints(maxWidth: m.isNewSlot == true ? 60 : 90, minWidth: 20),
+                                                                            child: TextHelper(
+                                                                              text: m.name.length > 2 ? m.name.substring(0, 2) : m.name,
+                                                                              fontsize: 9,
+                                                                              width: 20,
+                                                                              textalign: TextAlign.center,
+                                                                              // fontsize: 10,
+                                                                            ),
+                                                                          ),
+                                                                          if (m.isNewSlot == true)
+                                                                            ButtonHelperG(
+                                                                              onTap: () {
+                                                                                final start = parseString(data: c.rowValue['startTime'], defaultValue: "");
+                                                                                final end = parseString(data: c.rowValue['endTime'], defaultValue: "");
+                                                                                final date = DateFormat('yyyy-MM-dd').format(
+                                                                                  DateTime(
+                                                                                    slotController.month!.year,
+                                                                                    slotController.month!.month,
+                                                                                    parseInt(data: k, defaultInt: 1),
+                                                                                  ),
+                                                                                );
+                                                                                slotController.slots.removeWhere(
+                                                                                  (s) =>
+                                                                                      s.startTime == start &&
+                                                                                      s.endTime == end &&
+                                                                                      s.serviceId == m.id &&
+                                                                                      s.date == date,
+                                                                                );
+                                                                                slotController.update();
+                                                                              },
+                                                                              margin: 0,
+                                                                              shadow: [],
+                                                                              background: Colors.grey.shade200,
+                                                                              width: 20,
+                                                                              height: 20,
+                                                                              padding: EdgeInsets.zero,
+                                                                              icon: Icon(Icons.clear, size: 15),
+                                                                            ),
+                                                                        ],
+                                                                      ),
                                                                     ),
-                                                                  );
-                                                                  slotController.slots.removeWhere(
-                                                                    (s) => s.startTime == start && s.endTime == end && s.serviceId == m.id && s.date == date,
-                                                                  );
-                                                                  slotController.update();
-                                                                },
-                                                                margin: 0,
-                                                                shadow: [],
-                                                                background: Colors.grey.shade200,
-                                                                width: 20,
-                                                                height: 20,
-                                                                padding: EdgeInsets.zero,
-                                                                icon: Icon(Icons.clear, size: 15),
-                                                              ),
-                                                          ],
-                                                        ),
+                                                                  )
+                                                                  .toList(),
+                                                              if (isMoreThenThreeService)
+                                                                TextHelper(
+                                                                  text: "+ $leftService",
+                                                                  fontweight: FontWeight.w600,
+                                                                  color: Colors.blue.shade400,
+                                                                  fontsize: 10,
+                                                                ),
+                                                            ],
+                                                          ),
+                                                        ],
                                                       ),
-                                                    )
-                                                    .toList(),
-                                              ),
+                                                      Column(
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                        mainAxisSize: MainAxisSize.min,
+                                                        children: [
+                                                          if (membersName.isNotEmpty) TextHelper(text: "Members : ", fontsize: 10, fontweight: FontWeight.w600),
+                                                          Row(
+                                                            mainAxisSize: MainAxisSize.min,
+                                                            spacing: 5,
+                                                            children: [
+                                                              ...membersName
+                                                                  .map<Widget>(
+                                                                    (m) => Container(
+                                                                      height: 25,
+                                                                      width: 25,
+                                                                      decoration: BoxDecoration(
+                                                                        color: Colors.amber.shade100,
+                                                                        borderRadius: BorderRadius.circular(25),
+                                                                      ),
+                                                                      child: Row(
+                                                                        mainAxisAlignment: MainAxisAlignment.center,
+                                                                        mainAxisSize: MainAxisSize.min,
+                                                                        children: [
+                                                                          ConstrainedBox(
+                                                                            constraints: BoxConstraints(maxWidth: 30, minWidth: 20),
+                                                                            child: TextHelper(
+                                                                              text: m.length > 2 ? m.substring(0, 2) : m,
+                                                                              fontsize: 9,
+                                                                              width: 20,
+                                                                              textalign: TextAlign.center,
+                                                                              // fontsize: 10,
+                                                                            ),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                    ),
+                                                                  )
+                                                                  .toList(),
+                                                              if (isMoreThenThreeMembers)
+                                                                TextHelper(
+                                                                  text: "+ $leftMembers",
+                                                                  fontweight: FontWeight.w600,
+                                                                  color: Colors.amber.shade400,
+                                                                  fontsize: 10,
+                                                                ),
+                                                            ],
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  ),
+                                                );
+                                              },
                                             ),
                                           ),
                                         );

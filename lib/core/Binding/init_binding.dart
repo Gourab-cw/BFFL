@@ -18,6 +18,7 @@ import '../../features/slot_details_trainer/controller/slot_details_controller.d
 import '../../features/slot_details_trainer/controller/slot_details_register_controller.dart';
 import '../../features/slot_register/controller/slot_register_controller.dart';
 import '../../features/subscriptions/controller/subscription_controller.dart';
+import '../../features/user_add/controller/new_user_form_controller.dart';
 import '../../features/user_subscription/controller/user_subscription_controller.dart';
 import '../../features/user_subscription/controller/user_subscription_details_controller.dart';
 import '../branch/controller/branch_controller.dart';
@@ -30,6 +31,7 @@ class InitBindings extends Bindings {
     Get.lazyPut(() => MemberController(), fenix: true);
     Get.lazyPut(() => MemberApproveController(), fenix: true);
     Get.lazyPut(() => MemberHomeController(), fenix: true);
+    // Get.put(SubscriptionController());
     Get.lazyPut(() => SubscriptionController(), fenix: true);
     Get.lazyPut(() => ServiceController(), fenix: true);
     Get.lazyPut(() => CalenderReportController(), fenix: true);
@@ -45,6 +47,7 @@ class InitBindings extends Bindings {
     Get.lazyPut(() => PaymentController(), fenix: true);
     Get.lazyPut(() => StaffController(), fenix: true);
     Get.lazyPut(() => UserSubscriptionDetailsController(), fenix: true);
+    Get.lazyPut(() => NewUserFormController(), fenix: true);
     Get.lazyPut(() => StaffRegisterController(), fenix: true);
     Get.lazyPut(() => HolidayController(), fenix: true);
   }

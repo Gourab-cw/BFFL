@@ -223,36 +223,85 @@ class AccSubscriptionController extends GetxController {
     final db = await fb.getDB();
     final batch = db.batch();
     final auth = Get.find<Authenticator>();
+    final UserG? user = selectedUser.user;
+    if (user == null) {
+      throw Exception('No user found!');
+    }
+    double advanceAmount = user.balance < 0 ? 0 : user.balance;
     if (voucher == null) {
       throw Exception('No voucher found!');
     }
     if (auth.state == null) {
       throw Exception("Not Authenticated!");
     }
-    if (selectedPaymentMode == null) {
-      throw Exception("No Payment Method found!");
-    }
     final resp = await db.collection('payment').where('branchId', isEqualTo: auth.state!.branchId).count().get();
 
     int count = resp.count ?? 0;
+
     String voucherNumber = '${voucher!.prefix}${(count + 1).toString().padLeft(4, '0')}${voucher!.suffix}';
 
+    // adv = 00
+    // paid = 2000,
+    // bill = 1000 ,
+
+    // adv = 200
+    // paid = 100,
+    // bill = 400 ,
+
+    // adv = 100
+    // paid = 600,
+    // bill = 400 ,
+
+    // adv = 600
+    // paid = 00,
+    // bill = 400 ,
+
+    // adjustedBalanceAmount =  paid==0? -bill : (bill>adv && adv>0)? -adv : paid - bill;
+
     double paidAmount = parseDouble(data: amount.text, defaultValue: 0);
-    if (paidAmount <= 0) {
+    double adjustedBalanceAmount = paidAmount == 0
+        ? -selectedUser.dueAmount
+        : (selectedUser.dueAmount > advanceAmount && advanceAmount > 0)
+        ? -advanceAmount
+        : paidAmount - selectedUser.dueAmount;
+
+    double paymentByAdvanceAmount = advanceAmount == 0
+        ? 0
+        : selectedUser.dueAmount < advanceAmount
+        ? selectedUser.dueAmount
+        : advanceAmount;
+
+    if (selectedPaymentMode == null && selectedUser.dueAmount > advanceAmount) {
+      throw Exception("No Payment Method found!");
+    }
+    if (paidAmount <= 0 && selectedUser.dueAmount > advanceAmount) {
       throw Exception('Please enter paid amount');
     }
-    if (paidAmount > selectedUser.netAmount) {
-      throw Exception('Paid amount is greater than total amount');
-    }
+
+    // if (paidAmount > selectedUser.netAmount) {
+    //   // advanceAmount = paidAmount - selectedUser.netAmount;
+    //   // throw Exception('Paid amount is greater than total amount');
+    // }
     if (selectedUser.dueAmount <= 0) {
       throw Exception('No due amount found');
     }
-    if (selectedUser.dueAmount < paidAmount) {
-      throw Exception('Paid amount is greater than due amount');
+    if ((selectedUser.dueAmount - advanceAmount) < paidAmount) {
+      advanceAmount = paidAmount - (selectedUser.dueAmount - advanceAmount);
     }
+    final advanceResp = await db
+        .collection('User')
+        .where('userType', isEqualTo: userTypeMap2[UserType.paymentLedger])
+        .where('base', isEqualTo: 'advance')
+        .where('isActive', isEqualTo: true)
+        .get();
+    UserG? advanceUser = advanceResp.docs.map((m) => UserG.fromJSON(makeMapSerialize(m.data()))).firstOrNull;
+
     final now = Timestamp.fromDate(DateTime.now());
     String uID = Uuid().v4();
-    batch.update(db.collection('userSubscription').doc(selectedUser.id), {'isActive': true, 'dueAmount': FieldValue.increment(-paidAmount)});
+    batch.update(db.collection('userSubscription').doc(selectedUser.id), {
+      'isActive': true,
+      'dueAmount': advanceAmount > 0 ? 0 : FieldValue.increment(-paidAmount),
+    });
     batch.set(db.collection('payment').doc(uID), {
       'id': uID,
       'branchId': auth.state!.branchId,
@@ -267,6 +316,7 @@ class AccSubscriptionController extends GetxController {
       'voucherId': voucher!.id,
       'voucherAmount': selectedUser.netAmount,
       'paidAmount': paidAmount,
+      'advanceAmount': advanceAmount,
       'grossAmount': selectedUser.grossAmount,
       'gstPer': service.gstPer,
       'gstAmount': selectedUser.taxAmount,
@@ -282,6 +332,58 @@ class AccSubscriptionController extends GetxController {
     final ledgerRef = db.collection('transaction');
     final ledgerTransactionId = Ulid().toString();
     final ledgerTransaction1Id = Ulid().toString();
+    final ledgerTransactionAdvanceId = Ulid().toString();
+    if (advanceAmount > 0) {
+      if (advanceUser == null) {
+        throw Exception('No advance ledger found');
+      }
+      // Advance ledger payment entry
+      batch.set(ledgerRef.doc(ledgerTransactionAdvanceId), {
+        'id': ledgerTransactionAdvanceId,
+        'billId': selectedUser.id,
+        'userId': parseString(data: selectedUser.userId, defaultValue: ''),
+        'branchId': selectedUser.branchId,
+        'drCr': 'cr',
+        'voucherTypeId': voucher!.id,
+        'voucherTypeName': voucher!.name,
+        'voucherNo': selectedUser.name,
+        'subscriptionId': selectedUser.subscriptionId,
+        'subscriptionName': selectedUser.subscriptionName,
+        'amount': parseDouble(data: advanceAmount).toPrecision(2),
+        'ledgerId': advanceUser.id,
+        'ledgerName': advanceUser.name,
+        'companyId': auth.state!.companyId,
+        'createdAt': now,
+        'updatedAt': now,
+      });
+    }
+
+    if (paymentByAdvanceAmount > 0) {
+      if (advanceUser == null) {
+        throw Exception('No advance ledger found');
+      }
+      // Advance ledger payment entry
+      batch.set(ledgerRef.doc(ledgerTransactionAdvanceId), {
+        'id': ledgerTransactionAdvanceId,
+        'billId': selectedUser.id,
+        'userId': parseString(data: selectedUser.userId, defaultValue: ''),
+        'branchId': selectedUser.branchId,
+        'drCr': 'dr',
+        'voucherTypeId': voucher!.id,
+        'voucherTypeName': voucher!.name,
+        'voucherNo': selectedUser.name,
+        'subscriptionId': selectedUser.subscriptionId,
+        'subscriptionName': selectedUser.subscriptionName,
+        'amount': parseDouble(data: paymentByAdvanceAmount).toPrecision(2),
+        'ledgerId': advanceUser.id,
+        'ledgerName': advanceUser.name,
+        'companyId': auth.state!.companyId,
+        'createdAt': now,
+        'updatedAt': now,
+      });
+    }
+
+    // User ledger payment entry
     batch.set(ledgerRef.doc(ledgerTransactionId), {
       'id': ledgerTransactionId,
       'billId': selectedUser.id,
@@ -293,31 +395,37 @@ class AccSubscriptionController extends GetxController {
       'voucherNo': selectedUser.name,
       'subscriptionId': selectedUser.subscriptionId,
       'subscriptionName': selectedUser.subscriptionName,
-      'amount': parseDouble(data: paidAmount).toPrecision(2),
+      'amount': parseDouble(data: advanceAmount > 0 ? paidAmount - advanceAmount : paidAmount).toPrecision(2),
       'ledgerId': selectedUser.userId,
       'ledgerName': selectedUser.userName,
       'companyId': auth.state!.companyId,
       'createdAt': now,
       'updatedAt': now,
     });
-    batch.set(ledgerRef.doc(ledgerTransaction1Id), {
-      'id': ledgerTransaction1Id,
-      'billId': selectedUser.id,
-      'userId': parseString(data: selectedUser.userId, defaultValue: ''),
-      'branchId': selectedUser.branchId,
-      'drCr': 'dr',
-      'voucherTypeId': voucher!.id,
-      'voucherTypeName': voucher!.name,
-      'voucherNo': selectedUser.name,
-      'subscriptionId': selectedUser.subscriptionId,
-      'subscriptionName': selectedUser.subscriptionName,
-      'amount': parseDouble(data: paidAmount).toPrecision(2),
-      'ledgerId': selectedPaymentMode!.id,
-      'ledgerName': selectedPaymentMode!.name,
-      'companyId': auth.state!.companyId,
-      'createdAt': now,
-      'updatedAt': now,
-    });
+
+    if (paidAmount > 0) {
+      // Payment method ledger payment entry
+      batch.set(ledgerRef.doc(ledgerTransaction1Id), {
+        'id': ledgerTransaction1Id,
+        'billId': selectedUser.id,
+        'userId': parseString(data: selectedUser.userId, defaultValue: ''),
+        'branchId': selectedUser.branchId,
+        'drCr': 'dr',
+        'voucherTypeId': voucher!.id,
+        'voucherTypeName': voucher!.name,
+        'voucherNo': selectedUser.name,
+        'subscriptionId': selectedUser.subscriptionId,
+        'subscriptionName': selectedUser.subscriptionName,
+        'amount': parseDouble(data: paidAmount).toPrecision(2),
+        'ledgerId': selectedPaymentMode!.id,
+        'ledgerName': selectedPaymentMode!.name,
+        'companyId': auth.state!.companyId,
+        'createdAt': now,
+        'updatedAt': now,
+      });
+    }
+
+    batch.update(db.collection('User').doc(selectedUser.userId), {'balance': FieldValue.increment(adjustedBalanceAmount)});
     await batch.commit();
     await getList(force: true);
     update();

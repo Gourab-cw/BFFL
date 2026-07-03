@@ -32,8 +32,9 @@ class Authenticator extends GetxController {
   Future<bool> checkIfUserLogin() async {
     final auth = await _firebase.getAuth();
     // final User? u = await auth.authStateChanges().where((u) => u != null).first.timeout(const Duration(seconds: 5));
-    final User? u = auth.currentUser;
-    debugPrint("coming here,$u");
+    final User? u = GetPlatform.isWindows
+        ? await auth.authStateChanges().where((u) => u != null).first.timeout(const Duration(seconds: 5), onTimeout: () => null)
+        : auth.currentUser;
     if (u != null) {
       debugPrint("coming here,$u");
       User user = u;
@@ -100,7 +101,6 @@ class Authenticator extends GetxController {
       final userData = await db.collection("User").doc(user.uid).get();
 
       if (userData.exists && makeMapSerialize(userData.data())["isActive"] == true) {
-        print("coming here1");
         if (_firebase.token != null) {
           await db.collection("User").doc(user.uid).update({"token": _firebase.token});
         }
@@ -163,6 +163,7 @@ class Authenticator extends GetxController {
       state = null;
       branch = null;
       company = null;
+      // Get.find<SubscriptionController>().list = [];
       update();
       // Get.offAllNamed("/login");
     } catch (e) {

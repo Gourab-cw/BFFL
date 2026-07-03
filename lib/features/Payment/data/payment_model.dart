@@ -19,6 +19,7 @@ abstract class PaymentModel with _$PaymentModel {
     @JsonKey(name: 'gstPer', fromJson: parseDoubleV2) gstPer,
     @JsonKey(name: 'netAmount', fromJson: parseDoubleV2) netAmount,
     @JsonKey(name: 'paidAmount', fromJson: parseDoubleV2) paidAmount,
+    @JsonKey(name: 'advanceAmount', fromJson: parseDoubleV2) advanceAmount,
     @JsonKey(name: 'paymentModeId', fromJson: parseStringV2) required String paymentModeId,
     @JsonKey(name: 'paymentModeName', fromJson: parseStringV2) required String paymentModeName,
     @JsonKey(name: 'remarks', fromJson: parseStringV2) required String remarks,

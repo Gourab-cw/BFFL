@@ -97,7 +97,6 @@ class DailyScheduleController extends GetxController {
     final db = await fb.getDB();
     serviceController.selectedMember = {"id": booking.memberId, "name": booking.memberName};
     await serviceController.getServiceDetails(booking.serviceId, auth.state!.branchId, isReschedule: true);
-
     ServiceModel sv = ServiceModel.fromJson(makeMapSerialize((await db.collection('Subscription').doc(booking.serviceId).get()).data()));
     serviceController.selectedService = sv;
     if (!serviceController.services.any((s) => s.id == sv.id)) {

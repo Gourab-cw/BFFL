@@ -6,14 +6,6 @@ import 'package:healthandwellness/features/Service/data/service.dart';
 
 import '../../login/data/user.dart';
 
-class SubscriptionControllerBinding extends Bindings {
-  @override
-  void dependencies() {
-    // TODO: implement dependencies
-    Get.lazyPut(() => SubscriptionController(), fenix: true);
-  }
-}
-
 class SubscriptionController extends GetxController {
   List<ServiceModel> list = [];
 

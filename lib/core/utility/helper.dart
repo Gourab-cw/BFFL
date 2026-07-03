@@ -97,6 +97,7 @@ class TextHelper extends StatelessWidget {
     this.isSelectable = false,
     this.fontsize = 13,
     this.borderRadius = 8,
+    this.decoration = TextDecoration.none,
     this.fontweight = FontWeight.w400,
     this.textalign = TextAlign.left,
     this.bgColor,
@@ -118,6 +119,7 @@ class TextHelper extends StatelessWidget {
   final Color? bgColor;
   final EdgeInsetsGeometry? padding;
   final List<BoxShadow>? shadow;
+  final TextDecoration decoration;
 
   MainStore mainStore = Get.find();
 
@@ -176,6 +178,7 @@ class TextHelper extends StatelessWidget {
                     fontWeight: fontweight,
                     overflow: isWrap ? TextOverflow.visible : TextOverflow.ellipsis,
                     shadows: shadow,
+                    decoration: decoration,
                   ),
                 ),
           if (showRequired) const Text(' *', style: TextStyle(color: Colors.red)),

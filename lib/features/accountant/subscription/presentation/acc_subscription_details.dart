@@ -31,15 +31,21 @@ class _AccSubscriptionDetailsState extends State<AccSubscriptionDetails> {
     Future(() async {
       try {
         Loader.startLoading();
+        if (accSubController.selectedUser == null) {
+          showAlert("No user found!", AlertType.error);
+          return;
+        }
         VoucherModel? v = await voucherController.getReceiptVoucher();
         if (v != null) {
           accSubController.voucher = v;
           await accSubController.loadPaymentModes(v.paymentMethods);
           await accSubController.loadChargesLedgers();
+          // logG(subController.list.firstWhereOrNull((s) => s.id == accSubController.selectedUser!.subscriptionId));
           accSubController.getCalculationDetails(
             selectedUser: accSubController.selectedUser!,
             service: subController.list.firstWhereOrNull((s) => s.id == accSubController.selectedUser!.subscriptionId)!,
           );
+
           accSubController.update();
         } else {
           showAlert("No voucher found!", AlertType.error);
@@ -73,9 +79,14 @@ class _AccSubscriptionDetailsState extends State<AccSubscriptionDetails> {
             body: Builder(
               builder: (context) {
                 final us = accSubController.selectedUser;
+                final user = accSubController.selectedUser!.user;
                 if (us == null) {
                   return Center(child: Text("No data found!"));
                 }
+                if (user == null) {
+                  return Center(child: Text("No user data found!"));
+                }
+                final balance = user.balance;
                 return SingleChildScrollView(
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -305,6 +316,21 @@ class _AccSubscriptionDetailsState extends State<AccSubscriptionDetails> {
                             Divider(),
                           ],
                         ),
+                        if (balance > 0)
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            spacing: 6,
+                            children: [
+                              TextHelper(text: "Advance :", fontsize: 12, width: 85, fontweight: FontWeight.w600, color: Colors.grey.shade600),
+                              TextHelper(
+                                text: currenyFormater(value: balance, withDrCr: false),
+                                fontsize: 12,
+                                width: 80,
+                                fontweight: FontWeight.w600,
+                                color: Colors.blue.shade600,
+                              ),
+                            ],
+                          ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           spacing: 6,
@@ -313,90 +339,103 @@ class _AccSubscriptionDetailsState extends State<AccSubscriptionDetails> {
                             TextHelper(
                               text: currenyFormater(value: us.dueAmount, withDrCr: false),
                               fontsize: 12,
-                              width: 80,
+                              // width: 80,
                               fontweight: FontWeight.w600,
                               color: Colors.grey.shade600,
+                              decoration: balance > 0 ? TextDecoration.lineThrough : TextDecoration.none,
                             ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          spacing: 6,
-                          children: [
-                            TextHelper(text: "Payment :", fontsize: 12, width: 80, fontweight: FontWeight.w600, color: Colors.grey.shade600),
-                            SizedBox(
-                              width: 115,
-                              child: DropDownHelperG(
-                                height: 35,
-                                showBorder: true,
-                                leading: SizedBox.shrink(),
-                                trailing: Icon(Icons.arrow_drop_down, color: getMainStore().theme.value.HeadColor.withAlpha(200)),
-                                fontSize: 11.8,
-                                rowHeight: 30,
-                                showClearText: false,
-                                uniqueKey: UniqueKey().toString(),
-                                value: accSubController.selectedPaymentMode?.toJSON() ?? {},
-                                onValueChange: (v) {
-                                  accSubController.selectedPaymentMode = accSubController.paymentModes.firstWhereOrNull((f) => f.id == (v['id'] ?? ''));
-                                  accSubController.update();
-                                },
-                                items: accSubController.paymentModes.map((m) => m.toJSON()).toList(),
+                            if (balance > 0)
+                              TextHelper(
+                                text: currenyFormater(value: us.dueAmount - balance < 0 ? 0 : us.dueAmount - balance, withDrCr: false),
+                                fontsize: 12,
+                                textalign: TextAlign.left,
+                                fontweight: FontWeight.w600,
+                                color: Colors.blue.shade600,
                               ),
-                            ),
                           ],
                         ),
-                        if (accSubController.selectedPaymentMode != null && accSubController.selectedPaymentMode!.base != 'cash')
+                        if (us.dueAmount - balance > 0)
                           Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             spacing: 6,
                             children: [
-                              TextHelper(text: "Txn No. :", fontsize: 12, width: 80, fontweight: FontWeight.w600, color: Colors.grey.shade600),
-                              SizedBox(width: 215, child: TextBox(controller: txnController, height: 35, withBorder: true, fontSize: 11.8)),
+                              TextHelper(text: "Payment :", fontsize: 12, width: 80, fontweight: FontWeight.w600, color: Colors.grey.shade600),
+                              SizedBox(
+                                width: 115,
+                                child: DropDownHelperG(
+                                  height: 35,
+                                  showBorder: true,
+                                  leading: SizedBox.shrink(),
+                                  trailing: Icon(Icons.arrow_drop_down, color: getMainStore().theme.value.HeadColor.withAlpha(200)),
+                                  fontSize: 11.8,
+                                  rowHeight: 30,
+                                  showClearText: false,
+                                  uniqueKey: UniqueKey().toString(),
+                                  value: accSubController.selectedPaymentMode?.toJSON() ?? {},
+                                  onValueChange: (v) {
+                                    accSubController.selectedPaymentMode = accSubController.paymentModes.firstWhereOrNull((f) => f.id == (v['id'] ?? ''));
+                                    accSubController.update();
+                                  },
+                                  items: accSubController.paymentModes.map((m) => m.toJSON()).toList(),
+                                ),
+                              ),
                             ],
                           ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          spacing: 6,
-                          children: [
-                            TextHelper(text: "Paid :", fontsize: 12, width: 80, fontweight: FontWeight.w600, color: Colors.grey.shade600),
+                        if (us.dueAmount - balance > 0)
+                          if (accSubController.selectedPaymentMode != null && accSubController.selectedPaymentMode!.base != 'cash')
                             Row(
-                              mainAxisSize: MainAxisSize.min,
-                              spacing: 10,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              spacing: 6,
                               children: [
-                                SizedBox(
-                                  width: 120,
-                                  child: TextBox(
-                                    controller: accSubController.amount,
-                                    height: 35,
-                                    width: 120,
-                                    showAlwaysLabel: true,
-                                    labelText: 'Total ',
-                                    withBorder: true,
-                                    backgroundColor: getMainStore().theme.value.lowShadeColor,
-                                    fontSize: 13,
-                                    onValueChange: (v) {
-                                      double amount = parseDouble(data: v, defaultValue: 0);
-                                      if (amount > us.netAmount) {
-                                        showAlert("Paid amount is greater than total amount", AlertType.error);
-                                        accSubController.amount.clear();
-                                      }
-                                    },
-                                    leading: Icon(FontAwesomeIcons.indianRupeeSign, size: 12, color: getMainStore().theme.value.HeadColor.withAlpha(200)),
-                                  ),
-                                ),
-                                ButtonHelperG(
-                                  onTap: () {
-                                    accSubController.amount.text = us.dueAmount.toString();
-                                  },
-                                  width: 80,
-                                  height: 30,
-                                  background: getMainStore().theme.value.mediumShadeColor,
-                                  label: TextHelper(text: 'Full Paid', fontweight: FontWeight.w600, fontsize: 11),
-                                ),
+                                TextHelper(text: "Txn No. :", fontsize: 12, width: 80, fontweight: FontWeight.w600, color: Colors.grey.shade600),
+                                SizedBox(width: 215, child: TextBox(controller: txnController, height: 35, withBorder: true, fontSize: 11.8)),
                               ],
                             ),
-                          ],
-                        ),
+                        if (us.dueAmount - balance > 0)
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            spacing: 6,
+                            children: [
+                              TextHelper(text: "Paid :", fontsize: 12, width: 80, fontweight: FontWeight.w600, color: Colors.grey.shade600),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                spacing: 10,
+                                children: [
+                                  SizedBox(
+                                    width: 120,
+                                    child: TextBox(
+                                      controller: accSubController.amount,
+                                      height: 35,
+                                      width: 120,
+                                      showAlwaysLabel: true,
+                                      labelText: 'Total ',
+                                      withBorder: true,
+                                      backgroundColor: getMainStore().theme.value.lowShadeColor,
+                                      fontSize: 13,
+                                      onValueChange: (v) {
+                                        double amount = parseDouble(data: v, defaultValue: 0);
+                                        // if (amount > us.netAmount) {
+                                        //   showAlert("Paid amount is greater than total amount", AlertType.error);
+                                        //   accSubController.amount.clear();
+                                        // }
+                                      },
+                                      leading: Icon(FontAwesomeIcons.indianRupeeSign, size: 12, color: getMainStore().theme.value.HeadColor.withAlpha(200)),
+                                    ),
+                                  ),
+                                  ButtonHelperG(
+                                    onTap: () {
+                                      accSubController.amount.text = (us.dueAmount - balance < 0 ? 0 : us.dueAmount - balance).toStringAsFixed(2);
+                                    },
+                                    width: 80,
+                                    height: 30,
+                                    background: getMainStore().theme.value.mediumShadeColor,
+                                    label: TextHelper(text: 'Full Paid', fontweight: FontWeight.w600, fontsize: 11),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        if (us.dueAmount - balance < 0) SizedBox(height: 10),
                         TextAreaBox(
                           height: 40,
                           labelText: 'Remarks  ',

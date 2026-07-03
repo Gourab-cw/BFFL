@@ -29,6 +29,7 @@ class _MembersState extends State<Members> {
     Future(() async {
       loader.startLoading();
       await memberController.fetchMembers(await fb.getDB());
+      // await memberController.init(await fb.getDB());
       loader.stopLoading();
     });
     super.initState();

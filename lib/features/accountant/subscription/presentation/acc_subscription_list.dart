@@ -141,11 +141,7 @@ class _AccSubscriptionListState extends State<AccSubscriptionList> {
                                         Wrap(
                                           children: [
                                             TextHelper(text: us.name, fontweight: FontWeight.w600),
-                                            TextHelper(
-                                              text: "${us.userName} ( ${subController.list.firstWhereOrNull((sc) => sc.id == us.subscriptionId)?.name ?? ""} )",
-                                              fontweight: FontWeight.w400,
-                                              fontsize: 11,
-                                            ),
+                                            TextHelper(text: "${us.userName} ( ${us.subscriptionName} )", fontweight: FontWeight.w400, fontsize: 11),
                                           ],
                                         ),
 

@@ -99,15 +99,18 @@ class ServiceController extends GetxController {
   Future<void> bookSlot({SessionModel? reschedule}) async {
     try {
       if (userSubscription == null) {
+        throw Exception("Subscription not found!");
         showAlert("Subscription not found!", AlertType.error);
         return;
       }
       if (selectedService == null) {
+        throw Exception("Select a service to continue!");
         showAlert("Select a service to continue!", AlertType.error);
         return;
       }
 
       if (selectedSlot == null) {
+        throw Exception("Select a slot to continue!");
         showAlert("Select a slot to continue!", AlertType.error);
         return;
       }
@@ -115,16 +118,67 @@ class ServiceController extends GetxController {
       String memberId = parseString(data: selectedMember["id"], defaultValue: "");
 
       if (memberId.isEmpty) {
+        throw Exception("Select a member to continue!");
         showAlert("Select a member to continue!", AlertType.error);
         return;
       }
       if (selectedService!.trainerId.isEmpty) {
+        throw Exception("No trainer found!");
         showAlert("No trainer found!", AlertType.error);
         return;
       }
 
       final sUid = const Uuid().v4();
 
+      final serviceName = selectedService?.name ?? "";
+      final time = '${selectedSlot?.startTime} - ${selectedSlot?.endTime}';
+      String branchName = "";
+      String memberName = selectedMember["name"];
+      final branchResp = await db.collection("branch").doc(auth.state!.branchId).get();
+      if (branchResp.data() != null) {
+        branchName = makeMapSerialize(branchResp.data())["name"] ?? "";
+      }
+      String trainerId = selectedService!.trainerId[0];
+      String notificationTitle = "New booking done!";
+      String notificationTitleMember = reschedule == null ? "New booking done!" : "Reschedule done!";
+      String notificationMessage = "$memberName booked $serviceName for $time in $branchName";
+      String memberNotificationMessage = "$serviceName booked for $time in $branchName";
+
+      final fb = Get.find<FB>();
+      final users = await db
+          .collection("User")
+          .where("userType", whereIn: ["Fj3WvG9DjgG6ve0Xw3SF", "qeTcMMfWb1zzLwsNZDZW"])
+          .where('isActive', isEqualTo: true)
+          .get();
+      List<String> tokens = [];
+      for (var user in users.docs) {
+        tokens.add(makeMapSerialize(user.data())["token"]);
+      }
+      final trainerData = await db.collection('User').where('id', isEqualTo: trainerId).where('isActive', isEqualTo: true).get();
+      for (var trainer in trainerData.docs) {
+        tokens.add(makeMapSerialize(trainer.data())["token"]);
+      }
+
+      String memberToken = parseString(data: selectedMember["token"], defaultValue: "");
+      if (memberToken == "") {
+        final memberData = await db.collection('User').where('id', isEqualTo: memberId).where('isActive', isEqualTo: true).get();
+        for (var member in memberData.docs) {
+          memberToken = parseString(data: makeMapSerialize(member.data())["token"], defaultValue: "");
+        }
+      }
+      DateTime? subscriptionEndDate = parseStringToEmptyDate(data: userSubscription!.endDate, predefinedDateFormat: "yyyy-MM-dd", defaultValue: null);
+      DateTime? slotDate = parseStringToEmptyDate(data: selectedSlot!.date, predefinedDateFormat: "yyyy-MM-dd", defaultValue: null);
+
+      if (slotDate == null || subscriptionEndDate == null) {
+        throw Exception("Date issue! Subscription date not found");
+        showAlert("Date issue! Subscription date not found", AlertType.error);
+        return;
+      }
+      if (subscriptionEndDate.isBefore(slotDate)) {
+        throw Exception("Subscription expired!");
+        showAlert("content", AlertType.error);
+        return;
+      }
       final data = {
         "id": sUid,
         "isActive": true,
@@ -135,7 +189,7 @@ class ServiceController extends GetxController {
         "date": selectedSlot?.date,
         "memberId": memberId,
         "subscriptionId": userSubscription!.id,
-        "trainerId": selectedService!.trainerId[0],
+        "trainerId": trainerId,
         "hasAttend": false,
         "attendedAt": null,
         "feedback": "",
@@ -184,9 +238,17 @@ class ServiceController extends GetxController {
       await batch.commit();
       update();
       showAlert("Session booked successfully", AlertType.success);
+      await Future.wait([
+        ...tokens.toSet().toList().map((t) async {
+          return fb.sendNotification(t, notificationTitle, notificationMessage);
+        }),
+        fb.sendNotification(memberToken, notificationTitleMember, memberNotificationMessage),
+      ]);
     } on FirebaseException catch (e) {
+      throw Exception(e.message ?? "Firestore error occurred");
       showAlert(e.message ?? "Firestore error occurred", AlertType.error);
     } catch (e, st) {
+      throw Exception(e);
       showAlert("$e", AlertType.error);
     }
   }

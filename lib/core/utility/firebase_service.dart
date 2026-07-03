@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -35,6 +36,14 @@ abstract class FirebaseBaseService extends GetxService {
       return _db!;
     }
     return _db!;
+  }
+
+  Future<FirebaseMessaging> getMessage() async {
+    if (_firebaseMessaging == null) {
+      _firebaseMessaging = FirebaseMessaging.instance;
+      return _firebaseMessaging!;
+    }
+    return _firebaseMessaging!;
   }
 
   Future<FirebaseAuth> getAuth() async {
@@ -228,6 +237,27 @@ abstract class FirebaseBaseService extends GetxService {
   Future<void> unsubscribeFromTopic(String topic) async {
     await _firebaseMessaging.unsubscribeFromTopic(topic);
     print("Unsubscribed from topic: $topic");
+  }
+
+  Future<void> sendNotification(String token, String title, String body) async {
+    final db = await getDB();
+    final auth = await getAuth();
+    final user = auth.currentUser;
+    if (user == null) {
+      throw Exception("No user found! Unauthorized access");
+    }
+    final message = {'token': token, 'title': title, 'message': body};
+    Dio dio = Dio();
+    try {
+      final response = await dio.post(
+        'http://localhost:4000/sendnotification',
+        data: message,
+        options: Options(headers: {}),
+      );
+      logG(response);
+    } catch (e) {
+      print(e);
+    }
   }
 }
 

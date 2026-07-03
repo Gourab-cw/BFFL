@@ -7,8 +7,10 @@ import 'package:healthandwellness/core/utility/firebase_service.dart';
 import 'package:healthandwellness/features/login/repository/authenticator.dart';
 import 'package:healthandwellness/features/members/controller/member_controller.dart';
 import 'package:healthandwellness/features/members/presentation/sub_presentation/member_booking_history.dart';
+import 'package:healthandwellness/features/members/presentation/sub_presentation/member_documents_details.dart';
 import 'package:healthandwellness/features/members/presentation/sub_presentation/member_payment_details.dart';
 import 'package:healthandwellness/features/members/presentation/sub_presentation/member_sub_details.dart';
+import 'package:healthandwellness/features/user_add/controller/new_user_form_controller.dart';
 import 'package:healthandwellness/features/user_subscription/controller/user_subscription_controller.dart';
 import 'package:moon_design/moon_design.dart';
 
@@ -83,9 +85,34 @@ class _MemberDetailsState extends State<MemberDetails> {
   Widget build(BuildContext context) {
     final safePadding = MediaQuery.paddingOf(context);
     final UserG? user = memberController.selectedUser;
+    final auth = Get.find<Authenticator>();
     final double subTextSize = 11.4;
     return Scaffold(
-      appBar: AppBar(title: Text("Member Details")),
+      appBar: AppBar(
+        title: Text("Member Details"),
+        actions: [
+          if (user != null &&
+              !user.isApproved &&
+              (auth.state?.userType == UserType.admin || auth.state?.userType == UserType.branchManager || auth.state?.userType == UserType.receptionist))
+            ButtonHelperG(
+              onTap: () async {
+                try {
+                  final newMemberController = Get.find<NewUserFormController>();
+                  await newMemberController.loadUser(user);
+                  Get.offNamed('/useradd');
+                } catch (e) {
+                  showAlert("$e", AlertType.error);
+                }
+              },
+              margin: 0,
+              padding: EdgeInsets.zero,
+              icon: Icon(Icons.edit),
+              shadow: [],
+              label: TextHelper(text: "Edit", color: mainStore.theme.value.BackgroundColor, fontsize: 12, textalign: TextAlign.center),
+              direction: ButtonHelperDirectionG.vertical,
+            ),
+        ],
+      ),
       body: GetBuilder<MemberController>(
         init: memberController,
         autoRemove: false,
@@ -95,7 +122,7 @@ class _MemberDetailsState extends State<MemberDetails> {
           }
           return AppLoader(
             child: DefaultTabController(
-              length: 3,
+              length: 4,
               child: Column(
                 children: [
                   GestureDetector(
@@ -319,7 +346,7 @@ class _MemberDetailsState extends State<MemberDetails> {
                         TabBar(
                           automaticIndicatorColorAdjustment: true,
                           indicatorColor: mainStore.theme.value.HeadColor,
-                          indicatorWeight: 3,
+                          indicatorWeight: 4,
                           labelColor: mainStore.theme.value.HeadColor,
                           tabs: [
                             Tab(
@@ -331,9 +358,12 @@ class _MemberDetailsState extends State<MemberDetails> {
                             Tab(
                               child: Text('Payment Details', textAlign: TextAlign.center, style: TextStyle(fontSize: 12)),
                             ),
+                            Tab(
+                              child: Text('Documents', textAlign: TextAlign.center, style: TextStyle(fontSize: 12)),
+                            ),
                           ],
                         ),
-                        Expanded(child: TabBarView(children: [MemberSubDetails(), MemberBookingHistory(), MemberPaymentDetails()])),
+                        Expanded(child: TabBarView(children: [MemberSubDetails(), MemberBookingHistory(), MemberPaymentDetails(), MemberDocumentsDetails()])),
                       ],
                     ),
                   ),
