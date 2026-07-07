@@ -234,7 +234,7 @@ class SlotDetailsController extends GetxController {
     return users;
   }
 
-  Future<void> updateSlotData(SlotModel s, String serviceName, String trainerId, String trainerName, String trainerToken) async {
+  Future<void> updateSlotData(SlotModel s, String serviceName, String trainerId, String trainerName, String trainerToken, String remarks) async {
     final fb = Get.find<FB>();
     final db = await fb.getDB();
     await db.collection('slots').doc(s.id).update({'trainerId': trainerId});
@@ -259,7 +259,16 @@ class SlotDetailsController extends GetxController {
     }
 
     await Future.wait(
-      <String>{...tokens, ...memberTokens}.toList().map((t) async {
+      <String>{...tokens}.toList().map((t) async {
+        return fb.sendNotification(
+          t,
+          "New Trainer Assigned",
+          "$trainerName has been assigned to ${s.date} ${s.startTime}-${s.endTime} slot ( $serviceName ) | Reason : $remarks",
+        );
+      }),
+    );
+    await Future.wait(
+      <String>{...memberTokens}.toList().map((t) async {
         return fb.sendNotification(t, "New Trainer Assigned", "$trainerName has been assigned to ${s.date} ${s.startTime}-${s.endTime} slot ( $serviceName )");
       }),
     );

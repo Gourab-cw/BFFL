@@ -12,7 +12,7 @@ class SubscriptionController extends GetxController {
   Future<void> fetchSubscription(FirebaseFirestore db) async {
     final resp = await db.collection("Subscription").get();
     List<ServiceModel> list0 = resp.docs.map((m) => ServiceModel.fromJson(makeMapSerialize(m.data()))).toList();
-    List<String> trainerIds = list0.map((l) => l.trainerId).expand((element) => element).toList();
+    List<String> trainerIds = list0.map((l) => l.trainerId).expand((element) => element).toSet().toList();
     List<UserG> trainers = [];
     if (trainerIds.isNotEmpty) {
       final trainerResp = await db.collection("User").where("id", whereIn: trainerIds).get();
@@ -21,6 +21,7 @@ class SubscriptionController extends GetxController {
     list = list0.map((l) {
       return l.copyWith(trainersData: trainers.where((t) => l.trainerId.contains(t.id)).toList());
     }).toList();
+    list.sort((a, b) => a.name.compareTo(b.name));
     update();
   }
 

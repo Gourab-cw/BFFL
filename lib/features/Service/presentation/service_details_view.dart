@@ -108,22 +108,34 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView> {
                 padding: EdgeInsets.only(left: safePadding.left + 10, top: safePadding.top, bottom: safePadding.bottom, right: safePadding.right + 10),
                 child: Column(
                   children: [
-                    const SizedBox(height: 8),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      clipBehavior: Clip.antiAlias,
-                      child: s.image.isNotEmpty
-                          ? CachedNetworkImage(
-                              imageUrl: s.image,
-                              progressIndicatorBuilder: (context, url, downloadProgress) => CircularProgressIndicator(value: downloadProgress.progress),
-                              errorWidget: (context, url, error) => Icon(Icons.health_and_safety_rounded),
-                              height: 160,
-                              fit: BoxFit.cover,
-                            )
-                          : Icon(MoonIcons.generic_user_24_regular),
-                    ),
+                    if (s.image.isNotEmpty) const SizedBox(height: 8),
+                    if (s.image.isNotEmpty)
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        clipBehavior: Clip.antiAlias,
+                        child: s.image.isNotEmpty
+                            ? CachedNetworkImage(
+                                imageUrl: s.image,
+                                progressIndicatorBuilder: (context, url, downloadProgress) => CircularProgressIndicator(value: downloadProgress.progress),
+                                errorWidget: (context, url, error) => Icon(Icons.health_and_safety_rounded),
+                                height: 160,
+                                fit: BoxFit.cover,
+                              )
+                            : Icon(Icons.home_repair_service_sharp),
+                      ),
                     const SizedBox(height: 10),
-                    TextHelper(text: s.name, fontweight: FontWeight.w600, fontsize: 15),
+                    Column(
+                      spacing: 5,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        TextHelper(text: s.name, fontweight: FontWeight.w600, fontsize: 15),
+                        Container(
+                          padding: EdgeInsets.symmetric(vertical: 2, horizontal: 4),
+                          decoration: BoxDecoration(color: mainStore.theme.value.secondaryColor, borderRadius: BorderRadius.circular(10)),
+                          child: Text(s.categoryName, style: TextStyle(fontSize: 10.5, color: mainStore.theme.value.BackgroundColor)),
+                        ),
+                      ],
+                    ),
                     Divider(),
                     ListView.builder(
                       shrinkWrap: true,
@@ -190,13 +202,14 @@ class _ServiceDetailsViewState extends State<ServiceDetailsView> {
                       ],
                     ),
                     const SizedBox(height: 4),
-                    Row(
-                      spacing: 5,
-                      children: [
-                        TextHelper(text: "Package :", width: 80, fontweight: FontWeight.w600),
-                        TextHelper(text: currenyFormater(value: s.totalAmount, withDrCr: false), width: 200),
-                      ],
-                    ),
+                    if (!s.fullPackageBookingOnly)
+                      Row(
+                        spacing: 5,
+                        children: [
+                          TextHelper(text: "Package :", width: 80, fontweight: FontWeight.w600),
+                          TextHelper(text: currenyFormater(value: s.totalAmount, withDrCr: false), width: 200),
+                        ],
+                      ),
                     const SizedBox(height: 4),
                     Row(
                       spacing: 5,

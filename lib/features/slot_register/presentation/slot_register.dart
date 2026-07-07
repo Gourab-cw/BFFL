@@ -35,6 +35,7 @@ class _SlotRegisterState extends State<SlotRegister> {
       try {
         Loader.startLoading();
         await slotRegisterController.fetchRegister();
+        slotRegisterController.update();
       } catch (e) {
         showAlert('$e', AlertType.error);
       } finally {
@@ -112,6 +113,7 @@ class _SlotRegisterState extends State<SlotRegister> {
                     try {
                       Loader.startLoading();
                       await slotRegisterController.fetchRegister();
+                      slotRegisterController.update();
                     } catch (e) {
                       showAlert('$e', AlertType.error);
                     } finally {

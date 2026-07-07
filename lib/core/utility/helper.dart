@@ -1817,7 +1817,9 @@ class _DropDownHelperGState extends State<DropDownHelperG> {
                 },
                 onTap: () {
                   dropDownStore.showList.value = true;
-                  int index = dropDownStore.filteredList.value.indexWhere((t) => t[widget.valueKey] == widget.value![widget.valueKey]);
+                  int index = widget.value == null
+                      ? -1
+                      : dropDownStore.filteredList.value.indexWhere((t) => t[widget.valueKey] == widget.value![widget.valueKey]);
                   if (index > -1) {
                     Future.delayed(const Duration(milliseconds: 200), () {
                       _scrollController.animateTo(

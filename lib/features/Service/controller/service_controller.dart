@@ -24,6 +24,8 @@ class ServiceController extends GetxController {
   SessionModel? selectedReschedule;
   List<UserG> trainers = [];
   List<ServiceModel> services = [];
+
+  String searchKey = "";
   List<SlotModel> slots = [];
   ServiceModel? selectedService;
   UserSubscription? userSubscription;
@@ -259,6 +261,7 @@ class ServiceController extends GetxController {
       services = resp.docs.map((doc) {
         return ServiceModel.fromJson(doc.data());
       }).toList();
+      services.sort((a, b) => a.name.compareTo(b.name));
       update();
     }
     List<String> trainerIds = [];
@@ -267,7 +270,7 @@ class ServiceController extends GetxController {
         trainerIds.add(s);
       }
     }
-    final resp1 = await db.collection("User").where('id', whereIn: trainerIds).get();
+    final resp1 = await db.collection("User").where('id', whereIn: trainerIds.toSet().toList()).get();
     trainers = resp1.docs.map((m) => UserG.fromJSON(makeMapSerialize(m.data()))).toList();
     update();
   }

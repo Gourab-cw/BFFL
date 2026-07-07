@@ -89,8 +89,10 @@ Future subscriptionAddPopup(BuildContext context, UserSubscriptionController sub
         bool withGST = service.withGST;
         int totalSessions = isFullPackage ? (selectedService?.totalDays ?? 0) : parseInt(data: totalSessionCountController.text, defaultInt: 0);
         double discountAmount = parseDouble(data: discAmountController.text, defaultValue: 0);
-        double discountPer = parseDouble(data: discAmountController.text, defaultValue: 0);
-        double grossAmount = service.totalDays == totalSessions
+        double discountPer = parseDouble(data: discPerController.text, defaultValue: 0);
+        double grossAmount = service.fullPackageBookingOnly
+            ? parseDouble(data: service.amount)
+            : service.totalDays == totalSessions
             ? parseDouble(data: service.totalAmount, defaultValue: 0)
             : parseDouble(data: (service.amount * totalSessions), defaultValue: 0);
         double totalAmount = grossAmount;
@@ -241,9 +243,11 @@ Future subscriptionAddPopup(BuildContext context, UserSubscriptionController sub
                       showClearText: false,
                       uniqueKey: "serviceCreationDropdown",
                       onValueChange: (v) {
-                        logG(v);
                         setState(() {
                           selectedService = sc.list.firstWhereOrNull((m) => m.id == v['id']);
+                          if (selectedService != null && selectedService!.fullPackageBookingOnly) {
+                            isFullPackage = true;
+                          }
                         });
                         calculateGST(setState, isFullPackage: isFullPackage, isPaidService: isPaidService);
                       },
@@ -251,6 +255,7 @@ Future subscriptionAddPopup(BuildContext context, UserSubscriptionController sub
                       items: sc.list.map((m) => m.toJson()).toList(),
                       height: 40,
                     ),
+
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
@@ -264,6 +269,10 @@ Future subscriptionAddPopup(BuildContext context, UserSubscriptionController sub
                             setState(() {
                               isPaidService = true;
                             });
+                            if (selectedService != null && selectedService!.fullPackageBookingOnly) {
+                              discPerController.text = selectedService!.discountPer.toString();
+                              discAmountController.text = (selectedService!.amount * (selectedService!.discountPer / 100)).toStringAsFixed(2);
+                            }
                             calculateGST(setState, isFullPackage: isFullPackage, isPaidService: isPaidService);
                           },
                         ),
@@ -300,41 +309,42 @@ Future subscriptionAddPopup(BuildContext context, UserSubscriptionController sub
                         ),
                       ],
                     ),
-
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        MoonCheckbox(
-                          value: isFullPackage,
-                          activeColor: mainStore.theme.value.HeadColor,
-                          onChanged: (v) {
-                            if (isFullPackage) {
-                              return;
-                            }
-                            setState(() {
-                              isFullPackage = true;
-                            });
-                            calculateGST(setState, isFullPackage: isFullPackage, isPaidService: isPaidService);
-                          },
-                        ),
-                        TextHelper(text: "Full Package", width: 100, fontweight: FontWeight.w500),
-                        const SizedBox(width: 8),
-                        MoonCheckbox(
-                          value: !isFullPackage,
-                          activeColor: mainStore.theme.value.HeadColor,
-                          onChanged: (v) {
-                            if (!isFullPackage) {
-                              return;
-                            }
-                            setState(() {
-                              isFullPackage = false;
-                            });
-                            calculateGST(setState, isFullPackage: isFullPackage, isPaidService: isPaidService);
-                          },
-                        ),
-                        TextHelper(text: "Custom Booking", width: 110, fontweight: FontWeight.w500),
-                      ],
-                    ),
+                    if (selectedService != null)
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          MoonCheckbox(
+                            value: isFullPackage,
+                            activeColor: mainStore.theme.value.HeadColor,
+                            onChanged: (v) {
+                              if (isFullPackage) {
+                                return;
+                              }
+                              setState(() {
+                                isFullPackage = true;
+                              });
+                              calculateGST(setState, isFullPackage: isFullPackage, isPaidService: isPaidService);
+                            },
+                          ),
+                          TextHelper(text: "Full Package", width: 100, fontweight: FontWeight.w500),
+                          if (!selectedService!.fullPackageBookingOnly) const SizedBox(width: 8),
+                          if (!selectedService!.fullPackageBookingOnly)
+                            MoonCheckbox(
+                              value: !isFullPackage,
+                              activeColor: mainStore.theme.value.HeadColor,
+                              onChanged: (v) {
+                                if (!isFullPackage) {
+                                  return;
+                                }
+                                setState(() {
+                                  isFullPackage = false;
+                                });
+                                calculateGST(setState, isFullPackage: isFullPackage, isPaidService: isPaidService);
+                              },
+                            ),
+                          if (!selectedService!.fullPackageBookingOnly) TextHelper(text: "Custom Booking", width: 110, fontweight: FontWeight.w500),
+                        ],
+                      ),
                     Row(
                       children: [
                         TextHelper(text: "Total sessions :", width: 100),
@@ -437,16 +447,29 @@ Future subscriptionAddPopup(BuildContext context, UserSubscriptionController sub
                               ),
                             ],
                           ),
-                          Row(
-                            children: [
-                              TextHelper(text: "Tax amount :", width: 100),
-                              TextHelper(
-                                text: currenyFormater(value: gstDetails?.gstAmount.toString() ?? "", withDrCr: false),
-                                textalign: TextAlign.right,
-                                width: 100,
-                              ),
-                            ],
-                          ),
+                          if (gstDetails?.gstAmount != 0)
+                            Row(
+                              children: [
+                                TextHelper(text: "Tax amount :", width: 100),
+                                TextHelper(
+                                  text: currenyFormater(value: gstDetails?.gstAmount.toString() ?? "", withDrCr: false),
+                                  textalign: TextAlign.right,
+                                  width: 100,
+                                ),
+                              ],
+                            ),
+                          if (gstDetails?.discAmount != 0)
+                            Row(
+                              children: [
+                                TextHelper(text: "Discount :", width: 100),
+                                TextHelper(
+                                  text: currenyFormater(value: gstDetails?.discAmount.toString() ?? "", withDrCr: false),
+                                  textalign: TextAlign.right,
+                                  width: 100,
+                                  color: Colors.blue,
+                                ),
+                              ],
+                            ),
                           Row(
                             children: [
                               TextHelper(text: "Net amount :", width: 100),

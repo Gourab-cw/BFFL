@@ -5,6 +5,8 @@ import '../../login/data/user.dart';
 class ServiceModel {
   final String id;
   final String name;
+  final String categoryId;
+  final String categoryName;
   final String description;
   final bool isTrial;
   final String image;
@@ -12,12 +14,15 @@ class ServiceModel {
   final int amount;
   final double totalAmount;
   final double gstPer;
+  final double discountPer;
+  final double registrationCharge;
   final bool withGST;
   final int totalDays;
   final List<String> trainerId;
   final List<UserG>? trainersData;
 
   final bool? isNewSlot;
+  final bool fullPackageBookingOnly;
   ServiceModel({
     required this.id,
     required this.name,
@@ -33,6 +38,11 @@ class ServiceModel {
     this.isNewSlot,
     this.trainersData,
     required this.totalAmount,
+    this.discountPer = 0,
+    this.fullPackageBookingOnly = false,
+    required this.registrationCharge,
+    required this.categoryId,
+    required this.categoryName,
   });
 
   /// Create from Firestore / JSON
@@ -50,6 +60,11 @@ class ServiceModel {
       totalDays: parseInt(data: json['totalDays'], defaultInt: 0),
       totalAmount: parseDouble(data: json['totalAmount'], defaultValue: 0),
       gstPer: parseDouble(data: json['gstPer'], defaultValue: 0),
+      categoryId: parseString(data: json['categoryId'], defaultValue: ""),
+      categoryName: parseString(data: json['categoryName'], defaultValue: ""),
+      discountPer: parseDouble(data: json['discountPer'], defaultValue: 0),
+      registrationCharge: parseDouble(data: json['registrationCharge'], defaultValue: 0),
+      fullPackageBookingOnly: parseBool(data: json['fullPackageBookingOnly'], defaultValue: false),
     );
   }
 
@@ -68,6 +83,11 @@ class ServiceModel {
       'totalAmount': totalAmount,
       'withGST': withGST,
       'gstPer': gstPer,
+      'categoryId': categoryId,
+      'categoryName': categoryName,
+      'discountPer': discountPer,
+      'registrationCharge': registrationCharge,
+      'fullPackageBookingOnly': fullPackageBookingOnly,
     };
   }
 
@@ -87,6 +107,11 @@ class ServiceModel {
     bool? isNewSlot,
     bool? withGST,
     List<UserG>? trainersData,
+    String? categoryId,
+    String? categoryName,
+    double? discountPer,
+    double? registrationCharge,
+    bool? fullPackageBookingOnly,
   }) {
     return ServiceModel(
       id: id ?? this.id,
@@ -103,6 +128,11 @@ class ServiceModel {
       gstPer: gstPer ?? this.gstPer,
       withGST: withGST ?? this.withGST,
       trainersData: trainersData ?? this.trainersData,
+      categoryId: categoryId ?? this.categoryId,
+      categoryName: categoryName ?? this.categoryName,
+      discountPer: discountPer ?? this.discountPer,
+      registrationCharge: registrationCharge ?? this.registrationCharge,
+      fullPackageBookingOnly: fullPackageBookingOnly ?? this.fullPackageBookingOnly,
     );
   }
 }

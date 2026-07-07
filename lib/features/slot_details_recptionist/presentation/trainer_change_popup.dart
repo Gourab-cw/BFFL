@@ -13,6 +13,7 @@ Future<void> trainerChangePopup({required BuildContext context, required SlotMod
   final mainStore = Get.find<MainStore>();
   final slotDetailsController = Get.find<SlotDetailsController>();
   final AppLoaderController loader = Get.find<AppLoaderController>();
+  final remarks = TextEditingController();
   showAdaptiveDialog(
     context: context,
     builder: (_) {
@@ -94,15 +95,20 @@ Future<void> trainerChangePopup({required BuildContext context, required SlotMod
                   ),
                 ),
                 Divider(),
+                TextBox(labelText: "Remarks", showAlwaysLabel: true, controller: remarks),
                 ButtonHelperG(
                   onTap: () async {
                     if (selectedTrainer.isEmpty) {
                       showAlert("Please select a trainer to continue!", AlertType.error);
                       return;
                     }
+                    if (remarks.text.isEmpty) {
+                      showAlert("Please enter remarks!", AlertType.error);
+                      return;
+                    }
                     try {
                       loader.startLoading();
-                      await slotDetailsController.updateSlotData(slot, serviceName, selectedTrainer, selectedTrainerName, selectedTrainerToken);
+                      await slotDetailsController.updateSlotData(slot, serviceName, selectedTrainer, selectedTrainerName, selectedTrainerToken, remarks.text);
                     } catch (e) {
                       showAlert("$e", AlertType.error);
                     } finally {

@@ -24,6 +24,9 @@ class _ServiceViewState extends State<ServiceView> {
   final ServiceController service = Get.find<ServiceController>();
   final AppLoaderController loaderController = Get.find<AppLoaderController>();
   late final EdgeInsets safePadding = MediaQuery.paddingOf(context);
+
+  final TextEditingController searchController = TextEditingController();
+  bool showSearch = false;
   Future<void> fetchingServices() async {
     // mainStore.makeLoading();
     try {
@@ -57,124 +60,175 @@ class _ServiceViewState extends State<ServiceView> {
             init: service,
             autoRemove: false,
             builder: (service) {
-              return SingleChildScrollView(
-                child: Column(
-                  spacing: 10,
-                  children: [
-                    TextHelper(text: "Available Services", fontweight: FontWeight.w600, fontsize: 16),
-                    Divider(),
-                    GetBuilder<ServiceController>(
-                      init: service,
-                      builder: (service) {
-                        return Wrap(
-                          spacing: 20,
-                          runSpacing: 20,
-                          children: [
-                            ...service.services.map(
-                              (m) => GestureDetector(
-                                onTap: () {
-                                  service.selectedService = m;
-                                  Get.toNamed('/servicedetailsview');
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(color: Colors.grey.shade200),
-                                    boxShadow: [BoxShadow(color: Colors.grey.shade300, blurRadius: 4, spreadRadius: 2)],
-                                  ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    clipBehavior: Clip.antiAliasWithSaveLayer,
-                                    child: Stack(
-                                      children: [
-                                        CachedNetworkImage(
-                                          imageUrl: m.image,
-                                          fit: BoxFit.cover,
-                                          width: 160,
-                                          height: 160,
-                                          errorWidget: (ctx, _, _) => Icon(Icons.health_and_safety_rounded),
-                                        ),
+              return Column(
+                spacing: 10,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    spacing: 15,
+                    children: [
+                      TextHelper(text: "Available Services", fontweight: FontWeight.w600, fontsize: 16),
 
-                                        // Positioned(
-                                        //   bottom: 0,
-                                        //   child: ImageFiltered(
-                                        //     imageFilter: ImageFilter.blur(sigmaX: 5.5, sigmaY: 3, tileMode: TileMode.decal),
-                                        //     child: Container(
-                                        //       width: double.maxFinite,
-                                        //       decoration: BoxDecoration(color: Colors.white.withAlpha(140)),
-                                        //       height: 40,
-                                        //       child: Text(""),
-                                        //     ),
-                                        //   ),
-                                        // ),
-                                        // Positioned(
-                                        //   bottom: 0,
-                                        //   child: Container(
-                                        //     width: double.maxFinite,
-                                        //     decoration: BoxDecoration(color: Colors.white.withAlpha(100)),
-                                        //     height: 40,
-                                        //     child: TextHelper(
-                                        //       text: m.name,
-                                        //       padding: EdgeInsets.symmetric(horizontal: 8),
-                                        //       isWrap: true,
-                                        //       fontsize: 11.5,
-                                        //       fontweight: FontWeight.w600,
-                                        //     ),
-                                        //   ),
-                                        // ),
-                                        Positioned(
-                                          top: 5,
-                                          left: 5,
-                                          child: SizedBox(
-                                            width: 150,
-                                            child: TextHelper(
-                                              text: m.name,
-                                              color: Colors.white,
-                                              shadow: [BoxShadow(color: Colors.black, spreadRadius: 10, blurRadius: 10)],
-                                              fontweight: FontWeight.w600,
-                                              fontsize: 14,
-                                              isWrap: true,
-                                            ),
-                                          ),
+                      if (showSearch)
+                        Expanded(
+                          child: TextBox(
+                            controller: searchController,
+                            autofocus: true,
+                            onValueChange: (v) {
+                              service.searchKey = v;
+                              service.update();
+                            },
+                            trailing: ButtonHelperG(
+                              onTap: () {
+                                setState(() {
+                                  showSearch = !showSearch;
+                                });
+                                searchController.clear();
+                                service.searchKey = "";
+                                service.update();
+                              },
+                              icon: Icon(MoonIcons.controls_close_24_regular, size: 18, color: mainStore.theme.value.secondaryColor),
+                              background: Colors.transparent,
+                            ),
+                            placeholder: "Search...",
+                          ),
+                        ),
+                      if (!showSearch)
+                        ButtonHelperG(
+                          onTap: () {
+                            setState(() {
+                              showSearch = !showSearch;
+                            });
+                            searchController.clear();
+                            service.searchKey = "";
+                            service.update();
+                          },
+                          icon: Icon(MoonIcons.generic_search_24_regular, color: mainStore.theme.value.secondaryColor),
+                          background: Colors.transparent,
+                          margin: 0,
+                        ),
+                    ],
+                  ),
+                  Divider(),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: GetBuilder<ServiceController>(
+                        init: service,
+                        builder: (service) {
+                          return Wrap(
+                            spacing: 20,
+                            runSpacing: 20,
+                            children: [
+                              ...service.services
+                                  .where((w) => w.name.toLowerCase().contains(service.searchKey.toLowerCase()))
+                                  .map(
+                                    (m) => GestureDetector(
+                                      onTap: () {
+                                        service.selectedService = m;
+                                        Get.toNamed('/servicedetailsview');
+                                      },
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: m.image == "" ? mainStore.theme.value.secondaryColor : null,
+                                          borderRadius: BorderRadius.circular(10),
+                                          border: Border.all(color: Colors.grey.shade200),
+                                          boxShadow: [BoxShadow(color: Colors.grey.shade300, blurRadius: 4, spreadRadius: 2)],
                                         ),
-                                        Positioned(
-                                          bottom: 5,
-                                          left: 5,
-                                          child: ClipRRect(
-                                            borderRadius: BorderRadius.circular(20),
-                                            child: BackdropFilter(
-                                              filter: ImageFilter.blur(sigmaY: 5, sigmaX: 5),
-                                              child: ButtonHelperG(
-                                                onTap: () {
-                                                  service.selectedService = m;
-                                                  Get.toNamed('/servicedetailsview');
-                                                },
-                                                margin: 0,
-                                                borderRadius: 20,
-                                                // background: Colors.grey.withAlpha(50),
-                                                background: Colors.grey.withAlpha(50),
-                                                shadow: [],
-                                                withBorder: true,
-                                                width: 150,
-                                                height: 32,
-                                                label: TextHelper(text: "Book Now!", color: Colors.white),
-                                                icon: Icon(MoonIcons.arrows_chevron_right_double_24_regular, size: 14, color: Colors.white),
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(10),
+                                          clipBehavior: Clip.antiAliasWithSaveLayer,
+                                          child: Stack(
+                                            children: [
+                                              CachedNetworkImage(
+                                                imageUrl: m.image,
+                                                fit: BoxFit.cover,
+                                                width: 160,
+                                                height: 160,
+                                                errorWidget: (ctx, _, _) =>
+                                                    Icon(Icons.health_and_safety_rounded, size: 35, color: mainStore.theme.value.BackgroundColor),
                                               ),
-                                            ),
+
+                                              // Positioned(
+                                              //   bottom: 0,
+                                              //   child: ImageFiltered(
+                                              //     imageFilter: ImageFilter.blur(sigmaX: 5.5, sigmaY: 3, tileMode: TileMode.decal),
+                                              //     child: Container(
+                                              //       width: double.maxFinite,
+                                              //       decoration: BoxDecoration(color: Colors.white.withAlpha(140)),
+                                              //       height: 40,
+                                              //       child: Text(""),
+                                              //     ),
+                                              //   ),
+                                              // ),
+                                              // Positioned(
+                                              //   bottom: 0,
+                                              //   child: Container(
+                                              //     width: double.maxFinite,
+                                              //     decoration: BoxDecoration(color: Colors.white.withAlpha(100)),
+                                              //     height: 40,
+                                              //     child: TextHelper(
+                                              //       text: m.name,
+                                              //       padding: EdgeInsets.symmetric(horizontal: 8),
+                                              //       isWrap: true,
+                                              //       fontsize: 11.5,
+                                              //       fontweight: FontWeight.w600,
+                                              //     ),
+                                              //   ),
+                                              // ),
+                                              Positioned(
+                                                top: 5,
+                                                left: 5,
+                                                child: SizedBox(
+                                                  width: 150,
+                                                  child: TextHelper(
+                                                    text: m.name,
+                                                    color: Colors.white,
+                                                    shadow: [BoxShadow(color: Colors.black, spreadRadius: 10, blurRadius: 10)],
+                                                    fontweight: FontWeight.w600,
+                                                    fontsize: 14,
+                                                    isWrap: true,
+                                                  ),
+                                                ),
+                                              ),
+                                              Positioned(
+                                                bottom: 5,
+                                                left: 5,
+                                                child: ClipRRect(
+                                                  borderRadius: BorderRadius.circular(20),
+                                                  child: BackdropFilter(
+                                                    filter: ImageFilter.blur(sigmaY: 5, sigmaX: 5),
+                                                    child: ButtonHelperG(
+                                                      onTap: () {
+                                                        service.selectedService = m;
+                                                        Get.toNamed('/servicedetailsview');
+                                                      },
+                                                      margin: 0,
+                                                      borderRadius: 20,
+                                                      // background: Colors.grey.withAlpha(50),
+                                                      background: Colors.grey.withAlpha(50),
+                                                      shadow: [],
+                                                      withBorder: true,
+                                                      width: 150,
+                                                      height: 32,
+                                                      label: TextHelper(text: "Book Now!", color: Colors.white),
+                                                      icon: Icon(MoonIcons.arrows_chevron_right_double_24_regular, size: 12, color: Colors.white),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
-                                      ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        );
-                      },
+                            ],
+                          );
+                        },
+                      ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               );
             },
           ),

@@ -24,6 +24,7 @@ class SlotRegisterController extends GetxController {
     if (auth.state == null) {
       throw Exception("No user found");
     }
+    register = [];
     final UserG user = auth.state!;
     CollectionReference<Map<String, dynamic>> finalQuery = db.collection('slots');
     Query<Map<String, dynamic>> query = finalQuery;

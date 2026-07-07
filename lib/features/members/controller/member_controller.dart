@@ -30,7 +30,6 @@ class MemberController extends GetxController {
   // int currentPage = 1;
   // int totalFetchLimit = 20;
   TextEditingController search = TextEditingController();
-
   Future<void> searchMembers(FirebaseFirestore db) async {
     String s = search.text.trim();
     if (s.isEmpty && members.isEmpty) {
