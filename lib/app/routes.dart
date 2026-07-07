@@ -10,6 +10,9 @@ import 'package:healthandwellness/features/slot_manage/controller/slot_manage_co
 import '../features/Payment/presentation/payment_details.dart';
 import '../features/Service/presentation/service_details_view.dart';
 import '../features/Service/presentation/service_view.dart';
+import '../features/Service/presentation/service_master_view.dart';
+import '../features/Service/presentation/service_create_edit_view.dart';
+import '../features/Service/presentation/service_category_master_view.dart';
 import '../features/accountant/history/presentation/accountant_history.dart';
 import '../features/accountant/subscription/presentation/acc_subscription_details.dart';
 import '../features/holiday/presentation/holiday_register.dart';
@@ -55,4 +58,7 @@ final List<GetPage<dynamic>> routes = [
   GetPage(name: "/holidayregister", page: () => HolidayRegister()),
   GetPage(name: "/accountantHistory", page: () => AccountantHistory()),
   GetPage(name: "/userSubscriptionDetails", page: () => UserSubscriptionDetails()),
+  GetPage(name: "/servicemaster", page: () => const ServiceMasterView()),
+  GetPage(name: "/servicecreateedit", page: () => const ServiceCreateEditView()),
+  GetPage(name: "/servicecategorymaster", page: () => const ServiceCategoryMasterView()),
 ];

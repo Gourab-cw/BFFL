@@ -23,6 +23,10 @@ class ServiceModel {
 
   final bool? isNewSlot;
   final bool fullPackageBookingOnly;
+  final bool isActive;
+  final bool isPosted;
+  final String companyId;
+
   ServiceModel({
     required this.id,
     required this.name,
@@ -43,6 +47,9 @@ class ServiceModel {
     required this.registrationCharge,
     required this.categoryId,
     required this.categoryName,
+    this.isActive = true,
+    this.isPosted = false,
+    this.companyId = '',
   });
 
   /// Create from Firestore / JSON
@@ -65,6 +72,9 @@ class ServiceModel {
       discountPer: parseDouble(data: json['discountPer'], defaultValue: 0),
       registrationCharge: parseDouble(data: json['registrationCharge'], defaultValue: 0),
       fullPackageBookingOnly: parseBool(data: json['fullPackageBookingOnly'], defaultValue: false),
+      isActive: parseBool(data: json['isActive'], defaultValue: true),
+      isPosted: parseBool(data: json['isPosted'], defaultValue: false),
+      companyId: parseString(data: json['companyId'], defaultValue: ""),
     );
   }
 
@@ -88,6 +98,9 @@ class ServiceModel {
       'discountPer': discountPer,
       'registrationCharge': registrationCharge,
       'fullPackageBookingOnly': fullPackageBookingOnly,
+      'isActive': isActive,
+      'isPosted': isPosted,
+      'companyId': companyId,
     };
   }
 
@@ -112,6 +125,9 @@ class ServiceModel {
     double? discountPer,
     double? registrationCharge,
     bool? fullPackageBookingOnly,
+    bool? isActive,
+    bool? isPosted,
+    String? companyId,
   }) {
     return ServiceModel(
       id: id ?? this.id,
@@ -133,6 +149,9 @@ class ServiceModel {
       discountPer: discountPer ?? this.discountPer,
       registrationCharge: registrationCharge ?? this.registrationCharge,
       fullPackageBookingOnly: fullPackageBookingOnly ?? this.fullPackageBookingOnly,
+      isActive: isActive ?? this.isActive,
+      isPosted: isPosted ?? this.isPosted,
+      companyId: companyId ?? this.companyId,
     );
   }
 }

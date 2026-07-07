@@ -17,10 +17,15 @@ import '../../../../core/utility/firebase_service.dart';
 import '../../../accountant/subscription/controller/acc_subscription_controller.dart';
 import '../../data/user_subscription.dart';
 
-Future subscriptionAddPopup(BuildContext context, UserSubscriptionController subController, {UserSubscription? userSubscription}) async {
+Future subscriptionAddPopup(
+  BuildContext context,
+  UserSubscriptionController subController, {
+  UserSubscription? userSubscription,
+}) async {
   final sc = Get.find<SubscriptionController>();
   final auth = Get.find<Authenticator>();
-  final TextEditingController totalSessionCountController = TextEditingController();
+  final TextEditingController totalSessionCountController =
+      TextEditingController();
   final TextEditingController discPerController = TextEditingController();
   final TextEditingController discAmountController = TextEditingController();
 
@@ -35,14 +40,24 @@ Future subscriptionAddPopup(BuildContext context, UserSubscriptionController sub
       DateTimeRange? selectedDate;
 
       if (userSubscription != null) {
-        selectedService = sc.list.firstWhereOrNull((f) => f.id == userSubscription.subscriptionId);
+        selectedService = sc.list.firstWhereOrNull(
+          (f) => f.id == userSubscription.subscriptionId,
+        );
       }
       if (selectedService != null && userSubscription != null) {
         isFullPackage = userSubscription.isFullPackage;
         isPaidService = userSubscription.isPaidSubscription;
         selectedDate = DateTimeRange(
-          start: parseStringToDate(data: userSubscription.startDate, predefinedDateFormat: 'yyyy-MM-dd', defaultValue: DateTime.now()),
-          end: parseStringToDate(data: userSubscription.endDate, predefinedDateFormat: 'yyyy-MM-dd', defaultValue: DateTime.now()),
+          start: parseStringToDate(
+            data: userSubscription.startDate,
+            predefinedDateFormat: 'yyyy-MM-dd',
+            defaultValue: DateTime.now(),
+          ),
+          end: parseStringToDate(
+            data: userSubscription.endDate,
+            predefinedDateFormat: 'yyyy-MM-dd',
+            defaultValue: DateTime.now(),
+          ),
         );
         gstDetails = GSTDetails(
           totalAmount: userSubscription.totalAmount,
@@ -53,12 +68,19 @@ Future subscriptionAddPopup(BuildContext context, UserSubscriptionController sub
           discPer: userSubscription.discPer,
           discAmount: userSubscription.discAmount,
           discountWithGST: parseBool(
-            data: subController.chargesLedgers.firstWhereOrNull((f) => f.name.toLowerCase().removeAllWhitespace.contains('discount'))?.withGST,
+            data: subController.chargesLedgers
+                .firstWhereOrNull(
+                  (f) => f.name.toLowerCase().removeAllWhitespace.contains(
+                    'discount',
+                  ),
+                )
+                ?.withGST,
             defaultValue: false,
           ),
           netAmount: userSubscription.netAmount,
         );
-        totalSessionCountController.text = userSubscription.totalSessions.toString();
+        totalSessionCountController.text = userSubscription.totalSessions
+            .toString();
         discPerController.text = userSubscription.discPer.toString();
         discAmountController.text = userSubscription.discAmount.toString();
       }
@@ -81,27 +103,53 @@ Future subscriptionAddPopup(BuildContext context, UserSubscriptionController sub
           return;
         }
         bool withDiscountOnGST = parseBool(
-          data: subController.chargesLedgers.firstWhereOrNull((f) => f.name.toLowerCase().removeAllWhitespace.contains('discount'))?.withGST,
+          data: subController.chargesLedgers
+              .firstWhereOrNull(
+                (f) => f.name.toLowerCase().removeAllWhitespace.contains(
+                  'discount',
+                ),
+              )
+              ?.withGST,
           defaultValue: false,
         );
-        bool voucherHaveDiscount = parseBool(data: subController.voucher?.withDiscount, defaultValue: false);
+        bool voucherHaveDiscount = parseBool(
+          data: subController.voucher?.withDiscount,
+          defaultValue: false,
+        );
         double gstPer = service.gstPer;
         bool withGST = service.withGST;
-        int totalSessions = isFullPackage ? (selectedService?.totalDays ?? 0) : parseInt(data: totalSessionCountController.text, defaultInt: 0);
-        double discountAmount = parseDouble(data: discAmountController.text, defaultValue: 0);
-        double discountPer = parseDouble(data: discPerController.text, defaultValue: 0);
+        int totalSessions = isFullPackage
+            ? (selectedService?.totalDays ?? 0)
+            : parseInt(data: totalSessionCountController.text, defaultInt: 0);
+        double discountAmount = parseDouble(
+          data: discAmountController.text,
+          defaultValue: 0,
+        );
+        double discountPer = parseDouble(
+          data: discPerController.text,
+          defaultValue: 0,
+        );
         double grossAmount = service.fullPackageBookingOnly
-            ? parseDouble(data: service.amount)
+            ? parseDouble(data: service.amount * totalSessions)
             : service.totalDays == totalSessions
             ? parseDouble(data: service.totalAmount, defaultValue: 0)
-            : parseDouble(data: (service.amount * totalSessions), defaultValue: 0);
+            : parseDouble(
+                data: (service.amount * totalSessions),
+                defaultValue: 0,
+              );
         double totalAmount = grossAmount;
         if (!withDiscountOnGST && voucherHaveDiscount) {
           if (updateByDiscAmount) {
-            discountAmount = parseDouble(data: discAmountController.text, defaultValue: 0).toPrecision(2);
+            discountAmount = parseDouble(
+              data: discAmountController.text,
+              defaultValue: 0,
+            ).toPrecision(2);
             discountPer = (discountAmount / grossAmount * 100).toPrecision(2);
           } else if (updateByDiscPer) {
-            discountPer = parseDouble(data: discPerController.text, defaultValue: 0).toPrecision(2);
+            discountPer = parseDouble(
+              data: discPerController.text,
+              defaultValue: 0,
+            ).toPrecision(2);
             discountAmount = (discountPer / 100 * grossAmount).toPrecision(2);
           }
           grossAmount = grossAmount - discountAmount;
@@ -114,16 +162,25 @@ Future subscriptionAddPopup(BuildContext context, UserSubscriptionController sub
         }
         if (withDiscountOnGST && voucherHaveDiscount) {
           if (updateByDiscAmount) {
-            discountAmount = parseDouble(data: discAmountController.text, defaultValue: 0).toPrecision(2);
+            discountAmount = parseDouble(
+              data: discAmountController.text,
+              defaultValue: 0,
+            ).toPrecision(2);
             discountPer = (discountAmount / netAmount * 100).toPrecision(2);
           } else if (updateByDiscPer) {
-            discountPer = parseDouble(data: discPerController.text, defaultValue: 0).toPrecision(2);
+            discountPer = parseDouble(
+              data: discPerController.text,
+              defaultValue: 0,
+            ).toPrecision(2);
             discountAmount = (discountPer / 100 * netAmount).toPrecision(2);
           }
           netAmount = netAmount - discountAmount;
         }
 
-        discPerController.text = parseDoubleWithLength(data: discountPer, defaultValue: '');
+        discPerController.text = parseDoubleWithLength(
+          data: discountPer,
+          defaultValue: '',
+        );
         discAmountController.text = discountAmount.toString();
         gstDetails = GSTDetails(
           totalAmount: totalAmount,
@@ -143,9 +200,18 @@ Future subscriptionAddPopup(BuildContext context, UserSubscriptionController sub
 
       Future<void> addSubscription(GSTDetails? gstDetails) async {
         UserG? user = auth.state;
-        String userId = parseString(data: subController.user['id'], defaultValue: '');
-        String branchId = parseString(data: subController.user['branchId'], defaultValue: '');
-        String userName = parseString(data: subController.user['name'], defaultValue: '');
+        String userId = parseString(
+          data: subController.user['id'],
+          defaultValue: '',
+        );
+        String branchId = parseString(
+          data: subController.user['branchId'],
+          defaultValue: '',
+        );
+        String userName = parseString(
+          data: subController.user['name'],
+          defaultValue: '',
+        );
         final fb = Get.find<FB>();
         final db = await fb.getDB();
         final voucher = subController.voucher;
@@ -170,37 +236,60 @@ Future subscriptionAddPopup(BuildContext context, UserSubscriptionController sub
           return;
         }
         if (gstDetails == null) {
-          showAlert("Error on saving! Calculation not found! ", AlertType.error);
+          showAlert(
+            "Error on saving! Calculation not found! ",
+            AlertType.error,
+          );
           return;
         }
 
         int count = 0;
         if (userSubscription == null) {
-          count = parseInt(data: (await db.collection('userSubscription').where('branchId', isEqualTo: branchId).count().get()).count);
+          count = parseInt(
+            data:
+                (await db
+                        .collection('userSubscription')
+                        .where('branchId', isEqualTo: branchId)
+                        .count()
+                        .get())
+                    .count,
+          );
         }
 
         final userSubscriptionData = UserSubscription(
           id: userSubscription == null ? Uuid().v4() : userSubscription.id,
           voucherTypeId: voucher.id,
           voucherTypeName: voucher.name,
-          name: userSubscription != null ? userSubscription.name : '${voucher.prefix}${(count + 1).toString().padLeft(4, '0')}${voucher.suffix}',
+          name: userSubscription != null
+              ? userSubscription.name
+              : '${voucher.prefix}${(count + 1).toString().padLeft(4, '0')}${voucher.suffix}',
           userId: userId,
           userName: userName,
           branchId: auth.state!.branchId,
           subscriptionId: selectedService!.id,
           startDate: selectedDate!.start.toString(),
           endDate: selectedDate!.end.toString(),
-          totalSessions: isFullPackage ? parseInt(data: selectedService?.totalDays) : parseInt(data: totalSessionCountController.text),
+          totalSessions: isFullPackage
+              ? parseInt(data: selectedService?.totalDays)
+              : parseInt(data: totalSessionCountController.text),
           usedSessions: 0,
-          remainingSessions: isFullPackage ? parseInt(data: selectedService?.totalDays) : parseInt(data: totalSessionCountController.text),
+          remainingSessions: isFullPackage
+              ? parseInt(data: selectedService?.totalDays)
+              : parseInt(data: totalSessionCountController.text),
           isActive: isPaidService ? false : true,
           isPosted: false,
           createdAt: DateTime.now(),
           updatedAt: DateTime.now(),
           subscriptionName: selectedService!.name,
           subscriptionTotalDays: parseInt(data: selectedService?.totalDays),
-          subscriptionTotalAmount: parseDouble(data: selectedService?.totalAmount, defaultValue: 0),
-          subscriptionAmount: parseDouble(data: selectedService?.amount, defaultValue: 0),
+          subscriptionTotalAmount: parseDouble(
+            data: selectedService?.totalAmount,
+            defaultValue: 0,
+          ),
+          subscriptionAmount: parseDouble(
+            data: selectedService?.amount,
+            defaultValue: 0,
+          ),
           discAmount: gstDetails.discAmount,
           discPer: gstDetails.discPer,
           totalAmount: gstDetails.totalAmount,
@@ -216,8 +305,12 @@ Future subscriptionAddPopup(BuildContext context, UserSubscriptionController sub
         if (userSubscription == null) {
           subController.allSubscriptions.add(userSubscriptionData);
         } else {
-          int index = subController.allSubscriptions.indexWhere((f) => f.id == userSubscription.id);
-          subController.allSubscriptions.replaceRange(index, index + 1, [userSubscriptionData]);
+          int index = subController.allSubscriptions.indexWhere(
+            (f) => f.id == userSubscription.id,
+          );
+          subController.allSubscriptions.replaceRange(index, index + 1, [
+            userSubscriptionData,
+          ]);
         }
 
         subController.update();
@@ -228,9 +321,13 @@ Future subscriptionAddPopup(BuildContext context, UserSubscriptionController sub
           return Dialog(
             insetPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 8),
             backgroundColor: Colors.white,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(10)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadiusGeometry.circular(10),
+            ),
             child: SizedBox(
-              width: MediaQuery.sizeOf(context).width * 0.8 > 500 ? 500 : MediaQuery.sizeOf(context).width * 0.9,
+              width: MediaQuery.sizeOf(context).width * 0.8 > 500
+                  ? 500
+                  : MediaQuery.sizeOf(context).width * 0.9,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
@@ -240,16 +337,28 @@ Future subscriptionAddPopup(BuildContext context, UserSubscriptionController sub
                     DropDownHelperG(
                       labelText: "Select Service",
                       showLabelAlways: true,
+                      isSearchEnable: true,
                       showClearText: false,
                       uniqueKey: "serviceCreationDropdown",
                       onValueChange: (v) {
                         setState(() {
-                          selectedService = sc.list.firstWhereOrNull((m) => m.id == v['id']);
-                          if (selectedService != null && selectedService!.fullPackageBookingOnly) {
+                          selectedService = sc.list.firstWhereOrNull(
+                            (m) => m.id == v['id'],
+                          );
+                          if (selectedService != null &&
+                              selectedService!.fullPackageBookingOnly) {
                             isFullPackage = true;
                           }
+                          if (selectedService != null &&
+                              !selectedService!.isTrial) {
+                            isPaidService = true;
+                          }
                         });
-                        calculateGST(setState, isFullPackage: isFullPackage, isPaidService: isPaidService);
+                        calculateGST(
+                          setState,
+                          isFullPackage: isFullPackage,
+                          isPaidService: isPaidService,
+                        );
                       },
                       value: selectedService?.toJson(),
                       items: sc.list.map((m) => m.toJson()).toList(),
@@ -269,29 +378,53 @@ Future subscriptionAddPopup(BuildContext context, UserSubscriptionController sub
                             setState(() {
                               isPaidService = true;
                             });
-                            if (selectedService != null && selectedService!.fullPackageBookingOnly) {
-                              discPerController.text = selectedService!.discountPer.toString();
-                              discAmountController.text = (selectedService!.amount * (selectedService!.discountPer / 100)).toStringAsFixed(2);
+                            if (selectedService != null &&
+                                selectedService!.fullPackageBookingOnly) {
+                              discPerController.text = selectedService!
+                                  .discountPer
+                                  .toString();
+                              discAmountController.text =
+                                  (selectedService!.amount *
+                                          (selectedService!.discountPer / 100))
+                                      .toStringAsFixed(2);
                             }
-                            calculateGST(setState, isFullPackage: isFullPackage, isPaidService: isPaidService);
+                            calculateGST(
+                              setState,
+                              isFullPackage: isFullPackage,
+                              isPaidService: isPaidService,
+                            );
                           },
                         ),
-                        TextHelper(text: "Paid Service", width: 100, fontweight: FontWeight.w500),
+                        TextHelper(
+                          text: "Paid Service",
+                          width: 100,
+                          fontweight: FontWeight.w500,
+                        ),
                         const SizedBox(width: 8),
-                        MoonCheckbox(
-                          value: !isPaidService,
-                          activeColor: mainStore.theme.value.HeadColor,
-                          onChanged: (v) {
-                            if (!isPaidService) {
-                              return;
-                            }
-                            setState(() {
-                              isPaidService = false;
-                            });
-                            calculateGST(setState, isFullPackage: isFullPackage, isPaidService: isPaidService);
-                          },
-                        ),
-                        TextHelper(text: "Trail Service", width: 110, fontweight: FontWeight.w500),
+                        if (selectedService != null && selectedService!.isTrial)
+                          MoonCheckbox(
+                            value: !isPaidService,
+                            activeColor: mainStore.theme.value.HeadColor,
+                            onChanged: (v) {
+                              if (!isPaidService) {
+                                return;
+                              }
+                              setState(() {
+                                isPaidService = false;
+                              });
+                              calculateGST(
+                                setState,
+                                isFullPackage: isFullPackage,
+                                isPaidService: isPaidService,
+                              );
+                            },
+                          ),
+                        if (selectedService != null && selectedService!.isTrial)
+                          TextHelper(
+                            text: "Trail Service",
+                            width: 110,
+                            fontweight: FontWeight.w500,
+                          ),
                       ],
                     ),
                     Row(
@@ -323,11 +456,20 @@ Future subscriptionAddPopup(BuildContext context, UserSubscriptionController sub
                               setState(() {
                                 isFullPackage = true;
                               });
-                              calculateGST(setState, isFullPackage: isFullPackage, isPaidService: isPaidService);
+                              calculateGST(
+                                setState,
+                                isFullPackage: isFullPackage,
+                                isPaidService: isPaidService,
+                              );
                             },
                           ),
-                          TextHelper(text: "Full Package", width: 100, fontweight: FontWeight.w500),
-                          if (!selectedService!.fullPackageBookingOnly) const SizedBox(width: 8),
+                          TextHelper(
+                            text: "Full Package",
+                            width: 100,
+                            fontweight: FontWeight.w500,
+                          ),
+                          if (!selectedService!.fullPackageBookingOnly)
+                            const SizedBox(width: 8),
                           if (!selectedService!.fullPackageBookingOnly)
                             MoonCheckbox(
                               value: !isFullPackage,
@@ -339,29 +481,52 @@ Future subscriptionAddPopup(BuildContext context, UserSubscriptionController sub
                                 setState(() {
                                   isFullPackage = false;
                                 });
-                                calculateGST(setState, isFullPackage: isFullPackage, isPaidService: isPaidService);
+                                calculateGST(
+                                  setState,
+                                  isFullPackage: isFullPackage,
+                                  isPaidService: isPaidService,
+                                );
                               },
                             ),
-                          if (!selectedService!.fullPackageBookingOnly) TextHelper(text: "Custom Booking", width: 110, fontweight: FontWeight.w500),
+                          if (!selectedService!.fullPackageBookingOnly)
+                            TextHelper(
+                              text: "Custom Booking",
+                              width: 110,
+                              fontweight: FontWeight.w500,
+                            ),
                         ],
                       ),
                     Row(
                       children: [
                         TextHelper(text: "Total sessions :", width: 100),
                         isFullPackage
-                            ? TextHelper(text: selectedService?.totalDays.toString() ?? '0', width: 60)
+                            ? TextHelper(
+                                text:
+                                    selectedService?.totalDays.toString() ??
+                                    '0',
+                                width: 60,
+                              )
                             : TextBox(
                                 width: 60,
                                 height: 35,
                                 withBorder: false,
                                 controller: totalSessionCountController,
                                 onSubmitted: (v) {
-                                  calculateGST(setState, isFullPackage: isFullPackage, isPaidService: isPaidService);
+                                  calculateGST(
+                                    setState,
+                                    isFullPackage: isFullPackage,
+                                    isPaidService: isPaidService,
+                                  );
                                 },
                                 onTapOutside: () {
-                                  calculateGST(setState, isFullPackage: isFullPackage, isPaidService: isPaidService);
+                                  calculateGST(
+                                    setState,
+                                    isFullPackage: isFullPackage,
+                                    isPaidService: isPaidService,
+                                  );
                                 },
-                                backgroundColor: mainStore.theme.value.lowShadeColor,
+                                backgroundColor:
+                                    mainStore.theme.value.lowShadeColor,
                               ),
                       ],
                     ),
@@ -386,20 +551,45 @@ Future subscriptionAddPopup(BuildContext context, UserSubscriptionController sub
                                       showAlwaysLabel: true,
                                       labelText: 'Per ',
                                       withBorder: false,
-                                      backgroundColor: getMainStore().theme.value.lowShadeColor,
+                                      backgroundColor: getMainStore()
+                                          .theme
+                                          .value
+                                          .lowShadeColor,
                                       fontSize: 13,
                                       selectTextOnFocus: true,
                                       onTapOutside: () {
-                                        calculateGST(setState, isFullPackage: isFullPackage, isPaidService: isPaidService, updateByDiscPer: true);
+                                        calculateGST(
+                                          setState,
+                                          isFullPackage: isFullPackage,
+                                          isPaidService: isPaidService,
+                                          updateByDiscPer: true,
+                                        );
                                       },
                                       onSubmitted: (v) {
-                                        calculateGST(setState, isFullPackage: isFullPackage, isPaidService: isPaidService, updateByDiscPer: true);
+                                        calculateGST(
+                                          setState,
+                                          isFullPackage: isFullPackage,
+                                          isPaidService: isPaidService,
+                                          updateByDiscPer: true,
+                                        );
                                       },
                                       onValueChange: (v) {},
-                                      leading: Icon(FontAwesomeIcons.percentage, size: 12, color: getMainStore().theme.value.HeadColor.withAlpha(200)),
+                                      leading: Icon(
+                                        FontAwesomeIcons.percentage,
+                                        size: 12,
+                                        color: getMainStore()
+                                            .theme
+                                            .value
+                                            .HeadColor
+                                            .withAlpha(200),
+                                      ),
                                     ),
                                   ),
-                                  SizedBox(width: 12, height: 20, child: VerticalDivider()),
+                                  SizedBox(
+                                    width: 12,
+                                    height: 20,
+                                    child: VerticalDivider(),
+                                  ),
                                   SizedBox(
                                     width: 100,
                                     child: TextBox(
@@ -414,12 +604,30 @@ Future subscriptionAddPopup(BuildContext context, UserSubscriptionController sub
                                       // backgroundColor: getMainStore().theme.value.lowShadeColor,
                                       fontSize: 13,
                                       onTapOutside: () {
-                                        calculateGST(setState, isFullPackage: isFullPackage, isPaidService: isPaidService, updateByDiscAmount: true);
+                                        calculateGST(
+                                          setState,
+                                          isFullPackage: isFullPackage,
+                                          isPaidService: isPaidService,
+                                          updateByDiscAmount: true,
+                                        );
                                       },
                                       onSubmitted: (v) {
-                                        calculateGST(setState, isFullPackage: isFullPackage, isPaidService: isPaidService, updateByDiscAmount: true);
+                                        calculateGST(
+                                          setState,
+                                          isFullPackage: isFullPackage,
+                                          isPaidService: isPaidService,
+                                          updateByDiscAmount: true,
+                                        );
                                       },
-                                      leading: Icon(FontAwesomeIcons.indianRupeeSign, size: 12, color: getMainStore().theme.value.HeadColor.withAlpha(200)),
+                                      leading: Icon(
+                                        FontAwesomeIcons.indianRupeeSign,
+                                        size: 12,
+                                        color: getMainStore()
+                                            .theme
+                                            .value
+                                            .HeadColor
+                                            .withAlpha(200),
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -430,7 +638,11 @@ Future subscriptionAddPopup(BuildContext context, UserSubscriptionController sub
                             children: [
                               TextHelper(text: "Total amount :", width: 100),
                               TextHelper(
-                                text: currenyFormater(value: gstDetails?.totalAmount.toString() ?? "", withDrCr: false),
+                                text: currenyFormater(
+                                  value:
+                                      gstDetails?.totalAmount.toString() ?? "",
+                                  withDrCr: false,
+                                ),
                                 fontsize: 13,
                                 textalign: TextAlign.right,
                                 width: 100,
@@ -441,7 +653,11 @@ Future subscriptionAddPopup(BuildContext context, UserSubscriptionController sub
                             children: [
                               TextHelper(text: "Gross amount :", width: 100),
                               TextHelper(
-                                text: currenyFormater(value: gstDetails?.grossAmount.toString() ?? "", withDrCr: false),
+                                text: currenyFormater(
+                                  value:
+                                      gstDetails?.grossAmount.toString() ?? "",
+                                  withDrCr: false,
+                                ),
                                 textalign: TextAlign.right,
                                 width: 100,
                               ),
@@ -452,7 +668,11 @@ Future subscriptionAddPopup(BuildContext context, UserSubscriptionController sub
                               children: [
                                 TextHelper(text: "Tax amount :", width: 100),
                                 TextHelper(
-                                  text: currenyFormater(value: gstDetails?.gstAmount.toString() ?? "", withDrCr: false),
+                                  text: currenyFormater(
+                                    value:
+                                        gstDetails?.gstAmount.toString() ?? "",
+                                    withDrCr: false,
+                                  ),
                                   textalign: TextAlign.right,
                                   width: 100,
                                 ),
@@ -463,7 +683,11 @@ Future subscriptionAddPopup(BuildContext context, UserSubscriptionController sub
                               children: [
                                 TextHelper(text: "Discount :", width: 100),
                                 TextHelper(
-                                  text: currenyFormater(value: gstDetails?.discAmount.toString() ?? "", withDrCr: false),
+                                  text: currenyFormater(
+                                    value:
+                                        gstDetails?.discAmount.toString() ?? "",
+                                    withDrCr: false,
+                                  ),
                                   textalign: TextAlign.right,
                                   width: 100,
                                   color: Colors.blue,
@@ -474,7 +698,11 @@ Future subscriptionAddPopup(BuildContext context, UserSubscriptionController sub
                             children: [
                               TextHelper(text: "Net amount :", width: 100),
                               TextHelper(
-                                text: currenyFormater(value: (gstDetails?.netAmount.toString() ?? ""), withDrCr: false),
+                                text: currenyFormater(
+                                  value:
+                                      (gstDetails?.netAmount.toString() ?? ""),
+                                  withDrCr: false,
+                                ),
                                 textalign: TextAlign.right,
                                 width: 100,
                               ),
@@ -496,8 +724,16 @@ Future subscriptionAddPopup(BuildContext context, UserSubscriptionController sub
                       },
                       width: 100,
                       height: 35,
-                      icon: Icon(FontAwesomeIcons.plus, fontWeight: FontWeight.w400, size: 14, color: mainStore.theme.value.BackgroundColor),
-                      label: TextHelper(text: "Add", color: mainStore.theme.value.BackgroundColor),
+                      icon: Icon(
+                        FontAwesomeIcons.plus,
+                        fontWeight: FontWeight.w400,
+                        size: 14,
+                        color: mainStore.theme.value.BackgroundColor,
+                      ),
+                      label: TextHelper(
+                        text: "Add",
+                        color: mainStore.theme.value.BackgroundColor,
+                      ),
                     ),
                   ],
                 ),

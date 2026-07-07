@@ -5,6 +5,8 @@ import 'package:healthandwellness/features/staff_register/controller/staff_regis
 
 import '../../features/Payment/controller/payment_controller.dart';
 import '../../features/Service/controller/service_controller.dart';
+import '../../features/Service/controller/service_master_controller.dart';
+import '../../features/Service/controller/service_category_master_controller.dart';
 import '../../features/accountant/history/controller/accountant_history_controller.dart';
 import '../../features/accountant/subscription/controller/acc_subscription_controller.dart';
 import '../../features/calendar_report/controller/calendar_report_controller.dart';
@@ -34,6 +36,8 @@ class InitBindings extends Bindings {
     // Get.put(SubscriptionController());
     Get.lazyPut(() => SubscriptionController(), fenix: true);
     Get.lazyPut(() => ServiceController(), fenix: true);
+    Get.lazyPut(() => ServiceMasterController(), fenix: true);
+    Get.lazyPut(() => ServiceCategoryMasterController(), fenix: true);
     Get.lazyPut(() => CalenderReportController(), fenix: true);
     Get.lazyPut(() => SlotDetailsController(), fenix: true);
     Get.lazyPut(() => UserSubscriptionController(), fenix: true);

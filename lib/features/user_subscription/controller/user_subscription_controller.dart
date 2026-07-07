@@ -26,8 +26,14 @@ class UserSubscriptionController extends GetxController {
       if (auth.state == null) {
         showAlert("No branch found!", AlertType.error);
       }
-      final resp = await db.collection('User').where('isActive', isEqualTo: true).where('userType', isEqualTo: 's4Jt0ceWglK1ZAwerJKS').get();
-      chargesLedgers = resp.docs.map((m) => UserG.fromJSON(makeMapSerialize(m.data()))).toList();
+      final resp = await db
+          .collection('User')
+          .where('isActive', isEqualTo: true)
+          .where('userType', isEqualTo: 's4Jt0ceWglK1ZAwerJKS')
+          .get();
+      chargesLedgers = resp.docs
+          .map((m) => UserG.fromJSON(makeMapSerialize(m.data())))
+          .toList();
       update();
     } catch (e) {
       showAlert("$e", AlertType.error);
@@ -76,7 +82,10 @@ class UserSubscriptionController extends GetxController {
       throw Exception("No user found!");
     }
     String branchId = parseString(data: auth.state?.branchId, defaultValue: "");
-    String companyId = parseString(data: auth.state?.companyId, defaultValue: "");
+    String companyId = parseString(
+      data: auth.state?.companyId,
+      defaultValue: "",
+    );
     if (companyId == "") {
       throw Exception("No company found!");
     }
@@ -160,7 +169,9 @@ class UserSubscriptionController extends GetxController {
           'subscriptionName': f.subscriptionName,
           'amount': parseDouble(data: f.discAmount).toPrecision(2),
           'ledgerId': chargesLedgers.firstWhere((m) => m.base == 'discount').id,
-          'ledgerName': chargesLedgers.firstWhere((m) => m.base == 'discount').name,
+          'ledgerName': chargesLedgers
+              .firstWhere((m) => m.base == 'discount')
+              .name,
           'companyId': companyId,
           'createdAt': now,
           'updatedAt': now,
@@ -203,8 +214,14 @@ class UserSubscriptionController extends GetxController {
         'updatedAt': now,
       });
 
-      batch.update(db.collection('User').doc(f.userId), {'balance': FieldValue.increment(-f.netAmount)});
-      batch.set(ref.doc(f.id), {...f.toJSON(), 'companyId': auth.state!.companyId, 'createdBy': auth.state!.id});
+      batch.update(db.collection('User').doc(f.userId), {
+        'balance': FieldValue.increment(-f.netAmount),
+      });
+      batch.set(ref.doc(f.id), {
+        ...f.toJSON(),
+        'companyId': auth.state!.companyId,
+        'createdBy': auth.state!.id,
+      });
     }
     // int count = ((await db.collection('userSubscription').count().get()).count) ?? 0;
     // for (final f in subDataGridData) {
@@ -241,8 +258,15 @@ class UserSubscriptionController extends GetxController {
           .collection("User")
           .where("userType", isEqualTo: userTypeMap2[UserType.member])
           .where("isActive", isEqualTo: true)
-          .where("searchTerm", isGreaterThanOrEqualTo: q.replaceAll(" ", "").toLowerCase().trim())
-          .where("searchTerm", isLessThanOrEqualTo: '${q.replaceAll(" ", "").toLowerCase().trim()}\uf8ff')
+          .where(
+            "searchTerm",
+            isGreaterThanOrEqualTo: q.replaceAll(" ", "").toLowerCase().trim(),
+          )
+          .where(
+            "searchTerm",
+            isLessThanOrEqualTo:
+                '${q.replaceAll(" ", "").toLowerCase().trim()}\uf8ff',
+          )
           .limit(10);
       if (auth.state!.userType != UserType.admin) {
         query = query.where("branchId", isEqualTo: auth.state?.branchId);
@@ -271,7 +295,9 @@ class UserSubscriptionController extends GetxController {
       }
       final resp = await query.get();
       // .get();
-      subscriptionList = resp.docs.map((m) => UserSubscription.fromJSON(makeMapSerialize(m.data()))).toList();
+      subscriptionList = resp.docs
+          .map((m) => UserSubscription.fromJSON(makeMapSerialize(m.data())))
+          .toList();
 
       update();
     } catch (e) {

@@ -153,6 +153,64 @@ class _MasterState extends State<Master> {
                       ],
                     ),
                   ),
+                  CardHelper(
+                    onTap: () {
+                      Get.toNamed('/servicemaster');
+                    },
+                    boxShadow: [],
+                    backgroundColor: mainStore.theme.value.lowShadeColor.withAlpha(180),
+                    height: 50,
+                    padding: EdgeInsets.symmetric(vertical: 2, horizontal: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          spacing: 15,
+                          children: [
+                            Icon(FontAwesomeIcons.briefcase, size: 20, color: mainStore.theme.value.HeadColor.withAlpha(180)),
+                            TextHelper(text: "Service Master", fontweight: FontWeight.w600),
+                          ],
+                        ),
+                        ButtonHelperG(
+                          onTap: () {
+                            Get.toNamed('/servicemaster');
+                          },
+                          background: Colors.transparent,
+                          icon: const Icon(Icons.chevron_right),
+                        ),
+                      ],
+                    ),
+                  ),
+                  CardHelper(
+                    onTap: () {
+                      Get.toNamed('/servicecategorymaster');
+                    },
+                    boxShadow: [],
+                    backgroundColor: mainStore.theme.value.lowShadeColor.withAlpha(180),
+                    height: 50,
+                    padding: EdgeInsets.symmetric(vertical: 2, horizontal: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          spacing: 15,
+                          children: [
+                            Icon(FontAwesomeIcons.list, size: 20, color: mainStore.theme.value.HeadColor.withAlpha(180)),
+                            TextHelper(text: "Service Category Master", fontweight: FontWeight.w600),
+                          ],
+                        ),
+                        ButtonHelperG(
+                          onTap: () {
+                            Get.toNamed('/servicecategorymaster');
+                          },
+                          background: Colors.transparent,
+                          icon: const Icon(Icons.chevron_right),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
