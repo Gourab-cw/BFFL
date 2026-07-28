@@ -71,7 +71,13 @@ class CustomResponse {
   Object? error;
   String response;
   Dio.Response<dynamic>? raw;
-  CustomResponse({required this.success, this.data, this.error, required this.response, this.raw});
+  CustomResponse({
+    required this.success,
+    this.data,
+    this.error,
+    required this.response,
+    this.raw,
+  });
 }
 
 String makeDrCrCurrencyFormat(String format, double data) {
@@ -133,7 +139,10 @@ class TextHelper extends StatelessWidget {
 
     // Use a regular expression to find all uppercase letters that are followed
     // by a lowercase letter, or are preceded by a lowercase letter.
-    String result = data.replaceAllMapped(RegExp(r'(?<=[a-z])[A-Z]'), (Match m) => ' ${m.group(0)}');
+    String result = data.replaceAllMapped(
+      RegExp(r'(?<=[a-z])[A-Z]'),
+      (Match m) => ' ${m.group(0)}',
+    );
 
     // Capitalize the very first letter of the result string
     return result[0].toUpperCase() + result.substring(1);
@@ -149,8 +158,18 @@ class TextHelper extends StatelessWidget {
         borderRadius: BorderRadius.circular(borderRadius),
         border: withBorder
             ? onlyBottomBorder
-                  ? Border(bottom: BorderSide(color: mainStore.isDarkEnable.value ? const Color(0xFF2B2B2B) : const Color(0xFFD6D6D6)))
-                  : Border.all(color: mainStore.isDarkEnable.value ? const Color(0xFF2B2B2B) : const Color(0xFFD6D6D6))
+                  ? Border(
+                      bottom: BorderSide(
+                        color: mainStore.isDarkEnable.value
+                            ? const Color(0xFF2B2B2B)
+                            : const Color(0xFFD6D6D6),
+                      ),
+                    )
+                  : Border.all(
+                      color: mainStore.isDarkEnable.value
+                          ? const Color(0xFF2B2B2B)
+                          : const Color(0xFFD6D6D6),
+                    )
             : const Border.fromBorderSide(BorderSide.none),
       ),
       alignment: textalign == TextAlign.right
@@ -165,10 +184,16 @@ class TextHelper extends StatelessWidget {
                   !camalToLabel ? text : makeCamalToLabel(text),
                   maxLines: !isWrap ? 1 : null,
                   style: TextStyle(
-                    color: color ?? (mainStore.isDarkEnable.value ? Colors.blueGrey.shade200 : mainStore.theme.value.LightTextColor),
+                    color:
+                        color ??
+                        (mainStore.isDarkEnable.value
+                            ? Colors.blueGrey.shade200
+                            : mainStore.theme.value.LightTextColor),
                     fontSize: fontsize,
                     fontWeight: fontweight,
-                    overflow: isWrap ? TextOverflow.visible : TextOverflow.ellipsis,
+                    overflow: isWrap
+                        ? TextOverflow.visible
+                        : TextOverflow.ellipsis,
                     shadows: shadow,
                   ),
                 )
@@ -176,15 +201,22 @@ class TextHelper extends StatelessWidget {
                   !camalToLabel ? text : makeCamalToLabel(text),
                   softWrap: isWrap,
                   style: TextStyle(
-                    color: color ?? (mainStore.isDarkEnable.value ? Colors.blueGrey.shade200 : mainStore.theme.value.LightTextColor),
+                    color:
+                        color ??
+                        (mainStore.isDarkEnable.value
+                            ? Colors.blueGrey.shade200
+                            : mainStore.theme.value.LightTextColor),
                     fontSize: fontsize,
                     fontWeight: fontweight,
-                    overflow: isWrap ? TextOverflow.visible : TextOverflow.ellipsis,
+                    overflow: isWrap
+                        ? TextOverflow.visible
+                        : TextOverflow.ellipsis,
                     shadows: shadow,
                     decoration: decoration,
                   ),
                 ),
-          if (showRequired) const Text(' *', style: TextStyle(color: Colors.red)),
+          if (showRequired)
+            const Text(' *', style: TextStyle(color: Colors.red)),
         ],
       ),
     );
@@ -234,8 +266,18 @@ class SelectableTextHelper extends StatelessWidget {
         borderRadius: BorderRadius.circular(borderRadius),
         border: withBorder
             ? onlyBottomBorder
-                  ? Border(bottom: BorderSide(color: mainStore.isDarkEnable.value ? const Color(0xFF2B2B2B) : const Color(0xFFD6D6D6)))
-                  : Border.all(color: mainStore.isDarkEnable.value ? const Color(0xFF2B2B2B) : const Color(0xFFD6D6D6))
+                  ? Border(
+                      bottom: BorderSide(
+                        color: mainStore.isDarkEnable.value
+                            ? const Color(0xFF2B2B2B)
+                            : const Color(0xFFD6D6D6),
+                      ),
+                    )
+                  : Border.all(
+                      color: mainStore.isDarkEnable.value
+                          ? const Color(0xFF2B2B2B)
+                          : const Color(0xFFD6D6D6),
+                    )
             : const Border.fromBorderSide(BorderSide.none),
       ),
       alignment: textalign == TextAlign.right
@@ -249,13 +291,18 @@ class SelectableTextHelper extends StatelessWidget {
             text,
             // softWrap: isWrap ,
             style: TextStyle(
-              color: color ?? (mainStore.isDarkEnable.value ? Colors.blueGrey.shade200 : Colors.grey.shade900),
+              color:
+                  color ??
+                  (mainStore.isDarkEnable.value
+                      ? Colors.blueGrey.shade200
+                      : Colors.grey.shade900),
               fontSize: fontsize,
               fontWeight: fontweight,
               overflow: isWrap ? TextOverflow.visible : TextOverflow.ellipsis,
             ),
           ),
-          if (showRequired) const Text(' *', style: TextStyle(color: Colors.red)),
+          if (showRequired)
+            const Text(' *', style: TextStyle(color: Colors.red)),
         ],
       ),
     );
@@ -270,7 +317,13 @@ class MultiSwitchBoxChildG {
   final String label;
   final MultiSwitchBoxChildType type;
   final Function(bool v) onTap;
-  MultiSwitchBoxChildG({required this.value, required this.label, required this.onTap, this.groupValue, this.type = MultiSwitchBoxChildType.radioG});
+  MultiSwitchBoxChildG({
+    required this.value,
+    required this.label,
+    required this.onTap,
+    this.groupValue,
+    this.type = MultiSwitchBoxChildType.radioG,
+  });
 }
 
 class MultiSwitchBoxG extends StatefulWidget {
@@ -278,7 +331,13 @@ class MultiSwitchBoxG extends StatefulWidget {
   final FontWeight fontWeight;
   final double fontSize;
   final List<MultiSwitchBoxChildG> children;
-  const MultiSwitchBoxG({super.key, this.direction = Axis.horizontal, required this.children, this.fontWeight = FontWeight.w600, this.fontSize = 12});
+  const MultiSwitchBoxG({
+    super.key,
+    this.direction = Axis.horizontal,
+    required this.children,
+    this.fontWeight = FontWeight.w600,
+    this.fontSize = 12,
+  });
 
   @override
   State<MultiSwitchBoxG> createState() => _MultiSwitchBoxGState();
@@ -317,7 +376,11 @@ class _MultiSwitchBoxGState extends State<MultiSwitchBoxG> {
                 onTap: () {
                   m.onTap(!m.value);
                 },
-                child: TextHelper(text: m.label, fontweight: widget.fontWeight, fontsize: widget.fontSize),
+                child: TextHelper(
+                  text: m.label,
+                  fontweight: widget.fontWeight,
+                  fontsize: widget.fontSize,
+                ),
               ),
             ],
           ),
@@ -402,7 +465,8 @@ class TextBox extends StatefulWidget {
     this.autofillHints,
     this.initialValue,
     TextEditingController? controller,
-  }) : controller = controller ?? TextEditingController(text: initialValue ?? '');
+  }) : controller =
+           controller ?? TextEditingController(text: initialValue ?? '');
   MainStore mainStore = Get.find();
   @override
   State<TextBox> createState() => _TextBoxState();
@@ -419,7 +483,10 @@ class _TextBoxState extends State<TextBox> {
           isActive = true;
         });
         if (widget.selectTextOnFocus) {
-          widget.controller.selection = TextSelection(baseOffset: 0, extentOffset: widget.controller.value.text.length);
+          widget.controller.selection = TextSelection(
+            baseOffset: 0,
+            extentOffset: widget.controller.value.text.length,
+          );
         }
       } else {
         if (widget.makeSubmitOnFocus) {
@@ -458,7 +525,9 @@ class _TextBoxState extends State<TextBox> {
             readOnly: widget.readonly,
             leading: widget.leading,
             trailing: widget.trailing,
-            hintText: widget.showAlwaysLabel ? "" : widget.placeholder ?? (isActive ? '' : widget.labelText),
+            hintText: widget.showAlwaysLabel
+                ? ""
+                : widget.placeholder ?? (isActive ? '' : widget.labelText),
             controller: widget.controller,
             initialValue: widget.initialValue,
             keyboardType: widget.keyboard,
@@ -467,16 +536,26 @@ class _TextBoxState extends State<TextBox> {
             textAlign: widget.textAlign,
             autofillHints: widget.autofillHints,
             borderRadius: BorderRadius.circular(widget.borderRadius),
-            style: TextStyle(color: widget.fontColor, fontSize: widget.fontSize, fontWeight: widget.fontWeight),
+            style: TextStyle(
+              color: widget.fontColor,
+              fontSize: widget.fontSize,
+              fontWeight: widget.fontWeight,
+            ),
             padding: EdgeInsets.only(left: widget.leftPadding),
 
             inputFormatters: <TextInputFormatter>[
-              if (widget.keyboard == TextInputType.number) FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+              if (widget.keyboard == TextInputType.number)
+                FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
               if (widget.inputFormatters != null) ...widget.inputFormatters!,
             ],
             onTap: () {
-              if (widget.selectTextOnFocus && widget.controller.selection.end < widget.controller.value.text.length) {
-                widget.controller.selection = TextSelection(baseOffset: 0, extentOffset: widget.controller.value.text.length);
+              if (widget.selectTextOnFocus &&
+                  widget.controller.selection.end <
+                      widget.controller.value.text.length) {
+                widget.controller.selection = TextSelection(
+                  baseOffset: 0,
+                  extentOffset: widget.controller.value.text.length,
+                );
               }
               if (widget.onTap != null) {
                 widget.onTap!();
@@ -488,8 +567,11 @@ class _TextBoxState extends State<TextBox> {
               if (widget.withDebounce) {
                 EasyDebounce.debounce(
                   'my-debouncerTextBox', // <-- An ID for this particular debouncer
-                  const Duration(milliseconds: 500), // <-- The debounce duration
-                  () async => widget.onValueChange!(value), // <-- The target method
+                  const Duration(
+                    milliseconds: 500,
+                  ), // <-- The debounce duration
+                  () async =>
+                      widget.onValueChange!(value), // <-- The target method
                 );
               } else {
                 widget.onValueChange!(value);
@@ -504,8 +586,16 @@ class _TextBoxState extends State<TextBox> {
                 widget.onTapOutside!();
               }
             },
-            textColor: widget.fontColor ?? (widget.mainStore.isDarkEnable.value ? Colors.grey[400] : Colors.grey[900]),
-            backgroundColor: widget.backgroundColor ?? (widget.mainStore.isDarkEnable.value ? Colors.grey[900] : Colors.grey[50]),
+            textColor:
+                widget.fontColor ??
+                (widget.mainStore.isDarkEnable.value
+                    ? Colors.grey[400]
+                    : Colors.grey[900]),
+            backgroundColor:
+                widget.backgroundColor ??
+                (widget.mainStore.isDarkEnable.value
+                    ? Colors.grey[900]
+                    : Colors.grey[50]),
             activeBorderColor: (!widget.withBorder && !isActive)
                 ? Colors.transparent
                 : widget.readonly
@@ -521,17 +611,31 @@ class _TextBoxState extends State<TextBox> {
                 ? Colors.grey[500]
                 : Colors.grey[400],
           ),
-          if ((widget.showAlwaysLabel || isActive) && widget.labelText != null && widget.labelText != '')
+          if ((widget.showAlwaysLabel || isActive) &&
+              widget.labelText != null &&
+              widget.labelText != '')
             Positioned(
               top: 0,
               left: widget.leading == null ? 10 : 30,
               child: Container(
                 height: 2,
-                width: getTextWidth("${widget.labelText}", TextStyle(fontSize: widget.fontSize ?? 12, fontWeight: FontWeight.w500)),
-                color: widget.backgroundColor ?? (widget.mainStore.isDarkEnable.value ? widget.backgroundColor ?? Colors.grey.shade900 : Colors.grey[50]),
+                width: getTextWidth(
+                  "${widget.labelText}",
+                  TextStyle(
+                    fontSize: widget.fontSize ?? 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                color:
+                    widget.backgroundColor ??
+                    (widget.mainStore.isDarkEnable.value
+                        ? widget.backgroundColor ?? Colors.grey.shade900
+                        : Colors.grey[50]),
               ),
             ),
-          if ((widget.showAlwaysLabel || isActive) && widget.labelText != null && widget.labelText != '')
+          if ((widget.showAlwaysLabel || isActive) &&
+              widget.labelText != null &&
+              widget.labelText != '')
             Positioned(
               top: -8,
               left: widget.leading == null ? 10 : 30,
@@ -646,13 +750,18 @@ class _TextAreaBoxState extends State<TextAreaBox> {
         MoonTextArea(
           focusNode: focusNode,
           textPadding: const EdgeInsets.all(8),
-          textStyle: TextStyle(fontSize: widget.fontSize, fontWeight: widget.fontWeight),
+          textStyle: TextStyle(
+            fontSize: widget.fontSize,
+            fontWeight: widget.fontWeight,
+          ),
           height: widget.height,
           // width: widget.width,
           readOnly: widget.readonly,
           // leading: widget.leading,
           // trailing: widget.trailing,
-          hintText: widget.showAlwaysLabel ? "" : widget.placeholder ?? (isActive ? '' : widget.labelText),
+          hintText: widget.showAlwaysLabel
+              ? ""
+              : widget.placeholder ?? (isActive ? '' : widget.labelText),
           controller: widget.controller,
           initialValue: widget.initialValue,
           // keyboardType: widget.keyboard,
@@ -660,10 +769,16 @@ class _TextAreaBoxState extends State<TextAreaBox> {
           // obscureText: widget.obscureText,
           textAlign: widget.textAlign,
           borderRadius: widget.borderRadius ?? BorderRadius.circular(5),
-          inputFormatters: <TextInputFormatter>[if (widget.keyboard == TextInputType.number) FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))],
+          inputFormatters: <TextInputFormatter>[
+            if (widget.keyboard == TextInputType.number)
+              FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+          ],
           onTap: () {
             if (widget.selectTextOnFocus) {
-              widget.controller.selection = TextSelection(baseOffset: 0, extentOffset: widget.controller.value.text.length);
+              widget.controller.selection = TextSelection(
+                baseOffset: 0,
+                extentOffset: widget.controller.value.text.length,
+              );
             }
             if (widget.onTap != null) {
               widget.onTap!();
@@ -692,7 +807,8 @@ class _TextAreaBoxState extends State<TextAreaBox> {
               EasyDebounce.debounce(
                 'my-debouncerTextBox', // <-- An ID for this particular debouncer
                 const Duration(milliseconds: 500), // <-- The debounce duration
-                () async => widget.onValueChange!(value), // <-- The target method
+                () async =>
+                    widget.onValueChange!(value), // <-- The target method
               );
             } else {
               widget.onValueChange!(value);
@@ -704,8 +820,12 @@ class _TextAreaBoxState extends State<TextAreaBox> {
               isActive = false;
             });
           },
-          textColor: widget.mainStore.isDarkEnable.value ? Colors.grey[400] : Colors.grey[900],
-          backgroundColor: widget.mainStore.isDarkEnable.value ? Colors.grey[900] : widget.backgroundColor ?? Colors.grey[50],
+          textColor: widget.mainStore.isDarkEnable.value
+              ? Colors.grey[400]
+              : Colors.grey[900],
+          backgroundColor: widget.mainStore.isDarkEnable.value
+              ? Colors.grey[900]
+              : widget.backgroundColor ?? Colors.grey[50],
           activeBorderColor: !widget.withBorder
               ? Colors.transparent
               : widget.mainStore.isDarkEnable.value
@@ -717,17 +837,31 @@ class _TextAreaBoxState extends State<TextAreaBox> {
               ? Colors.grey[800]
               : Colors.grey[400],
         ),
-        if ((widget.showAlwaysLabel || isActive) && widget.labelText != null && widget.labelText != '')
+        if ((widget.showAlwaysLabel || isActive) &&
+            widget.labelText != null &&
+            widget.labelText != '')
           Positioned(
             top: 0,
             left: widget.leading == null ? 15 : 30,
             child: Container(
               height: 2,
-              width: getTextWidth("${widget.labelText}", TextStyle(fontSize: widget.fontSize ?? 12, fontWeight: FontWeight.w500)),
-              color: widget.backgroundColor ?? (widget.mainStore.isDarkEnable.value ? widget.backgroundColor ?? Colors.grey.shade900 : Colors.grey[50]),
+              width: getTextWidth(
+                "${widget.labelText}",
+                TextStyle(
+                  fontSize: widget.fontSize ?? 12,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              color:
+                  widget.backgroundColor ??
+                  (widget.mainStore.isDarkEnable.value
+                      ? widget.backgroundColor ?? Colors.grey.shade900
+                      : Colors.grey[50]),
             ),
           ),
-        if ((widget.showAlwaysLabel || isActive) && widget.labelText != null && widget.labelText != '')
+        if ((widget.showAlwaysLabel || isActive) &&
+            widget.labelText != null &&
+            widget.labelText != '')
           Positioned(
             top: -8,
             left: widget.leading == null ? 17 : 30,
@@ -801,7 +935,9 @@ class _DatePickerHelperState extends State<DatePickerHelper> {
       setState(() {
         if (widget.value != null) {
           d = widget.value;
-          textEditingController.text = DateFormat(widget.dateFormat).format(widget.value!);
+          textEditingController.text = DateFormat(
+            widget.dateFormat,
+          ).format(widget.value!);
         } else {
           textEditingController.text = "";
         }
@@ -820,8 +956,10 @@ class _DatePickerHelperState extends State<DatePickerHelper> {
             allowSameValueSelection: true,
             dynamicCalendarRows: true,
             daySplashColor: getMainStore().theme.value.lowShadeColor,
-            selectedDayHighlightColor: getMainStore().theme.value.secondaryColor,
-            selectedRangeHighlightColor: getMainStore().theme.value.lowShadeColor,
+            selectedDayHighlightColor:
+                getMainStore().theme.value.secondaryColor,
+            selectedRangeHighlightColor:
+                getMainStore().theme.value.lowShadeColor,
             rangeBidirectional: true,
             animateToDisplayedMonthDate: true,
             calendarType: CalendarDatePicker2Type.single,
@@ -829,8 +967,15 @@ class _DatePickerHelperState extends State<DatePickerHelper> {
             firstDayOfWeek: 1,
             firstDate: widget.firstDate,
             lastDate: widget.lastDate,
-            weekdayLabelTextStyle: TextStyle(fontWeight: FontWeight.w500, fontSize: 12),
-            dayTextStylePredicate: ({required date}) => TextStyle(color: DateFormat("EEE").format(date) == "Sun" ? Colors.orange.shade900 : Colors.blueGrey),
+            weekdayLabelTextStyle: TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: 12,
+            ),
+            dayTextStylePredicate: ({required date}) => TextStyle(
+              color: DateFormat("EEE").format(date) == "Sun"
+                  ? Colors.orange.shade900
+                  : Colors.blueGrey,
+            ),
           ),
           dialogSize: Size(MediaQuery.sizeOf(context).width * 0.98, 400),
         );
@@ -851,7 +996,9 @@ class _DatePickerHelperState extends State<DatePickerHelper> {
         if (dd != null && widget.onValueChange != null) {
           setState(() {
             d = dd;
-            textEditingController.text = DateFormat(widget.dateFormat).format(dd!);
+            textEditingController.text = DateFormat(
+              widget.dateFormat,
+            ).format(dd!);
           });
           widget.onValueChange!(DateFormat(widget.dateFormat).format(dd));
         }
@@ -873,7 +1020,11 @@ class _DatePickerHelperState extends State<DatePickerHelper> {
               },
               background: Colors.transparent,
               margin: 0,
-              icon: Icon(FontAwesomeIcons.xmark, color: Colors.blueGrey, size: 14),
+              icon: Icon(
+                FontAwesomeIcons.xmark,
+                color: Colors.blueGrey,
+                size: 14,
+              ),
             )
           : null,
       readonly: true,
@@ -929,12 +1080,16 @@ class _SelectBoxHelperState extends State<SelectBoxHelper> {
                     ...widget.items.map(
                       (m) => GestureDetector(
                         onTap: () {
-                          if (widget.isMultiValue && widget.onMultiValueChange != null) {
+                          if (widget.isMultiValue &&
+                              widget.onMultiValueChange != null) {
                             if (widget.valueList.contains(m.id)) {
                               widget.valueList.removeWhere((t) => t == m.id);
                               widget.onMultiValueChange!(widget.valueList);
                             } else {
-                              widget.onMultiValueChange!([...widget.valueList, m.id]);
+                              widget.onMultiValueChange!([
+                                ...widget.valueList,
+                                m.id,
+                              ]);
                             }
                           } else {
                             if (widget.value == m.id) {
@@ -945,7 +1100,10 @@ class _SelectBoxHelperState extends State<SelectBoxHelper> {
                           }
                         },
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 15,
+                            vertical: 6,
+                          ),
                           margin: const EdgeInsets.only(right: 10, bottom: 8),
                           decoration: BoxDecoration(
                             color: widget.isMultiValue
@@ -969,18 +1127,31 @@ class _SelectBoxHelperState extends State<SelectBoxHelper> {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              if (widget.isMultiValue && widget.valueList.contains(m.id))
-                                Icon(FontAwesomeIcons.check, size: 11, color: getMainStore().theme.value.HeadColor),
+                              if (widget.isMultiValue &&
+                                  widget.valueList.contains(m.id))
+                                Icon(
+                                  FontAwesomeIcons.check,
+                                  size: 11,
+                                  color: getMainStore().theme.value.HeadColor,
+                                ),
                               if (!widget.isMultiValue && widget.value == m.id)
-                                Icon(FontAwesomeIcons.check, size: 11, color: getMainStore().theme.value.HeadColor),
-                              if (widget.value == m.id) const SizedBox(width: 6),
+                                Icon(
+                                  FontAwesomeIcons.check,
+                                  size: 11,
+                                  color: getMainStore().theme.value.HeadColor,
+                                ),
+                              if (widget.value == m.id)
+                                const SizedBox(width: 6),
                               Text(
                                 parseString(data: m.value, defaultValue: ''),
                                 style: TextStyle(
                                   fontSize: 11,
                                   color: widget.isMultiValue
                                       ? widget.valueList.contains(m.id)
-                                            ? getMainStore().theme.value.HeadColor
+                                            ? getMainStore()
+                                                  .theme
+                                                  .value
+                                                  .HeadColor
                                             : Colors.black
                                       : widget.value == m.id
                                       ? getMainStore().theme.value.HeadColor
@@ -1008,22 +1179,43 @@ class _SelectBoxHelperState extends State<SelectBoxHelper> {
                       widget.onValueChange(m.id);
                     },
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 15,
+                        vertical: 6,
+                      ),
                       margin: const EdgeInsets.only(right: 10, bottom: 8),
                       decoration: BoxDecoration(
-                        color: widget.value == m.id ? getMainStore().theme.value.lowShadeColor : Colors.white,
-                        border: Border.all(width: 1, color: widget.value == m.id ? Color(0xFF0676FC) : Colors.blueGrey),
+                        color: widget.value == m.id
+                            ? getMainStore().theme.value.lowShadeColor
+                            : Colors.white,
+                        border: Border.all(
+                          width: 1,
+                          color: widget.value == m.id
+                              ? Color(0xFF0676FC)
+                              : Colors.blueGrey,
+                        ),
                         borderRadius: BorderRadius.circular(50),
-                        boxShadow: [BoxShadow(color: Color(0xFF94B6C6), blurRadius: 5)],
+                        boxShadow: [
+                          BoxShadow(color: Color(0xFF94B6C6), blurRadius: 5),
+                        ],
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          if (widget.value == m.id) Icon(FontAwesomeIcons.check, size: 15, color: getMainStore().theme.value.HeadColor),
+                          if (widget.value == m.id)
+                            Icon(
+                              FontAwesomeIcons.check,
+                              size: 15,
+                              color: getMainStore().theme.value.HeadColor,
+                            ),
                           if (widget.value == m.id) const SizedBox(width: 6),
                           Text(
                             parseString(data: m.value, defaultValue: ''),
-                            style: TextStyle(color: widget.value == m.id ? getMainStore().theme.value.HeadColor : Colors.black),
+                            style: TextStyle(
+                              color: widget.value == m.id
+                                  ? getMainStore().theme.value.HeadColor
+                                  : Colors.black,
+                            ),
                           ),
                         ],
                       ),
@@ -1064,7 +1256,11 @@ class AreaChartHelper extends StatelessWidget {
   AreaChartHelper({
     super.key,
     required this.dataSource,
-    this.gradient = const LinearGradient(colors: [Color(0xff6eaeff), Color(0x90dbecff)], begin: Alignment.topCenter, end: Alignment.bottomCenter),
+    this.gradient = const LinearGradient(
+      colors: [Color(0xff6eaeff), Color(0x90dbecff)],
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+    ),
     required this.chartTitle,
     this.customTooltip,
     this.showBorder = false,
@@ -1094,7 +1290,11 @@ class AreaChartHelper extends StatelessWidget {
       ),
       margin: EdgeInsets.zero,
       enableAxisAnimation: false,
-      zoomPanBehavior: ZoomPanBehavior(enableMouseWheelZooming: false, enableDoubleTapZooming: false, enablePanning: false),
+      zoomPanBehavior: ZoomPanBehavior(
+        enableMouseWheelZooming: false,
+        enableDoubleTapZooming: false,
+        enablePanning: false,
+      ),
       primaryXAxis: CategoryAxis(
         labelPlacement: LabelPlacement.onTicks,
         majorGridLines: MajorGridLines(color: gridXLineColor, width: 0),
@@ -1115,13 +1315,17 @@ class AreaChartHelper extends StatelessWidget {
           xValueMapper: (data, _) => data.x,
           yValueMapper: (data, _) => data.y,
           dataSource: dataSource.where((e) {
-            if (dataSource.indexOf(e) == 0 || dataSource.indexOf(e) == dataSource.length - 1) return true;
+            if (dataSource.indexOf(e) == 0 ||
+                dataSource.indexOf(e) == dataSource.length - 1)
+              return true;
             return e.y > 0;
           }).toList(),
           markerSettings: MarkerSettings(
             color: Colors.white,
             isVisible: showToolTip,
-            shape: tooltipcircle ? DataMarkerType.circle : DataMarkerType.rectangle,
+            shape: tooltipcircle
+                ? DataMarkerType.circle
+                : DataMarkerType.rectangle,
             borderColor: tooltipColor,
             width: 10,
             height: 10,
@@ -1139,29 +1343,45 @@ class AreaChartHelper extends StatelessWidget {
       tooltipBehavior: TooltipBehavior(
         enable: true,
         color: mainStore.theme.value.HeadColor.withAlpha(200),
-        builder: (dynamic data, dynamic point, dynamic series, int pointIndex, int seriesIndex) {
-          if ((customTooltip != null)) {
-            return customTooltip!(data);
-          } else {
-            return Container(
-              color: mainStore.theme.value.HeadColor.withAlpha(200),
-              width: 110,
-              height: 70,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    child: TextHelper(text: '${data.x}', color: mainStore.theme.value.lowShadeColor, textalign: TextAlign.center),
+        builder:
+            (
+              dynamic data,
+              dynamic point,
+              dynamic series,
+              int pointIndex,
+              int seriesIndex,
+            ) {
+              if ((customTooltip != null)) {
+                return customTooltip!(data);
+              } else {
+                return Container(
+                  color: mainStore.theme.value.HeadColor.withAlpha(200),
+                  width: 110,
+                  height: 70,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        child: TextHelper(
+                          text: '${data.x}',
+                          color: mainStore.theme.value.lowShadeColor,
+                          textalign: TextAlign.center,
+                        ),
+                      ),
+                      Divider(),
+                      Container(
+                        child: TextHelper(
+                          text: '${data.y}',
+                          color: mainStore.theme.value.lowShadeColor,
+                          fontweight: FontWeight.w600,
+                          textalign: TextAlign.center,
+                        ),
+                      ),
+                    ],
                   ),
-                  Divider(),
-                  Container(
-                    child: TextHelper(text: '${data.y}', color: mainStore.theme.value.lowShadeColor, fontweight: FontWeight.w600, textalign: TextAlign.center),
-                  ),
-                ],
-              ),
-            );
-          }
-        },
+                );
+              }
+            },
       ),
     );
   }
@@ -1187,7 +1407,11 @@ class BarChartHelper extends StatelessWidget {
   BarChartHelper({
     super.key,
     required this.dataSource,
-    this.gradient = const LinearGradient(colors: [Color(0xff6eaeff), Color(0x90dbecff)], begin: Alignment.topCenter, end: Alignment.bottomCenter),
+    this.gradient = const LinearGradient(
+      colors: [Color(0xff6eaeff), Color(0x90dbecff)],
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+    ),
     required this.chartTitle,
     this.customTooltip,
     this.showBorder = false,
@@ -1214,7 +1438,11 @@ class BarChartHelper extends StatelessWidget {
         textStyle: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
       ),
       enableAxisAnimation: false,
-      zoomPanBehavior: ZoomPanBehavior(enableMouseWheelZooming: false, enableDoubleTapZooming: false, enablePanning: false),
+      zoomPanBehavior: ZoomPanBehavior(
+        enableMouseWheelZooming: false,
+        enableDoubleTapZooming: false,
+        enablePanning: false,
+      ),
       primaryXAxis: CategoryAxis(
         labelPlacement: LabelPlacement.betweenTicks,
         majorGridLines: MajorGridLines(color: gridXLineColor),
@@ -1231,7 +1459,9 @@ class BarChartHelper extends StatelessWidget {
           dataSource: dataSource.where((e) => e.y > 0).toList(),
           markerSettings: MarkerSettings(
             isVisible: true,
-            shape: tooltipcircle ? DataMarkerType.circle : DataMarkerType.rectangle,
+            shape: tooltipcircle
+                ? DataMarkerType.circle
+                : DataMarkerType.rectangle,
             borderColor: tooltipColor,
             width: 14,
             height: 14,
@@ -1249,34 +1479,45 @@ class BarChartHelper extends StatelessWidget {
       tooltipBehavior: TooltipBehavior(
         enable: true,
         color: Colors.blueAccent[800],
-        builder: (dynamic data, dynamic point, dynamic series, int pointIndex, int seriesIndex) {
-          if ((customTooltip != null)) {
-            return customTooltip!(data);
-          } else {
-            return Container(
-              color: Color(0xFF040A0E),
-              width: 110,
-              height: 70,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    child: TextHelper(text: '${data.x}', color: getMainStore().theme.value.lowShadeColor, textalign: TextAlign.center),
+        builder:
+            (
+              dynamic data,
+              dynamic point,
+              dynamic series,
+              int pointIndex,
+              int seriesIndex,
+            ) {
+              if ((customTooltip != null)) {
+                return customTooltip!(data);
+              } else {
+                return Container(
+                  color: Color(0xFF040A0E),
+                  width: 110,
+                  height: 70,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        child: TextHelper(
+                          text: '${data.x}',
+                          color: getMainStore().theme.value.lowShadeColor,
+                          textalign: TextAlign.center,
+                        ),
+                      ),
+                      Divider(),
+                      Container(
+                        child: TextHelper(
+                          text: '${data.y}',
+                          color: getMainStore().theme.value.lowShadeColor,
+                          fontweight: FontWeight.w600,
+                          textalign: TextAlign.center,
+                        ),
+                      ),
+                    ],
                   ),
-                  Divider(),
-                  Container(
-                    child: TextHelper(
-                      text: '${data.y}',
-                      color: getMainStore().theme.value.lowShadeColor,
-                      fontweight: FontWeight.w600,
-                      textalign: TextAlign.center,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }
-        },
+                );
+              }
+            },
       ),
     );
   }
@@ -1324,7 +1565,9 @@ class PieChartHelper extends StatelessWidget {
           legendIconType: LegendIconType.circle,
           xValueMapper: (data, _) => data.x,
           yValueMapper: (data, _) => data.y,
-          dataLabelMapper: (data, _) => dataLabelMaper != null ? dataLabelMaper!(parseString(data: data.y, defaultValue: '')) : data.x,
+          dataLabelMapper: (data, _) => dataLabelMaper != null
+              ? dataLabelMaper!(parseString(data: data.y, defaultValue: ''))
+              : data.x,
           dataSource: dataSource,
           enableTooltip: enableTooltip,
           name: chartTitle,
@@ -1333,7 +1576,10 @@ class PieChartHelper extends StatelessWidget {
           dataLabelSettings: DataLabelSettings(
             isVisible: showLabel,
             labelPosition: labelPositon,
-            connectorLineSettings: const ConnectorLineSettings(type: ConnectorType.line, length: '10%'),
+            connectorLineSettings: const ConnectorLineSettings(
+              type: ConnectorType.line,
+              length: '10%',
+            ),
             useSeriesColor: true,
           ),
         ),
@@ -1341,34 +1587,45 @@ class PieChartHelper extends StatelessWidget {
       tooltipBehavior: TooltipBehavior(
         enable: true,
         color: Colors.blueAccent[800],
-        builder: (dynamic data, dynamic point, dynamic series, int pointIndex, int seriesIndex) {
-          if ((customTooltip != null)) {
-            return customTooltip!(data);
-          } else {
-            return Container(
-              color: Color(0xFF040A0E),
-              width: 110,
-              height: 70,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    child: TextHelper(text: '${data.x}', color: getMainStore().theme.value.lowShadeColor, textalign: TextAlign.center),
+        builder:
+            (
+              dynamic data,
+              dynamic point,
+              dynamic series,
+              int pointIndex,
+              int seriesIndex,
+            ) {
+              if ((customTooltip != null)) {
+                return customTooltip!(data);
+              } else {
+                return Container(
+                  color: Color(0xFF040A0E),
+                  width: 110,
+                  height: 70,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        child: TextHelper(
+                          text: '${data.x}',
+                          color: getMainStore().theme.value.lowShadeColor,
+                          textalign: TextAlign.center,
+                        ),
+                      ),
+                      Divider(),
+                      Container(
+                        child: TextHelper(
+                          text: '${data.y}',
+                          color: getMainStore().theme.value.lowShadeColor,
+                          fontweight: FontWeight.w600,
+                          textalign: TextAlign.center,
+                        ),
+                      ),
+                    ],
                   ),
-                  Divider(),
-                  Container(
-                    child: TextHelper(
-                      text: '${data.y}',
-                      color: getMainStore().theme.value.lowShadeColor,
-                      fontweight: FontWeight.w600,
-                      textalign: TextAlign.center,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }
-        },
+                );
+              }
+            },
       ),
     );
   }
@@ -1457,7 +1714,10 @@ class DropDownHelperG extends StatefulHookWidget {
 }
 
 class _DropDownHelperGState extends State<DropDownHelperG> {
-  late DropDownStore dropDownStore = Get.put(DropDownStore(), tag: widget.uniqueKey);
+  late DropDownStore dropDownStore = Get.put(
+    DropDownStore(),
+    tag: widget.uniqueKey,
+  );
   MainStore mainStore = Get.find();
 
   final ScrollController _scrollController = ScrollController();
@@ -1466,8 +1726,12 @@ class _DropDownHelperGState extends State<DropDownHelperG> {
     return Obx(
       () => GestureDetector(
         onTap: () {
-          if (dropDownStore.selectedList.any((t) => t[widget.valueKey] == data[widget.valueKey])) {
-            dropDownStore.selectedList.removeWhere((t) => t[widget.valueKey] == data[widget.valueKey]);
+          if (dropDownStore.selectedList.any(
+            (t) => t[widget.valueKey] == data[widget.valueKey],
+          )) {
+            dropDownStore.selectedList.removeWhere(
+              (t) => t[widget.valueKey] == data[widget.valueKey],
+            );
           } else {
             dropDownStore.selectedList.add(data);
           }
@@ -1481,10 +1745,16 @@ class _DropDownHelperGState extends State<DropDownHelperG> {
               child: MoonCheckbox(
                 activeColor: Colors.blue[50],
                 checkColor: Colors.blue[800],
-                value: dropDownStore.selectedList.any((t) => t[widget.valueKey] == data[widget.valueKey]),
+                value: dropDownStore.selectedList.any(
+                  (t) => t[widget.valueKey] == data[widget.valueKey],
+                ),
                 onChanged: (v) {
-                  if (dropDownStore.selectedList.any((t) => t[widget.valueKey] == data[widget.valueKey])) {
-                    dropDownStore.selectedList.removeWhere((t) => t[widget.valueKey] == data[widget.valueKey]);
+                  if (dropDownStore.selectedList.any(
+                    (t) => t[widget.valueKey] == data[widget.valueKey],
+                  )) {
+                    dropDownStore.selectedList.removeWhere(
+                      (t) => t[widget.valueKey] == data[widget.valueKey],
+                    );
                   } else {
                     dropDownStore.selectedList.add(data);
                   }
@@ -1493,7 +1763,10 @@ class _DropDownHelperGState extends State<DropDownHelperG> {
               ),
             ),
             Expanded(
-              child: TextHelper(text: data[widget.displayKey], fontsize: widget.fontSize),
+              child: TextHelper(
+                text: data[widget.displayKey],
+                fontsize: widget.fontSize,
+              ),
             ),
           ],
         ),
@@ -1507,7 +1780,9 @@ class _DropDownHelperGState extends State<DropDownHelperG> {
         dropDownStore.showList.value = true;
       },
       onDoubleTap: () {
-        dropDownStore.selectedList.removeWhere((t) => t[widget.valueKey] == data[widget.valueKey]);
+        dropDownStore.selectedList.removeWhere(
+          (t) => t[widget.valueKey] == data[widget.valueKey],
+        );
         if (widget.onMultiValueChange != null) {
           widget.onMultiValueChange!(dropDownStore.selectedList.value);
         }
@@ -1517,22 +1792,33 @@ class _DropDownHelperGState extends State<DropDownHelperG> {
         children: [
           Container(
             padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-            decoration: BoxDecoration(color: Colors.blueGrey[50], borderRadius: BorderRadius.circular(15)),
-            child: TextHelper(text: data[widget.displayKey], fontsize: widget.fontSize),
+            decoration: BoxDecoration(
+              color: Colors.blueGrey[50],
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: TextHelper(
+              text: data[widget.displayKey],
+              fontsize: widget.fontSize,
+            ),
           ),
           Positioned(
             right: -5,
             top: -5,
             child: GestureDetector(
               onTap: () {
-                dropDownStore.selectedList.removeWhere((t) => t[widget.valueKey] == data[widget.valueKey]);
+                dropDownStore.selectedList.removeWhere(
+                  (t) => t[widget.valueKey] == data[widget.valueKey],
+                );
                 if (widget.onMultiValueChange != null) {
                   widget.onMultiValueChange!(dropDownStore.selectedList.value);
                 }
               },
               child: Container(
                 padding: EdgeInsets.all(2),
-                decoration: BoxDecoration(color: Colors.grey[500], borderRadius: BorderRadius.circular(10)),
+                decoration: BoxDecoration(
+                  color: Colors.grey[500],
+                  borderRadius: BorderRadius.circular(10),
+                ),
                 child: Icon(FontAwesomeIcons.xmark, size: 12),
               ),
             ),
@@ -1548,7 +1834,9 @@ class _DropDownHelperGState extends State<DropDownHelperG> {
       child: MoonAccordion(
         shadows: [],
         label: TextHelper(text: data['label']),
-        children: [for (Map<String, dynamic> m in data['list']) multiSelectWidget(m)],
+        children: [
+          for (Map<String, dynamic> m in data['list']) multiSelectWidget(m),
+        ],
       ),
     );
   }
@@ -1597,7 +1885,9 @@ class _DropDownHelperGState extends State<DropDownHelperG> {
                 child: TextHelper(
                   isWrap: true,
                   fontsize: widget.fontSize,
-                  color: data[widget.valueKey] == widget.value?[widget.valueKey] ? mainStore.theme.value.BackgroundColor : Colors.grey.shade800,
+                  color: data[widget.valueKey] == widget.value?[widget.valueKey]
+                      ? mainStore.theme.value.BackgroundColor
+                      : Colors.grey.shade800,
                   text: data[widget.displayKey],
                 ),
               ),
@@ -1620,7 +1910,10 @@ class _DropDownHelperGState extends State<DropDownHelperG> {
                   Container(
                     margin: EdgeInsets.only(left: 6),
                     padding: EdgeInsets.all(6),
-                    child: singleSelectWidget(makeListSerialize(data['list'])[index], index),
+                    child: singleSelectWidget(
+                      makeListSerialize(data['list'])[index],
+                      index,
+                    ),
                   ),
                 ),
               )
@@ -1639,7 +1932,9 @@ class _DropDownHelperGState extends State<DropDownHelperG> {
     } else {
       List<Map<String, dynamic>> labels = [];
       list.forEach((l) {
-        int index = labels.indexWhere((w) => w['label'] == l[widget.treeViewkey]);
+        int index = labels.indexWhere(
+          (w) => w['label'] == l[widget.treeViewkey],
+        );
         if (index == -1) {
           labels.add({
             'label': l[widget.treeViewkey],
@@ -1659,8 +1954,13 @@ class _DropDownHelperGState extends State<DropDownHelperG> {
       dropDownStore.list.value = widget.items;
       dropDownStore.filteredList.value = widget.items;
       dropDownStore.selectedList.value = widget.multiSelectValue ?? [];
-      if (widget.value != null && widget.isMultiSelect == false && dropDownStore.init.value == false) {
-        dropDownStore.textController.value.text = parseString(data: widget.value![widget.displayKey], defaultValue: '');
+      if (widget.value != null &&
+          widget.isMultiSelect == false &&
+          dropDownStore.init.value == false) {
+        dropDownStore.textController.value.text = parseString(
+          data: widget.value![widget.displayKey],
+          defaultValue: '',
+        );
         Timer(const Duration(milliseconds: 300), () {
           dropDownStore.init.value = true;
         });
@@ -1678,7 +1978,8 @@ class _DropDownHelperGState extends State<DropDownHelperG> {
     if (dropDownStore.filteredList.value.isEmpty) {
       return 50;
     }
-    return (widget.rowHeight * dropDownStore.filteredList.length) < widget.listHeight
+    return (widget.rowHeight * dropDownStore.filteredList.length) <
+            widget.listHeight
         ? ((widget.rowHeight + 30) * dropDownStore.filteredList.length) > 40
               ? ((widget.rowHeight + 30) * dropDownStore.filteredList.length)
               : 255
@@ -1694,9 +1995,15 @@ class _DropDownHelperGState extends State<DropDownHelperG> {
     dropDownStore.selectedList.value = widget.multiSelectValue ?? [];
     // if (mounted) {
     // if (dropDownStore.init.value) {
-    dropDownStore.textController.value.text = makeMapSerialize(widget.value).isEmpty
+    dropDownStore.textController.value.text =
+        makeMapSerialize(widget.value).isEmpty
         ? ''
-        : parseString(data: widget.items.firstWhereOrNull((t) => t[widget.valueKey] == widget.value![widget.valueKey])?[widget.displayKey], defaultValue: '');
+        : parseString(
+            data: widget.items.firstWhereOrNull(
+              (t) => t[widget.valueKey] == widget.value![widget.valueKey],
+            )?[widget.displayKey],
+            defaultValue: '',
+          );
     // }
     // }
 
@@ -1742,7 +2049,9 @@ class _DropDownHelperGState extends State<DropDownHelperG> {
         constrainWidthToChild: true,
         transitionDuration: widget.transitionDuration,
         minHeight: 40,
-        backgroundColor: mainStore.isDarkEnable.value ? Colors.black87 : Colors.white,
+        backgroundColor: mainStore.isDarkEnable.value
+            ? Colors.black87
+            : Colors.white,
         onTapOutside: () {
           dropDownStore.showList.value = false;
           if (widget.onHiding != null) {
@@ -1753,7 +2062,9 @@ class _DropDownHelperGState extends State<DropDownHelperG> {
         content: dropDownStore.filteredList.value.isEmpty
             ? Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [TextHelper(text: "No Data", fontweight: FontWeight.w400)],
+                children: [
+                  TextHelper(text: "No Data", fontweight: FontWeight.w400),
+                ],
               )
             : ListView.builder(
                 controller: _scrollController,
@@ -1761,11 +2072,22 @@ class _DropDownHelperGState extends State<DropDownHelperG> {
                 itemCount: listMaker(dropDownStore.filteredList.value).length,
                 itemBuilder: (context, index) => widget.isMultiSelect
                     ? widget.treeViewkey != ''
-                          ? treeViewWidget(listMaker(dropDownStore.filteredList.value)[index])
-                          : multiSelectWidget(dropDownStore.filteredList.value[index])
+                          ? treeViewWidget(
+                              listMaker(
+                                dropDownStore.filteredList.value,
+                              )[index],
+                            )
+                          : multiSelectWidget(
+                              dropDownStore.filteredList.value[index],
+                            )
                     : widget.treeViewkey != ''
-                    ? treeViewWidgetSingleSelect(listMaker(dropDownStore.filteredList.value)[index])
-                    : singleSelectWidget(dropDownStore.filteredList.value[index], index),
+                    ? treeViewWidgetSingleSelect(
+                        listMaker(dropDownStore.filteredList.value)[index],
+                      )
+                    : singleSelectWidget(
+                        dropDownStore.filteredList.value[index],
+                        index,
+                      ),
               ),
         child: widget.isMultiSelect
             ? dropDownStore.selectedList.isNotEmpty
@@ -1777,7 +2099,11 @@ class _DropDownHelperGState extends State<DropDownHelperG> {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           spacing: 10,
-                          children: [for (Map<String, dynamic> m in dropDownStore.selectedList.value) multiSelectWidgetChild(m)],
+                          children: [
+                            for (Map<String, dynamic> m
+                                in dropDownStore.selectedList.value)
+                              multiSelectWidgetChild(m),
+                          ],
                         ),
                       ),
                     )
@@ -1789,7 +2115,9 @@ class _DropDownHelperGState extends State<DropDownHelperG> {
                       label: TextHelper(text: 'Choose option'),
                     )
             : TextBox(
-                leading: widget.leading == null ? null : widget.leading ?? Icon(MoonIcons.generic_search_24_light),
+                leading: widget.leading == null
+                    ? null
+                    : widget.leading ?? Icon(MoonIcons.generic_search_24_light),
                 readonly: !widget.isSearchEnable,
                 placeholder: widget.placeHolder,
                 height: widget.height,
@@ -1806,7 +2134,8 @@ class _DropDownHelperGState extends State<DropDownHelperG> {
                               dropDownStore.selectedValue.value = {};
                               dropDownStore.list.value = widget.items;
                               dropDownStore.filteredList.value = widget.items;
-                              dropDownStore.selectedList.value = widget.multiSelectValue ?? [];
+                              dropDownStore.selectedList.value =
+                                  widget.multiSelectValue ?? [];
                               if (widget.onValueChange != null) {
                                 widget.onValueChange!({});
                               }
@@ -1822,7 +2151,11 @@ class _DropDownHelperGState extends State<DropDownHelperG> {
                   dropDownStore.showList.value = true;
                   int index = widget.value == null
                       ? -1
-                      : dropDownStore.filteredList.value.indexWhere((t) => t[widget.valueKey] == widget.value![widget.valueKey]);
+                      : dropDownStore.filteredList.value.indexWhere(
+                          (t) =>
+                              t[widget.valueKey] ==
+                              widget.value![widget.valueKey],
+                        );
                   if (index > -1) {
                     Future.delayed(const Duration(milliseconds: 200), () {
                       _scrollController.animateTo(
@@ -1839,7 +2172,14 @@ class _DropDownHelperGState extends State<DropDownHelperG> {
                     return;
                   }
                   List<Map<String, dynamic>> list = dropDownStore.list.value;
-                  dropDownStore.filteredList.value = list.where((t) => t[widget.displayKey].toString().toLowerCase().contains(v.toLowerCase())).toList();
+                  dropDownStore.filteredList.value = list
+                      .where(
+                        (t) => t[widget.displayKey]
+                            .toString()
+                            .toLowerCase()
+                            .contains(v.toLowerCase()),
+                      )
+                      .toList();
                 },
                 withBorder: widget.showBorder,
                 backgroundColor: widget.lightModeBackgroundColor,
@@ -1983,11 +2323,17 @@ class _ButtonHelperGState extends State<ButtonHelperG> {
         margin: EdgeInsets.all(widget.margin),
         decoration: BoxDecoration(
           border: isFocused
-              ? Border.all(color: mainStore.isDarkEnable.value ? Colors.black : Colors.grey.shade800)
+              ? Border.all(
+                  color: mainStore.isDarkEnable.value
+                      ? Colors.black
+                      : Colors.grey.shade800,
+                )
               : widget.withBorder
               ? Border.all(
                   color: widget.type == ButtonHelperTypeG.outlined
-                      ? widget.borderColor ?? widget.background ?? Colors.grey.shade300
+                      ? widget.borderColor ??
+                            widget.background ??
+                            Colors.grey.shade300
                       : mainStore.isDarkEnable.value
                       ? Colors.black
                       : widget.borderColor ?? Colors.grey.shade300,
@@ -2002,7 +2348,8 @@ class _ButtonHelperGState extends State<ButtonHelperG> {
                       ? Colors.transparent
                       : mainStore.isDarkEnable.value
                       ? Colors.grey.shade700
-                      : widget.borderColor ?? mainStore.theme.value.BackgroundShadeColor,
+                      : widget.borderColor ??
+                            mainStore.theme.value.BackgroundShadeColor,
                   offset: const Offset(0, 0),
                   spreadRadius: 0.005,
                   blurRadius: 10,
@@ -2044,17 +2391,30 @@ class _ButtonHelperGState extends State<ButtonHelperG> {
             height: widget.height,
             alignment: widget.alignment,
             decoration: BoxDecoration(
-              color: widget.type == ButtonHelperTypeG.outlined ? Colors.white : widget.background ?? getMainStore().theme.value.BottomNavColor,
+              color: widget.type == ButtonHelperTypeG.outlined
+                  ? Colors.white
+                  : widget.background ??
+                        getMainStore().theme.value.BottomNavColor,
               borderRadius: BorderRadius.circular(widget.borderRadius),
             ),
             child: widget.direction == ButtonHelperDirectionG.horizontal
-                ? Row(mainAxisSize: MainAxisSize.min, spacing: 5, children: [if (widget.icon != null) widget.icon!, if (widget.label != null) widget.label!])
+                ? Row(
+                    mainAxisSize: MainAxisSize.min,
+                    spacing: 5,
+                    children: [
+                      if (widget.icon != null) widget.icon!,
+                      if (widget.label != null) widget.label!,
+                    ],
+                  )
                 : Column(
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     spacing: 2,
-                    children: [if (widget.icon != null) widget.icon!, if (widget.label != null) widget.label!],
+                    children: [
+                      if (widget.icon != null) widget.icon!,
+                      if (widget.label != null) widget.label!,
+                    ],
                   ),
           ),
         ),
@@ -2070,7 +2430,14 @@ class JsonViewerG extends StatelessWidget {
   final bool enableCopy;
   final void Function(String path)? onValueTap;
 
-  const JsonViewerG({Key? key, required this.json, this.path = '', this.onValueTap, this.keyName = '', this.enableCopy = false}) : super(key: key);
+  const JsonViewerG({
+    Key? key,
+    required this.json,
+    this.path = '',
+    this.onValueTap,
+    this.keyName = '',
+    this.enableCopy = false,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -2096,7 +2463,11 @@ class JsonViewerG extends StatelessWidget {
               ),
             Expanded(
               child: keyName == ''
-                  ? TextHelper(text: (json as Map).toString(), fontweight: FontWeight.w600, color: Colors.blueGrey.shade800)
+                  ? TextHelper(
+                      text: (json as Map).toString(),
+                      fontweight: FontWeight.w600,
+                      color: Colors.blueGrey.shade800,
+                    )
                   : Row(
                       children: [
                         GestureDetector(
@@ -2105,10 +2476,17 @@ class JsonViewerG extends StatelessWidget {
                               onValueTap!(path);
                             }
                           },
-                          child: TextHelper(text: "$keyName: ", fontweight: FontWeight.w600),
+                          child: TextHelper(
+                            text: "$keyName: ",
+                            fontweight: FontWeight.w600,
+                          ),
                         ),
                         Expanded(
-                          child: TextHelper(text: (json as Map).toString(), fontweight: FontWeight.w500, color: Colors.blueGrey.shade600),
+                          child: TextHelper(
+                            text: (json as Map).toString(),
+                            fontweight: FontWeight.w500,
+                            color: Colors.blueGrey.shade600,
+                          ),
                         ),
                       ],
                     ),
@@ -2121,7 +2499,12 @@ class JsonViewerG extends StatelessWidget {
           final newPath = path.isEmpty ? entry.key : '$path.${entry.key}';
           return Padding(
             padding: const EdgeInsets.only(left: 12),
-            child: JsonViewerG(json: entry.value, keyName: entry.key, path: newPath, onValueTap: onValueTap),
+            child: JsonViewerG(
+              json: entry.value,
+              keyName: entry.key,
+              path: newPath,
+              onValueTap: onValueTap,
+            ),
           );
         }).toList(),
       );
@@ -2136,7 +2519,8 @@ class JsonViewerG extends StatelessWidget {
         label: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (enableCopy) const Icon(MoonIcons.files_copy_32_regular, size: 20),
+            if (enableCopy)
+              const Icon(MoonIcons.files_copy_32_regular, size: 20),
             Expanded(
               child: keyName == ''
                   ? GestureDetector(
@@ -2145,7 +2529,11 @@ class JsonViewerG extends StatelessWidget {
                           onValueTap!(path);
                         }
                       },
-                      child: TextHelper(text: (json as List).toString(), fontweight: FontWeight.w600, color: Colors.blueGrey.shade800),
+                      child: TextHelper(
+                        text: (json as List).toString(),
+                        fontweight: FontWeight.w600,
+                        color: Colors.blueGrey.shade800,
+                      ),
                     )
                   : Row(
                       children: [
@@ -2155,10 +2543,17 @@ class JsonViewerG extends StatelessWidget {
                               onValueTap!(path);
                             }
                           },
-                          child: TextHelper(text: "$keyName: ", fontweight: FontWeight.w600),
+                          child: TextHelper(
+                            text: "$keyName: ",
+                            fontweight: FontWeight.w600,
+                          ),
                         ),
                         Expanded(
-                          child: TextHelper(text: makeListSerialize(json).toString(), fontweight: FontWeight.w500, color: Colors.blueGrey.shade600),
+                          child: TextHelper(
+                            text: makeListSerialize(json).toString(),
+                            fontweight: FontWeight.w500,
+                            color: Colors.blueGrey.shade600,
+                          ),
                         ),
                       ],
                     ),
@@ -2171,7 +2566,12 @@ class JsonViewerG extends StatelessWidget {
           final newPath = '$path[${entry.key}]';
           return Padding(
             padding: const EdgeInsets.only(left: 12),
-            child: JsonViewerG(json: entry.value, keyName: entry.key.toString(), path: newPath, onValueTap: onValueTap),
+            child: JsonViewerG(
+              json: entry.value,
+              keyName: entry.key.toString(),
+              path: newPath,
+              onValueTap: onValueTap,
+            ),
           );
         }).toList(),
       );
@@ -2190,7 +2590,8 @@ class JsonViewerG extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  if (enableCopy) const Icon(MoonIcons.files_copy_32_regular, size: 20),
+                  if (enableCopy)
+                    const Icon(MoonIcons.files_copy_32_regular, size: 20),
                   TextHelper(text: '$keyName: ', fontweight: FontWeight.w600),
                 ],
               ),
@@ -2199,11 +2600,15 @@ class JsonViewerG extends StatelessWidget {
               text: ' $json',
               fontweight: FontWeight.w500,
               fontsize: 13,
-              color: (json.toString().toLowerCase() == 'true' || json.toString().toLowerCase() == 'false')
+              color:
+                  (json.toString().toLowerCase() == 'true' ||
+                      json.toString().toLowerCase() == 'false')
                   ? getMainStore().theme.value.HeadColor
                   : double.tryParse(json.toString()) != null
                   ? getMainStore().theme.value.HeadColor
-                  : (json.toString().contains('#') && json.toString().length > 4 && json.toString().length < 9)
+                  : (json.toString().contains('#') &&
+                        json.toString().length > 4 &&
+                        json.toString().length < 9)
                   ? Colors.amber.shade600
                   : Colors.blueGrey.shade600,
             ),
@@ -2216,15 +2621,45 @@ class JsonViewerG extends StatelessWidget {
 
 // HELPER FUNCTIONS ========
 
-showAlert(String content, AlertType alertType, [BuildContext? context, Duration? duration, bool? withUndoBtn, Function? onUndoBtnClick]) {
+showAlert(
+  String content,
+  AlertType alertType, [
+  BuildContext? context,
+  Duration? duration,
+  bool? withUndoBtn,
+  Function? onUndoBtnClick,
+]) {
   logG("${alertType.name} - $content \n ${StackTrace.current}");
-  return AlertService.showAlert(content.replaceAll("Exception: ", ""), alertType, duration: duration, withUndoBtn: withUndoBtn, onUndoBtnClick: onUndoBtnClick);
+  return AlertService.showAlert(
+    content.replaceAll("Exception: ", ""),
+    alertType,
+    duration: duration,
+    withUndoBtn: withUndoBtn,
+    onUndoBtnClick: onUndoBtnClick,
+  );
 }
 
 class AlertService {
   static final List<OverlayEntry> _entries = [];
 
-  static void showAlert(String content, AlertType alertType, {Duration? duration, bool? withUndoBtn, Function? onUndoBtnClick}) {
+  static void showAlert(
+    String content,
+    AlertType alertType, {
+    Duration? duration,
+    bool? withUndoBtn,
+    Function? onUndoBtnClick,
+  }) {
+    Color getAccentColor() {
+      switch (alertType) {
+        case AlertType.error:
+          return Colors.red.shade600;
+        case AlertType.success:
+          return Colors.green.shade600;
+        default:
+          return Colors.blue.shade600;
+      }
+    }
+
     Color getBackgroundColor() {
       switch (alertType) {
         case AlertType.error:
@@ -2236,25 +2671,25 @@ class AlertService {
       }
     }
 
-    Color getBorderColor({bool isDark = false}) {
+    Color getBorderColor() {
       switch (alertType) {
         case AlertType.error:
-          return isDark ? Colors.red.shade300 : Colors.red.shade100;
+          return Colors.red.shade200;
         case AlertType.success:
-          return isDark ? Colors.green.shade400 : Colors.green.shade100;
+          return Colors.green.shade200;
         default:
-          return isDark ? Colors.blue.shade400 : Colors.blue.shade100;
+          return Colors.blue.shade200;
       }
     }
 
-    Color getTextColor() {
+    IconData getIcon() {
       switch (alertType) {
         case AlertType.error:
-          return Colors.red.shade400;
+          return Icons.error_outline_rounded;
         case AlertType.success:
-          return Colors.green.shade800;
+          return Icons.check_circle_outline_rounded;
         default:
-          return Colors.blue.shade800;
+          return Icons.info_outline_rounded;
       }
     }
 
@@ -2263,92 +2698,147 @@ class AlertService {
     entry = OverlayEntry(
       builder: (context) {
         int index = _entries.indexOf(entry);
-        double start = 20;
+        double topOffset = 10;
         return StatefulBuilder(
           builder: (context, setState) {
-            Future.delayed(const Duration(milliseconds: 200), () {
+            Future.delayed(const Duration(milliseconds: 50), () {
               setState(() {
-                start = 55;
+                topOffset = 50;
               });
             });
+
+            final screenWidth = MediaQuery.sizeOf(context).width;
+            final toastWidth = GetPlatform.isMobile
+                ? (screenWidth - 32).clamp(280.0, 420.0)
+                : 400.0;
+
             return AnimatedPositioned(
-              curve: Curves.fastEaseInToSlowEaseOut,
-              duration: const Duration(milliseconds: 700),
-              bottom: start + (index * 55),
-              // right: 20,
-              left: (MediaQuery.of(context).size.width - (GetPlatform.isMobile ? 350 : 450)) / 2,
+              curve: Curves.fastOutSlowIn,
+              duration: const Duration(milliseconds: 400),
+              top: topOffset + (index * 68),
+              left: (screenWidth - toastWidth) / 2,
               child: Material(
                 color: Colors.transparent,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  width: GetPlatform.isMobile ? 350 : 450,
+                  width: toastWidth,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 10,
+                  ),
                   decoration: BoxDecoration(
-                    color: getBackgroundColor(),
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: getBorderColor()),
-                    boxShadow: [BoxShadow(blurRadius: 4, spreadRadius: 1, color: Colors.grey.shade100)],
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: getBorderColor(), width: 1.2),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withAlpha(22),
+                        blurRadius: 16,
+                        offset: const Offset(0, 6),
+                      ),
+                      BoxShadow(
+                        color: getAccentColor().withAlpha(20),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
+                      // Icon Pill
+                      Container(
+                        width: 36,
+                        height: 36,
+                        decoration: BoxDecoration(
+                          color: getBackgroundColor(),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Icon(
+                          getIcon(),
+                          size: 20,
+                          color: getAccentColor(),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+
+                      // Text Content
                       Expanded(
-                        child: Row(
+                        child: Column(
                           mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Icon(alertType == AlertType.success ? Icons.check_circle : Icons.info, size: 18, color: getTextColor()),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  TextHelper(
-                                    text:
-                                        (alertType == AlertType.success
-                                                ? "Success"
-                                                : alertType == AlertType.info
-                                                ? "Info"
-                                                : "Error")
-                                            .toUpperCase(),
-                                    color: getTextColor(),
-                                    fontsize: 11,
-                                    fontweight: FontWeight.w600,
-                                  ),
-                                  TextHelper(
-                                    text: content,
-                                    isWrap: true,
-                                    fontsize: 12,
-                                    color: Colors.grey.shade800,
-                                    fontweight: FontWeight.w600,
-                                    textalign: TextAlign.left,
-                                  ),
-                                ],
-                              ),
+                            TextHelper(
+                              text:
+                                  (alertType == AlertType.success
+                                          ? "Success"
+                                          : alertType == AlertType.info
+                                          ? "Info"
+                                          : "Notice")
+                                      .toUpperCase(),
+                              color: getAccentColor(),
+                              fontsize: 10,
+                              fontweight: FontWeight.w800,
+                              padding: EdgeInsets.zero,
+                            ),
+                            const SizedBox(height: 2),
+                            TextHelper(
+                              text: content,
+                              isWrap: true,
+                              fontsize: 12.5,
+                              color: Colors.blueGrey.shade900,
+                              fontweight: FontWeight.w600,
+                              textalign: TextAlign.left,
+                              padding: EdgeInsets.zero,
                             ),
                           ],
                         ),
                       ),
+                      const SizedBox(width: 8),
+
+                      // Action / Close
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          if (withUndoBtn == true)
-                            TextButton(
-                              onPressed: () {
+                          if (withUndoBtn == true) ...[
+                            InkWell(
+                              onTap: () {
                                 onUndoBtnClick?.call();
                                 remove(entry);
                               },
+                              borderRadius: BorderRadius.circular(8),
                               child: Container(
-                                padding: const EdgeInsets.all(5),
-                                decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Colors.white),
-                                child: TextHelper(text: "Undo", fontsize: 12, fontweight: FontWeight.w600),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: getBackgroundColor(),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: TextHelper(
+                                  text: "Undo",
+                                  fontsize: 11,
+                                  fontweight: FontWeight.w700,
+                                  color: getAccentColor(),
+                                  padding: EdgeInsets.zero,
+                                ),
                               ),
                             ),
-                          GestureDetector(
+                            const SizedBox(width: 6),
+                          ],
+                          InkWell(
                             onTap: () => remove(entry),
+                            borderRadius: BorderRadius.circular(16),
                             child: Container(
                               padding: const EdgeInsets.all(5),
-                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Colors.white),
-                              child: Icon(Icons.close, size: 15, color: getBorderColor(isDark: true)),
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade100,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.close_rounded,
+                                size: 14,
+                                color: Colors.grey.shade600,
+                              ),
                             ),
                           ),
                         ],
@@ -2393,7 +2883,9 @@ Map<String, dynamic> makeMapSerialize(dynamic data) {
 
 List<Map<String, dynamic>> makeListSerialize(dynamic data) {
   try {
-    return data.map<Map<String, dynamic>>((m) => Map<String, dynamic>.from(m)).toList();
+    return data
+        .map<Map<String, dynamic>>((m) => Map<String, dynamic>.from(m))
+        .toList();
   } catch (e) {
     return [];
   }
@@ -2401,9 +2893,20 @@ List<Map<String, dynamic>> makeListSerialize(dynamic data) {
 
 int parseInt({required dynamic data, int? defaultInt}) {
   try {
-    return int.tryParse(parseDouble(data: data.toString(), defaultValue: 0.0).toStringAsFixed(0)) == null
+    return int.tryParse(
+              parseDouble(
+                data: data.toString(),
+                defaultValue: 0.0,
+              ).toStringAsFixed(0),
+            ) ==
+            null
         ? (defaultInt ?? 0)
-        : int.parse(parseDouble(data: data.toString(), defaultValue: 0.0).toStringAsFixed(0));
+        : int.parse(
+            parseDouble(
+              data: data.toString(),
+              defaultValue: 0.0,
+            ).toStringAsFixed(0),
+          );
   } catch (e) {
     return (defaultInt ?? 0);
   }
@@ -2411,9 +2914,20 @@ int parseInt({required dynamic data, int? defaultInt}) {
 
 int parseIntV2(dynamic data, {int? defaultInt}) {
   try {
-    return int.tryParse(parseDouble(data: data.toString(), defaultValue: 0.0).toStringAsFixed(0)) == null
+    return int.tryParse(
+              parseDouble(
+                data: data.toString(),
+                defaultValue: 0.0,
+              ).toStringAsFixed(0),
+            ) ==
+            null
         ? (defaultInt ?? 0)
-        : int.parse(parseDouble(data: data.toString(), defaultValue: 0.0).toStringAsFixed(0));
+        : int.parse(
+            parseDouble(
+              data: data.toString(),
+              defaultValue: 0.0,
+            ).toStringAsFixed(0),
+          );
   } catch (e) {
     return (defaultInt ?? 0);
   }
@@ -2421,7 +2935,9 @@ int parseIntV2(dynamic data, {int? defaultInt}) {
 
 double parseDouble({required dynamic data, double? defaultValue}) {
   try {
-    return double.tryParse(data.toString()) == null ? (defaultValue ?? 0) : double.parse(data.toString());
+    return double.tryParse(data.toString()) == null
+        ? (defaultValue ?? 0)
+        : double.parse(data.toString());
   } catch (e) {
     return (defaultValue ?? 0);
   }
@@ -2429,24 +2945,38 @@ double parseDouble({required dynamic data, double? defaultValue}) {
 
 double parseDoubleV2(dynamic data, {double? defaultValue}) {
   try {
-    return double.tryParse(data.toString()) == null ? (defaultValue ?? 0) : double.parse(data.toString());
+    return double.tryParse(data.toString()) == null
+        ? (defaultValue ?? 0)
+        : double.parse(data.toString());
   } catch (e) {
     return (defaultValue ?? 0);
   }
 }
 
-String parseDoubleWithLength({required dynamic data, required String defaultValue, int doubleLength = 2}) {
+String parseDoubleWithLength({
+  required dynamic data,
+  required String defaultValue,
+  int doubleLength = 2,
+}) {
   try {
-    return double.tryParse(data.toString()) == null ? defaultValue : double.parse(data.toString()).toStringAsFixed(doubleLength);
+    return double.tryParse(data.toString()) == null
+        ? defaultValue
+        : double.parse(data.toString()).toStringAsFixed(doubleLength);
   } catch (e) {
     return defaultValue;
   }
 }
 
-double parseDoubleWithFixLength({required dynamic data, required double defaultValue, int doubleLength = 2}) {
+double parseDoubleWithFixLength({
+  required dynamic data,
+  required double defaultValue,
+  int doubleLength = 2,
+}) {
   try {
     return parseDouble(
-      data: double.tryParse(data.toString()) == null ? defaultValue : double.parse(data.toString()).toStringAsFixed(doubleLength),
+      data: double.tryParse(data.toString()) == null
+          ? defaultValue
+          : double.parse(data.toString()).toStringAsFixed(doubleLength),
       defaultValue: 0.0,
     );
   } catch (e) {
@@ -2457,7 +2987,9 @@ double parseDoubleWithFixLength({required dynamic data, required double defaultV
 String parseString({required dynamic data, required String defaultValue}) {
   try {
     if (data == null) return defaultValue;
-    return (data.toString() == 'null' || data.toString().trim().isEmpty) ? defaultValue : data.toString();
+    return (data.toString() == 'null' || data.toString().trim().isEmpty)
+        ? defaultValue
+        : data.toString();
   } catch (e) {
     return defaultValue;
   }
@@ -2466,7 +2998,9 @@ String parseString({required dynamic data, required String defaultValue}) {
 String parseStringV2(dynamic data, {String defaultValue = ''}) {
   try {
     if (data == null) return defaultValue;
-    return (data.toString() == 'null' || data.toString().trim().isEmpty) ? defaultValue : data.toString();
+    return (data.toString() == 'null' || data.toString().trim().isEmpty)
+        ? defaultValue
+        : data.toString();
   } catch (e) {
     return defaultValue;
   }
@@ -2490,21 +3024,36 @@ bool parseBool({required dynamic data, required bool defaultValue}) {
 
 String parseIntToString({required dynamic data, required String valueForZero}) {
   try {
-    return parseInt(data: data, defaultInt: 0) == 0 ? valueForZero : parseInt(data: data, defaultInt: 0).toString();
+    return parseInt(data: data, defaultInt: 0) == 0
+        ? valueForZero
+        : parseInt(data: data, defaultInt: 0).toString();
   } catch (e) {
     return valueForZero;
   }
 }
 
-String parseDateToString({required dynamic data, required dynamic formatDate, required dynamic predefinedDateFormat, required String defaultValue}) {
+String parseDateToString({
+  required dynamic data,
+  required dynamic formatDate,
+  required dynamic predefinedDateFormat,
+  required String defaultValue,
+}) {
   try {
-    return DateFormat(formatDate).format(DateFormat(predefinedDateFormat).parse(parseString(data: data, defaultValue: '')));
+    return DateFormat(formatDate).format(
+      DateFormat(
+        predefinedDateFormat,
+      ).parse(parseString(data: data, defaultValue: '')),
+    );
   } catch (e) {
     return defaultValue;
   }
 }
 
-DateTime parseStringToDate({required dynamic data, required String predefinedDateFormat, required DateTime defaultValue}) {
+DateTime parseStringToDate({
+  required dynamic data,
+  required String predefinedDateFormat,
+  required DateTime defaultValue,
+}) {
   try {
     return DateFormat(predefinedDateFormat).parse(data);
   } catch (e) {
@@ -2512,7 +3061,11 @@ DateTime parseStringToDate({required dynamic data, required String predefinedDat
   }
 }
 
-DateTime? parseStringToEmptyDate({required dynamic data, required String predefinedDateFormat, required DateTime? defaultValue}) {
+DateTime? parseStringToEmptyDate({
+  required dynamic data,
+  required String predefinedDateFormat,
+  required DateTime? defaultValue,
+}) {
   try {
     return DateFormat(predefinedDateFormat).parse(data);
   } catch (e) {
@@ -2520,17 +3073,32 @@ DateTime? parseStringToEmptyDate({required dynamic data, required String predefi
   }
 }
 
-DateTimeRange getFinancialYearRange(DateTime date, {int fiscalYearStartMonth = 4, isLastDateIsToday = false}) {
+DateTimeRange getFinancialYearRange(
+  DateTime date, {
+  int fiscalYearStartMonth = 4,
+  isLastDateIsToday = false,
+}) {
   int year = date.year;
   if (date.month < fiscalYearStartMonth) {
     year--;
   }
   DateTime startDate = DateTime(year, fiscalYearStartMonth, 1);
-  DateTime endDate = isLastDateIsToday ? DateTime.now() : DateTime(year + 1, fiscalYearStartMonth, 1).subtract(const Duration(days: 1));
+  DateTime endDate = isLastDateIsToday
+      ? DateTime.now()
+      : DateTime(
+          year + 1,
+          fiscalYearStartMonth,
+          1,
+        ).subtract(const Duration(days: 1));
   return DateTimeRange(start: startDate, end: endDate);
 }
 
-String currenyFormater({required dynamic value, String format = "##,##,##,##,###.00", bool withDrCr = true, bool isPositiveEqualsDr = false}) {
+String currenyFormater({
+  required dynamic value,
+  String format = "##,##,##,##,###.00",
+  bool withDrCr = true,
+  bool isPositiveEqualsDr = false,
+}) {
   String val = parseString(data: value, defaultValue: '').replaceAll(',', '');
   String extra = '';
   if (val.contains('-')) {
@@ -2546,13 +3114,18 @@ String currenyFormater({required dynamic value, String format = "##,##,##,##,###
       ? ""
       : (!isPositiveEqualsDr &&
             parseDouble(
-              data: parseString(data: value, defaultValue: '').replaceAll(',', ''),
+              data: parseString(
+                data: value,
+                defaultValue: '',
+              ).replaceAll(',', ''),
               defaultValue: 0.0,
             ).isNegative)
       ? "DR"
       : "CR";
   if (val == '' || parseString(data: format, defaultValue: '') == '') {
-    print('Give proper value and format to use currenyFormater ===========>>> Error on currenyFormater');
+    print(
+      'Give proper value and format to use currenyFormater ===========>>> Error on currenyFormater',
+    );
     return '₹ 0.0';
   }
   if (format.contains('.')) {
@@ -2561,12 +3134,20 @@ String currenyFormater({required dynamic value, String format = "##,##,##,##,###
   }
   if (isDouble) {
     val = parseString(
-      data: parseDoubleWithLength(data: val, defaultValue: '0.0', doubleLength: doubleLen),
+      data: parseDoubleWithLength(
+        data: val,
+        defaultValue: '0.0',
+        doubleLength: doubleLen,
+      ),
       defaultValue: '',
     );
     floatPart = val.substring(val.indexOf('.'));
     intPart = val.substring(0, val.indexOf('.')).split('').reversed.join('');
-    reversedFormatStr = format.substring(0, format.indexOf('.')).split('').reversed.join('');
+    reversedFormatStr = format
+        .substring(0, format.indexOf('.'))
+        .split('')
+        .reversed
+        .join('');
   } else {
     intPart = val.split('').reversed.join('');
     reversedFormatStr = format.split('').reversed.join('');
@@ -2597,9 +3178,12 @@ double haversineDistance(double lat1, double lon1, double lat2, double lon2) {
   final double phi1 = lat1 * pi / 180; // Convert latitude to radians
   final double phi2 = lat2 * pi / 180; // Convert latitude to radians
   final double deltaPhi = (lat2 - lat1) * pi / 180; // Difference in latitudes
-  final double deltaLambda = (lon2 - lon1) * pi / 180; // Difference in longitudes
+  final double deltaLambda =
+      (lon2 - lon1) * pi / 180; // Difference in longitudes
 
-  final double a = sin(deltaPhi / 2) * sin(deltaPhi / 2) + cos(phi1) * cos(phi2) * sin(deltaLambda / 2) * sin(deltaLambda / 2);
+  final double a =
+      sin(deltaPhi / 2) * sin(deltaPhi / 2) +
+      cos(phi1) * cos(phi2) * sin(deltaLambda / 2) * sin(deltaLambda / 2);
 
   final double c = 2 * atan2(sqrt(a), sqrt(1 - a));
 
@@ -2625,11 +3209,17 @@ extension HexColor on Color {
   /// The returned string is in the format "#AARRGGBB" if [leadingHashSign] is
   /// `true`, otherwise "AARRGGBB".
   String toHex({bool leadingHashSign = true}) {
-    final String hexA = alpha.toRadixString(16).padLeft(2, '0'); // Alpha channel
+    final String hexA = alpha
+        .toRadixString(16)
+        .padLeft(2, '0'); // Alpha channel
     final String hexR = red.toRadixString(16).padLeft(2, '0'); // Red channel
-    final String hexG = green.toRadixString(16).padLeft(2, '0'); // Green channel
+    final String hexG = green
+        .toRadixString(16)
+        .padLeft(2, '0'); // Green channel
     final String hexB = blue.toRadixString(16).padLeft(2, '0'); // Blue channel
-    return '${leadingHashSign ? '#' : ''}' + '$hexA$hexR$hexG$hexB'.toUpperCase(); // Concatenate and convert to uppercase
+    return '${leadingHashSign ? '#' : ''}' +
+        '$hexA$hexR$hexG$hexB'
+            .toUpperCase(); // Concatenate and convert to uppercase
   }
 }
 
@@ -2668,7 +3258,10 @@ showDatePickerHelper({
                 value: [selectedDateRange.start, selectedDateRange.end],
                 onValueChanged: (value) {
                   if (value.length > 1) {
-                    selectedDateTimeRange = DateTimeRange(start: DateTime.parse(value[0].toString()), end: DateTime.parse(value[1].toString()));
+                    selectedDateTimeRange = DateTimeRange(
+                      start: DateTime.parse(value[0].toString()),
+                      end: DateTime.parse(value[1].toString()),
+                    );
                   }
                 },
               ),
@@ -2678,9 +3271,17 @@ showDatePickerHelper({
                   MoonTextButton(
                     onTap: () {
                       if (onValueChange != null) {
-                        selectedDateTimeRange = DateTimeRange(start: DateTime.now(), end: DateTime.now());
+                        selectedDateTimeRange = DateTimeRange(
+                          start: DateTime.now(),
+                          end: DateTime.now(),
+                        );
                         // print(DateTimeRange(start: DateTime.now(), end: DateTime.now()));
-                        onValueChange(DateTimeRange(start: DateTime.now(), end: DateTime.now()));
+                        onValueChange(
+                          DateTimeRange(
+                            start: DateTime.now(),
+                            end: DateTime.now(),
+                          ),
+                        );
                       }
                       goBack(context);
                     },
@@ -2696,7 +3297,10 @@ showDatePickerHelper({
                     },
                     label: const Text("Ok"),
                   ),
-                  MoonTextButton(onTap: () => goBack(context), label: const Text("Cancel")),
+                  MoonTextButton(
+                    onTap: () => goBack(context),
+                    label: const Text("Cancel"),
+                  ),
                 ],
               ),
               const SizedBox(height: 10),
@@ -2734,7 +3338,8 @@ Future<String> getDeviceId() async {
   if (GetPlatform.isWeb) {
     // Web
     WebBrowserInfo webInfo = await deviceInfoPlugin.webBrowserInfo;
-    identifier = '${webInfo.vendor}${webInfo.userAgent}${webInfo.hardwareConcurrency}';
+    identifier =
+        '${webInfo.vendor}${webInfo.userAgent}${webInfo.hardwareConcurrency}';
   } else if (Platform.isAndroid) {
     AndroidDeviceInfo androidInfo = await deviceInfoPlugin.androidInfo;
     identifier = androidInfo.id;
@@ -2766,7 +3371,11 @@ class DeviceDetails {
   final String osVersion;
   final String deviceModel;
 
-  DeviceDetails({required this.deviceId, required this.osVersion, required this.deviceModel});
+  DeviceDetails({
+    required this.deviceId,
+    required this.osVersion,
+    required this.deviceModel,
+  });
 }
 
 Future<DeviceDetails> getDeviceDetails() async {
@@ -2778,7 +3387,8 @@ Future<DeviceDetails> getDeviceDetails() async {
 
   if (GetPlatform.isWeb) {
     final webInfo = await deviceInfoPlugin.webBrowserInfo;
-    identifier = '${webInfo.vendor}${webInfo.userAgent}${webInfo.hardwareConcurrency}';
+    identifier =
+        '${webInfo.vendor}${webInfo.userAgent}${webInfo.hardwareConcurrency}';
     osVersion = '${webInfo.userAgent}';
     deviceModel = '${webInfo.vendor}';
   } else if (Platform.isAndroid) {
@@ -2812,7 +3422,11 @@ Future<DeviceDetails> getDeviceDetails() async {
   final bytes = utf8.encode(identifier);
   final digest = sha256.convert(bytes);
 
-  return DeviceDetails(deviceId: digest.toString(), osVersion: osVersion, deviceModel: deviceModel);
+  return DeviceDetails(
+    deviceId: digest.toString(),
+    osVersion: osVersion,
+    deviceModel: deviceModel,
+  );
 }
 
 Future<void> makePhoneCall(String number, BuildContext context) async {
@@ -2820,7 +3434,8 @@ Future<void> makePhoneCall(String number, BuildContext context) async {
   if (numberList.length == 1 && GetPlatform.isMobile) {
     // if (GetPlatform.isAndroid == false) return;
     String phnNo = parseString(data: numberList[0], defaultValue: '');
-    if (phnNo == '') return showAlert("No number found to call", AlertType.error, context);
+    if (phnNo == '')
+      return showAlert("No number found to call", AlertType.error, context);
     bool grant = await Permission.phone.request().isGranted;
     if (grant) {
       UssdPhoneCallSms().phoneCall(phoneNumber: "91$phnNo");
@@ -2854,37 +3469,61 @@ Future<void> makePhoneCall(String number, BuildContext context) async {
                       onTap: () async {
                         if (GetPlatform.isMobile == false) {
                           Clipboard.setData(ClipboardData(text: m));
-                          showAlert("$m copied to clipboard", AlertType.success, context);
+                          showAlert(
+                            "$m copied to clipboard",
+                            AlertType.success,
+                            context,
+                          );
                           return;
                         }
                         bool grant = await Permission.phone.request().isGranted;
                         if (grant) {
                           UssdPhoneCallSms().phoneCall(phoneNumber: m);
                         } else {
-                          bool denied = await Permission.phone.isPermanentlyDenied;
+                          bool denied =
+                              await Permission.phone.isPermanentlyDenied;
                           if (denied) {
-                            showAlert("Give call permission to conitnue", AlertType.error, context);
+                            showAlert(
+                              "Give call permission to conitnue",
+                              AlertType.error,
+                              context,
+                            );
                             Timer(const Duration(seconds: 1), () {
                               openAppSettings();
                             });
                           } else {
-                            showAlert("Give call permission to conitnue", AlertType.error, context);
+                            showAlert(
+                              "Give call permission to conitnue",
+                              AlertType.error,
+                              context,
+                            );
                           }
                         }
                       },
                       child: Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
-                        decoration: BoxDecoration(color: Colors.blueAccent.shade100.withAlpha(30), borderRadius: BorderRadius.circular(10)),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 8,
+                          horizontal: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.blueAccent.shade100.withAlpha(30),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           spacing: 10,
                           children: [
                             Container(
-                              decoration: BoxDecoration(color: Colors.green.shade100, borderRadius: BorderRadius.circular(10)),
+                              decoration: BoxDecoration(
+                                color: Colors.green.shade100,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
                               width: 25,
                               height: 25,
-                              child: const Center(child: Icon(MoonIcons.devices_phone_32_regular)),
+                              child: const Center(
+                                child: Icon(MoonIcons.devices_phone_32_regular),
+                              ),
                             ),
                             TextHelper(
                               text: parseString(data: m, defaultValue: ''),
@@ -2908,13 +3547,18 @@ Future<void> makePhoneCall(String number, BuildContext context) async {
 }
 
 String generateRandomPassword({int length = 12}) {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#';
+  const chars =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#';
 
   final rand = Random.secure();
   return List.generate(length, (_) => chars[rand.nextInt(chars.length)]).join();
 }
 
-List<Map<String, dynamic>> generateOneHourSlots(String startTime, String endTime, int period) {
+List<Map<String, dynamic>> generateOneHourSlots(
+  String startTime,
+  String endTime,
+  int period,
+) {
   int toMinutes(String time) {
     final parts = time.split(":");
     return int.parse(parts[0]) * 60 + int.parse(parts[1]);
@@ -2955,14 +3599,24 @@ class DateTimePicker {
       builder: (context) => Dialog(
         backgroundColor: Colors.white,
         child: SizedBox(
-          width: MediaQuery.sizeOf(context).width * 0.8 > 300 ? 300 : MediaQuery.sizeOf(context).width * 0.8,
+          width: MediaQuery.sizeOf(context).width * 0.8 > 300
+              ? 300
+              : MediaQuery.sizeOf(context).width * 0.8,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 25),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 10.0,
+                  horizontal: 25,
+                ),
                 child: Row(
-                  children: [TextHelper(text: headerText ?? "Select Month", fontweight: FontWeight.w600)],
+                  children: [
+                    TextHelper(
+                      text: headerText ?? "Select Month",
+                      fontweight: FontWeight.w600,
+                    ),
+                  ],
                 ),
               ),
               Container(
@@ -2981,7 +3635,10 @@ class DateTimePicker {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 25),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 10.0,
+                  horizontal: 25,
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   spacing: 30,
@@ -2996,16 +3653,27 @@ class DateTimePicker {
                         height: 30,
                         width: 30,
                         alignment: Alignment.center,
-                        child: TextHelper(text: "Ok", fontweight: FontWeight.w600, textalign: TextAlign.center),
+                        child: TextHelper(
+                          text: "Ok",
+                          fontweight: FontWeight.w600,
+                          textalign: TextAlign.center,
+                        ),
                       ),
                     ),
                     GestureDetector(
-                      onTap: () => {goBack(context), SystemSound.play(SystemSoundType.click)},
+                      onTap: () => {
+                        goBack(context),
+                        SystemSound.play(SystemSoundType.click),
+                      },
                       child: Container(
                         height: 30,
                         width: 80,
                         alignment: Alignment.center,
-                        child: TextHelper(text: "Cancel", fontweight: FontWeight.w600, textalign: TextAlign.center),
+                        child: TextHelper(
+                          text: "Cancel",
+                          fontweight: FontWeight.w600,
+                          textalign: TextAlign.center,
+                        ),
                       ),
                     ),
                   ],
@@ -3030,32 +3698,63 @@ Future<bool> getLocationPermission(BuildContext context) async {
   bool denied = await Permission.location.request().isPermanentlyDenied;
   if (denied) {
     if (!GetPlatform.isWeb) {
-      showAlert("Allow location permission from settings!", AlertType.error, context);
+      showAlert(
+        "Allow location permission from settings!",
+        AlertType.error,
+        context,
+      );
       Timer(const Duration(milliseconds: 1800), () async {
         await openAppSettings();
       });
       return false;
     } else {
-      showAlert("Allow location permission from settings!", AlertType.error, context);
+      showAlert(
+        "Allow location permission from settings!",
+        AlertType.error,
+        context,
+      );
       return false;
     }
   } else {
     bool locationRequested = await Permission.location.request().isGranted;
     if (!locationRequested) {
-      showAlert("Allow location permission from settings!", AlertType.error, context);
+      showAlert(
+        "Allow location permission from settings!",
+        AlertType.error,
+        context,
+      );
     }
     return locationRequested;
   }
 }
 
 Future<Position> getCurrentLocation() async {
-  Position pos = await location.getCurrentPosition(locationSettings: const LocationSettings(accuracy: LocationAccuracy.high, distanceFilter: 100));
+  Position pos = await location.getCurrentPosition(
+    locationSettings: const LocationSettings(
+      accuracy: LocationAccuracy.high,
+      distanceFilter: 100,
+    ),
+  );
   return pos;
 }
 
-Widget getNameIcon(String name, {Color? color, Color? borderColor, double? fontSize, double? width, double? height}) {
-  List<String> names = name.toUpperCase().split(' ').where((m) => m != '').map((m) => m.substring(0, 1)).toList();
-  String nameMod = names.length > 2 ? names.sublist(0, 2).join('') : names.join('');
+Widget getNameIcon(
+  String name, {
+  Color? color,
+  Color? borderColor,
+  double? fontSize,
+  double? width,
+  double? height,
+}) {
+  List<String> names = name
+      .toUpperCase()
+      .split(' ')
+      .where((m) => m != '')
+      .map((m) => m.substring(0, 1))
+      .toList();
+  String nameMod = names.length > 2
+      ? names.sublist(0, 2).join('')
+      : names.join('');
 
   return Container(
     width: width ?? 40,
@@ -3065,7 +3764,12 @@ Widget getNameIcon(String name, {Color? color, Color? borderColor, double? fontS
       borderRadius: BorderRadius.circular(200),
       border: Border.all(color: borderColor ?? Colors.blueGrey.shade100),
     ),
-    child: TextHelper(fontsize: fontSize ?? 15, fontweight: FontWeight.w600, textalign: TextAlign.center, text: nameMod),
+    child: TextHelper(
+      fontsize: fontSize ?? 15,
+      fontweight: FontWeight.w600,
+      textalign: TextAlign.center,
+      text: nameMod,
+    ),
   );
 }
 
@@ -3106,13 +3810,26 @@ class CardHelper extends StatelessWidget {
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(borderRadius),
-        boxShadow: boxShadow ?? [BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 8, spreadRadius: 1, offset: const Offset(0, 4))],
+        boxShadow:
+            boxShadow ??
+            [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.08),
+                blurRadius: 8,
+                spreadRadius: 1,
+                offset: const Offset(0, 4),
+              ),
+            ],
       ),
       child: child,
     );
 
     if (onTap != null) {
-      return InkWell(borderRadius: BorderRadius.circular(borderRadius), onTap: onTap, child: container);
+      return InkWell(
+        borderRadius: BorderRadius.circular(borderRadius),
+        onTap: onTap,
+        child: container,
+      );
     }
 
     return container;
@@ -3128,7 +3845,12 @@ class DownloadFileResponse {
   final String fileName;
   final bool success;
   final String response;
-  DownloadFileResponse({required this.file, required this.fileName, required this.success, required this.response});
+  DownloadFileResponse({
+    required this.file,
+    required this.fileName,
+    required this.success,
+    required this.response,
+  });
 }
 
 class FileHandlerG {
@@ -3136,7 +3858,10 @@ class FileHandlerG {
     return await getApplicationDocumentsDirectory().then((e) => e.path);
   }
 
-  Future<bool> saveFile({required Uint8List file, required String fileName}) async {
+  Future<bool> saveFile({
+    required Uint8List file,
+    required String fileName,
+  }) async {
     try {
       String path = await getAppDirectory();
       File f = await File('$path/$fileName').create();
@@ -3173,10 +3898,17 @@ class FileHandlerG {
       final file = XFile(fullPath);
 
       if (shareAfterDownload) {
-        await SharePlus.instance.share(ShareParams(title: filePathWithName, files: [file]));
+        await SharePlus.instance.share(
+          ShareParams(title: filePathWithName, files: [file]),
+        );
       }
 
-      return DownloadFileResponse(file: file, fileName: filePathWithName, success: true, response: 'File Download Successfully!');
+      return DownloadFileResponse(
+        file: file,
+        fileName: filePathWithName,
+        success: true,
+        response: 'File Download Successfully!',
+      );
     } catch (e) {
       throw Exception(e.toString());
     }
@@ -3212,7 +3944,9 @@ class FileHandlerG {
             Uint8List dataList = await file!.readAsBytes();
             String? outputFile = await FilePicker.platform.saveFile(
               dialogTitle: 'Choose location to save the file',
-              fileName: GetPlatform.isDesktop ? "${filePathWithName.replaceAll('/', '').replaceAll('PDF', '')}.pdf" : "$filePathWithName.pdf",
+              fileName: GetPlatform.isDesktop
+                  ? "${filePathWithName.replaceAll('/', '').replaceAll('PDF', '')}.pdf"
+                  : "$filePathWithName.pdf",
               bytes: dataList,
             );
             if (outputFile == null) {
@@ -3231,7 +3965,12 @@ class FileHandlerG {
             // }
             // showPdf("$path/${collectionStore.selectedPartyData.value['name'].toString().toLowerCase().replaceAll(' ', '')}.pdf",collectionStore.selectedPartyData.value['name']);
           });
-      return DownloadFileResponse(file: file!, fileName: filePathWithName, success: true, response: 'File Download Successfully!');
+      return DownloadFileResponse(
+        file: file!,
+        fileName: filePathWithName,
+        success: true,
+        response: 'File Download Successfully!',
+      );
     } catch (e) {
       return throw ('$e');
     }

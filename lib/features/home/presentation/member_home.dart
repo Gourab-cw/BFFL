@@ -30,7 +30,8 @@ class _HomeMemberState extends State<HomeMember> {
 
   late Future<int> _getDashboardDataActiveSubs;
   late Future<int> _getDashboardDataTotalBooking;
-  final SubscriptionController subscriptionController = Get.find<SubscriptionController>();
+  final SubscriptionController subscriptionController =
+      Get.find<SubscriptionController>();
 
   late final MemberHomeController homeController;
   final Authenticator user = Get.find<Authenticator>();
@@ -96,349 +97,668 @@ class _HomeMemberState extends State<HomeMember> {
           autoRemove: false,
           builder: (subscriptionController) {
             return Scaffold(
+              backgroundColor: Colors.transparent,
               body: Column(
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        spacing: 5,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(color: Colors.green.shade300, borderRadius: BorderRadius.circular(40)),
-                            padding: EdgeInsets.all(4),
-                            child: Icon(Icons.person_rounded, color: Colors.green.shade900, size: 24),
-                          ),
-                          TextHelper(text: "Hello, ${user.state?.name ?? ""}", fontsize: 15, fontweight: FontWeight.w600),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          // if (auth.state != null && auth.state!.userType == UserType.member)
-                          //   ButtonHelperG(
-                          //     onTap: () {
-                          //       Future(() async {
-                          //         try {
-                          //           loader.startLoading();
-                          //           await homeController.getBookings();
-                          //         } catch (e) {
-                          //           showAlert("$e", AlertType.error);
-                          //         } finally {
-                          //           loader.stopLoading();
-                          //         }
-                          //       });
-                          //     },
-                          //     background: Colors.transparent,
-                          //     icon: Icon(Icons.refresh),
-                          //   ),
-                          ButtonHelperG(
-                            onTap: () async {
-                              try {
-                                loader.startLoading();
-                                await homeController.getBookings();
-                                setState(() {
-                                  _getDashboardDataActiveSubs = homeController.getActiveSubscriptionCount();
-                                  _getDashboardDataTotalBooking = homeController.getTotalBookingCount();
-                                });
-                              } catch (e) {
-                                showAlert("$e", AlertType.error);
-                              } finally {
-                                loader.stopLoading();
-                              }
-                            },
-                            background: Colors.transparent,
-                            icon: Icon(Icons.refresh),
-                          ),
-                          ButtonHelperG(background: Colors.transparent, icon: Icon(Icons.notifications)),
-                        ],
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 15),
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Wrap(
-                            spacing: 10,
-                            runSpacing: 10,
-                            alignment: WrapAlignment.center,
-                            children: [
-                              FutureBuilder(
-                                future: _getDashboardDataActiveSubs,
-                                builder: (context, asyncSnapshot) {
-                                  bool waiting = false;
-                                  String content = '';
-                                  if (asyncSnapshot.connectionState == ConnectionState.waiting) {
-                                    waiting = true;
-                                  } else {
-                                    waiting = false;
-                                  }
-                                  if (asyncSnapshot.hasError) {
-                                    showAlert('${asyncSnapshot.error}', AlertType.error);
-                                    content = '';
-                                  } else {
-                                    content = parseString(data: asyncSnapshot.data, defaultValue: '0');
-                                  }
-                                  return AdminDashboardCard(
-                                    onTap: () {
-                                      // Get.toNamed('/memberlist');
-                                    },
-                                    icon: Icon(MoonIcons.generic_bookmark_24_regular),
-                                    enabled: waiting,
-                                    iconBgColor: mainStore.theme.value.HeadColor.withAlpha(30),
-                                    title: 'Active Subscription',
-                                    content: content,
-                                  );
-                                },
+                  // Modern Header Bar
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.grey.shade200),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withAlpha(8),
+                          blurRadius: 10,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              width: 42,
+                              height: 42,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    mainStore.theme.value.HeadColor,
+                                    mainStore.theme.value.HeadColor.withAlpha(
+                                      180,
+                                    ),
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                shape: BoxShape.circle,
                               ),
-                              FutureBuilder(
-                                future: _getDashboardDataTotalBooking,
-                                builder: (context, asyncSnapshot) {
-                                  bool waiting = false;
-                                  String content = '';
-                                  if (asyncSnapshot.connectionState == ConnectionState.waiting) {
-                                    waiting = true;
-                                  } else {
-                                    waiting = false;
-                                  }
-                                  if (asyncSnapshot.hasError) {
-                                    showAlert('${asyncSnapshot.error}', AlertType.error);
-                                    content = '';
-                                  } else {
-                                    content = parseString(data: asyncSnapshot.data, defaultValue: '0');
-                                  }
-                                  return AdminDashboardCard(
-                                    onTap: () {
-                                      // Get.toNamed('/memberlist');
+                              padding: const EdgeInsets.all(2),
+                              child: const CircleAvatar(
+                                backgroundColor: Colors.white,
+                                child: Icon(
+                                  Icons.person_rounded,
+                                  color: Colors.blueGrey,
+                                  size: 24,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                TextHelper(
+                                  text: "Hello, ${user.state?.name ?? ""}",
+                                  fontsize: 15,
+                                  fontweight: FontWeight.w700,
+                                  color: Colors.blueGrey.shade900,
+                                  padding: EdgeInsets.zero,
+                                ),
+                                const SizedBox(height: 2),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 2,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: mainStore.theme.value.HeadColor
+                                        .withAlpha(20),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: TextHelper(
+                                    text: "Member Portal",
+                                    fontsize: 11,
+                                    fontweight: FontWeight.w600,
+                                    color: mainStore.theme.value.HeadColor,
+                                    padding: EdgeInsets.zero,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            ButtonHelperG(
+                              onTap: () async {
+                                try {
+                                  loader.startLoading();
+                                  await homeController.getBookings();
+                                  setState(() {
+                                    _getDashboardDataActiveSubs = homeController
+                                        .getActiveSubscriptionCount();
+                                    _getDashboardDataTotalBooking =
+                                        homeController.getTotalBookingCount();
+                                  });
+                                } catch (e) {
+                                  showAlert("$e", AlertType.error);
+                                } finally {
+                                  loader.stopLoading();
+                                }
+                              },
+                              background: Colors.grey.shade100,
+                              width: 38,
+                              height: 38,
+                              icon: Icon(
+                                Icons.refresh_rounded,
+                                color: Colors.blueGrey.shade700,
+                                size: 20,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            ButtonHelperG(
+                              background: Colors.grey.shade100,
+                              width: 38,
+                              height: 38,
+                              icon: Icon(
+                                Icons.notifications_rounded,
+                                color: Colors.blueGrey.shade700,
+                                size: 20,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+
+                  // Dashboard Content
+                  Expanded(
+                    child: SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Stat Cards Row
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Wrap(
+                                spacing: 12,
+                                runSpacing: 12,
+                                alignment: WrapAlignment.center,
+                                children: [
+                                  FutureBuilder(
+                                    future: _getDashboardDataActiveSubs,
+                                    builder: (context, asyncSnapshot) {
+                                      bool waiting =
+                                          asyncSnapshot.connectionState ==
+                                          ConnectionState.waiting;
+                                      String content = '';
+                                      if (asyncSnapshot.hasError) {
+                                        showAlert(
+                                          '${asyncSnapshot.error}',
+                                          AlertType.error,
+                                        );
+                                        content = '0';
+                                      } else {
+                                        content = parseString(
+                                          data: asyncSnapshot.data,
+                                          defaultValue: '0',
+                                        );
+                                      }
+                                      return AdminDashboardCard(
+                                        onTap: () {},
+                                        icon: Icon(
+                                          MoonIcons.generic_bookmark_24_regular,
+                                          color:
+                                              mainStore.theme.value.HeadColor,
+                                        ),
+                                        enabled: waiting,
+                                        iconBgColor: mainStore
+                                            .theme
+                                            .value
+                                            .HeadColor
+                                            .withAlpha(30),
+                                        title: 'Active Subscription',
+                                        content: content,
+                                      );
                                     },
-                                    icon: Icon(MoonIcons.files_draft_24_regular),
-                                    enabled: waiting,
-                                    iconBgColor: mainStore.theme.value.HeadColor.withAlpha(30),
-                                    title: 'Total Booking',
-                                    content: content,
-                                  );
-                                },
+                                  ),
+                                  FutureBuilder(
+                                    future: _getDashboardDataTotalBooking,
+                                    builder: (context, asyncSnapshot) {
+                                      bool waiting =
+                                          asyncSnapshot.connectionState ==
+                                          ConnectionState.waiting;
+                                      String content = '';
+                                      if (asyncSnapshot.hasError) {
+                                        showAlert(
+                                          '${asyncSnapshot.error}',
+                                          AlertType.error,
+                                        );
+                                        content = '0';
+                                      } else {
+                                        content = parseString(
+                                          data: asyncSnapshot.data,
+                                          defaultValue: '0',
+                                        );
+                                      }
+                                      return AdminDashboardCard(
+                                        onTap: () {},
+                                        icon: Icon(
+                                          MoonIcons.files_draft_24_regular,
+                                          color:
+                                              mainStore.theme.value.HeadColor,
+                                        ),
+                                        enabled: waiting,
+                                        iconBgColor: mainStore
+                                            .theme
+                                            .value
+                                            .HeadColor
+                                            .withAlpha(30),
+                                        title: 'Total Booking',
+                                        content: content,
+                                      );
+                                    },
+                                  ),
+                                ],
                               ),
                             ],
                           ),
-                        ],
-                      ),
-                      ButtonHelperG(
-                        onTap: () {
-                          Get.toNamed('/serviceview');
-                        },
-                        width: 300,
-                        label: Stack(
-                          clipBehavior: Clip.none,
-                          children: [
-                            TextHelper(text: 'Book a slot now', color: mainStore.theme.value.DarkTextColor),
-                            AnimatedPositioned(
-                              curve: Curves.fastEaseInToSlowEaseOut,
-                              duration: Duration(milliseconds: 600),
-                              left: leftPadding + 90,
-                              top: 14,
-                              child: Icon(Icons.double_arrow, size: 15, color: mainStore.theme.value.DarkTextColor),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.vertical,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          spacing: 10,
-                          children: [
-                            TextHelper(text: "Today's booking,", fontweight: FontWeight.w600, fontsize: 14, color: Colors.blueGrey.shade800),
-                            homeController.getTodaysBooking().isEmpty
-                                ? Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: TextHelper(text: "No booking found!", color: Colors.grey.shade500, textalign: TextAlign.center),
-                                  )
-                                : SingleChildScrollView(
-                                    scrollDirection: Axis.horizontal,
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.start,
-                                      children: [
-                                        ...homeController.getTodaysBooking().map((m) {
-                                          return GestureDetector(
-                                            onTap: () async {
-                                              try {
-                                                Loader.startLoading();
-                                                final db = await fb.getDB();
-                                                final resp = await db.collection('userSubscription').doc(m.subscriptionId).get();
-                                                if (resp.exists) {
-                                                  SessionModel m1 = m.copyWith(subscriptionNo: UserSubscription.fromJSON(makeMapSerialize(resp.data())).name);
-                                                  homeController.selectedBooking = m1;
-                                                  Get.toNamed('/membersessiondetails');
-                                                } else {
-                                                  showAlert("No subscription found!", AlertType.error);
-                                                }
-                                              } catch (e) {
-                                                showAlert("$e", AlertType.error);
-                                              } finally {
-                                                Loader.stopLoading();
-                                              }
-                                            },
-                                            child: Builder(
-                                              builder: (context) {
-                                                return Container(
-                                                  alignment: Alignment.center,
-                                                  margin: EdgeInsets.symmetric(horizontal: 5),
-                                                  child: Container(
-                                                    // margin: EdgeInsets.all(10),
-                                                    padding: EdgeInsets.all(10),
-                                                    decoration: BoxDecoration(
-                                                      color: Colors.white,
-                                                      border: Border.all(color: Colors.green.shade50),
-                                                      borderRadius: BorderRadius.circular(10),
-                                                    ),
-                                                    child: Column(
-                                                      mainAxisSize: MainAxisSize.min,
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                                      children: [
-                                                        ConstrainedBox(
-                                                          constraints: BoxConstraints(maxWidth: 100),
-                                                          child: TextHelper(
-                                                            text: subscriptionController.list.firstWhereOrNull((s) => s.id == m.serviceId)?.name ?? "",
-                                                            isWrap: true,
-                                                            color: Colors.blueGrey.shade800,
-                                                            fontweight: FontWeight.w600,
-                                                          ),
-                                                        ),
-                                                        Row(
-                                                          mainAxisSize: MainAxisSize.min,
-                                                          spacing: 5,
-                                                          children: [
-                                                            Icon(Icons.watch_later_outlined, size: 17, color: Colors.blueGrey.shade500),
-                                                            TextHelper(
-                                                              text: "${m.startTime} - ${m.endTime}",
-                                                              width: 80,
-                                                              fontsize: 12,
-                                                              color: Colors.blueGrey.shade400,
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        Row(
-                                                          mainAxisSize: MainAxisSize.min,
-                                                          spacing: 5,
-                                                          children: [
-                                                            Icon(Icons.calendar_month_rounded, size: 17, color: Colors.blueGrey.shade500),
-                                                            TextHelper(text: "${m.date}", width: 80, fontsize: 12, color: Colors.blueGrey.shade400),
-                                                          ],
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                );
-                                              },
-                                            ),
-                                          );
-                                        }),
-                                      ],
+                          const SizedBox(height: 16),
+
+                          // Book Slot Hero Button
+                          Center(
+                            child: ButtonHelperG(
+                              onTap: () => Get.toNamed('/serviceview'),
+                              width: MediaQuery.sizeOf(context).width * 0.9,
+                              height: 50,
+                              label: Stack(
+                                alignment: Alignment.center,
+                                clipBehavior: Clip.none,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Icon(
+                                        Icons.bolt_rounded,
+                                        color: Colors.white,
+                                        size: 20,
+                                      ),
+                                      const SizedBox(width: 6),
+                                      TextHelper(
+                                        text: 'Book a Slot Now',
+                                        color: Colors.white,
+                                        fontweight: FontWeight.w700,
+                                        fontsize: 15,
+                                        padding: EdgeInsets.zero,
+                                      ),
+                                    ],
+                                  ),
+                                  AnimatedPositioned(
+                                    curve: Curves.fastEaseInToSlowEaseOut,
+                                    duration: const Duration(milliseconds: 600),
+                                    right: 20 - (leftPadding - 20),
+                                    child: const Icon(
+                                      Icons.double_arrow_rounded,
+                                      size: 18,
+                                      color: Colors.white,
                                     ),
                                   ),
-
-                            const SizedBox(height: 20),
-                            TextHelper(text: "Upcoming booking,", fontweight: FontWeight.w600, fontsize: 14, color: Colors.blueGrey.shade800),
-                            if (homeController.getUpcomingBooking().isEmpty)
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: TextHelper(text: "No booking found!", color: Colors.grey.shade500, textalign: TextAlign.center),
-                              ),
-                            SizedBox(
-                              height: 100,
-                              child: ListView.builder(
-                                shrinkWrap: true,
-                                itemCount: homeController.getUpcomingBooking().length,
-                                scrollDirection: Axis.horizontal,
-                                itemBuilder: (ctx, index) {
-                                  final m = homeController.getUpcomingBooking()[index];
-                                  return GestureDetector(
-                                    onTap: () async {
-                                      try {
-                                        Loader.startLoading();
-                                        final db = await fb.getDB();
-                                        final resp = await db.collection('userSubscription').doc(m.subscriptionId).get();
-                                        if (resp.exists) {
-                                          SessionModel m1 = m.copyWith(subscriptionNo: UserSubscription.fromJSON(makeMapSerialize(resp.data())).name);
-                                          homeController.selectedBooking = m1;
-                                          Get.toNamed('/membersessiondetails');
-                                        } else {
-                                          showAlert("No subscription found!", AlertType.error);
-                                        }
-                                      } catch (e) {
-                                        showAlert("$e", AlertType.error);
-                                      } finally {
-                                        Loader.stopLoading();
-                                      }
-                                    },
-                                    child: Container(
-                                      alignment: Alignment.center,
-                                      margin: EdgeInsets.symmetric(horizontal: 5),
-                                      child: Container(
-                                        // margin: EdgeInsets.all(10),
-                                        padding: EdgeInsets.all(10),
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          border: Border.all(color: Colors.green.shade50),
-                                          borderRadius: BorderRadius.circular(10),
-                                        ),
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            TextHelper(
-                                              text: subscriptionController.list.firstWhereOrNull((s) => s.id == m.serviceId)?.name ?? "",
-                                              isWrap: true,
-                                              color: Colors.blueGrey.shade800,
-                                              fontweight: FontWeight.w600,
-                                            ),
-                                            const SizedBox(height: 8),
-                                            Row(
-                                              spacing: 5,
-                                              children: [
-                                                Icon(Icons.watch_later_outlined, size: 17, color: Colors.blueGrey.shade500),
-                                                TextHelper(text: "${m.startTime} - ${m.endTime}", width: 80, fontsize: 12, color: Colors.blueGrey.shade400),
-                                              ],
-                                            ),
-                                            Row(
-                                              spacing: 5,
-                                              children: [
-                                                Icon(Icons.calendar_month_rounded, size: 17, color: Colors.blueGrey.shade500),
-                                                TextHelper(
-                                                  text: parseDateToString(
-                                                    data: m.date,
-                                                    formatDate: 'dd-MM-yyyy',
-                                                    predefinedDateFormat: 'yyyy-MM-dd',
-                                                    defaultValue: '',
-                                                  ),
-                                                  width: 80,
-                                                  fontsize: 12,
-                                                  color: Colors.blueGrey.shade400,
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                },
+                                ],
                               ),
                             ),
+                          ),
+                          const SizedBox(height: 22),
 
-                            // Button Row
-                          ],
-                        ),
+                          // Today's Bookings Section
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.today_rounded,
+                                size: 18,
+                                color: mainStore.theme.value.HeadColor,
+                              ),
+                              const SizedBox(width: 6),
+                              TextHelper(
+                                text: "Today's Bookings",
+                                fontweight: FontWeight.w700,
+                                fontsize: 15,
+                                color: Colors.blueGrey.shade900,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          homeController.getTodaysBooking().isEmpty
+                              ? Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(14),
+                                    border: Border.all(
+                                      color: Colors.grey.shade200,
+                                    ),
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: TextHelper(
+                                    text: "No bookings scheduled for today",
+                                    color: Colors.grey.shade500,
+                                    fontsize: 13,
+                                  ),
+                                )
+                              : SizedBox(
+                                  height: 110,
+                                  child: ListView.builder(
+                                    scrollDirection: Axis.horizontal,
+                                    physics: const BouncingScrollPhysics(),
+                                    itemCount: homeController
+                                        .getTodaysBooking()
+                                        .length,
+                                    itemBuilder: (ctx, index) {
+                                      final m = homeController
+                                          .getTodaysBooking()[index];
+                                      return GestureDetector(
+                                        onTap: () async {
+                                          try {
+                                            Loader.startLoading();
+                                            final db = await fb.getDB();
+                                            final resp = await db
+                                                .collection('userSubscription')
+                                                .doc(m.subscriptionId)
+                                                .get();
+                                            if (resp.exists) {
+                                              SessionModel m1 = m.copyWith(
+                                                subscriptionNo:
+                                                    UserSubscription.fromJSON(
+                                                      makeMapSerialize(
+                                                        resp.data(),
+                                                      ),
+                                                    ).name,
+                                              );
+                                              homeController.selectedBooking =
+                                                  m1;
+                                              Get.toNamed(
+                                                '/membersessiondetails',
+                                              );
+                                            } else {
+                                              showAlert(
+                                                "No subscription found!",
+                                                AlertType.error,
+                                              );
+                                            }
+                                          } catch (e) {
+                                            showAlert("$e", AlertType.error);
+                                          } finally {
+                                            Loader.stopLoading();
+                                          }
+                                        },
+                                        child: Container(
+                                          width: 175,
+                                          margin: const EdgeInsets.only(
+                                            right: 12,
+                                            top: 4,
+                                            bottom: 4,
+                                          ),
+                                          padding: const EdgeInsets.all(12),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            border: Border.all(
+                                              color: Colors.grey.shade200,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              14,
+                                            ),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black.withAlpha(
+                                                  8,
+                                                ),
+                                                blurRadius: 8,
+                                                offset: const Offset(0, 2),
+                                              ),
+                                            ],
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              TextHelper(
+                                                text:
+                                                    subscriptionController.list
+                                                        .firstWhereOrNull(
+                                                          (s) =>
+                                                              s.id ==
+                                                              m.serviceId,
+                                                        )
+                                                        ?.name ??
+                                                    "Service",
+                                                isWrap: true,
+                                                color: Colors.blueGrey.shade900,
+                                                fontweight: FontWeight.w700,
+                                                fontsize: 13,
+                                                padding: EdgeInsets.zero,
+                                              ),
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      Icon(
+                                                        Icons
+                                                            .access_time_rounded,
+                                                        size: 14,
+                                                        color: Colors
+                                                            .blueGrey
+                                                            .shade400,
+                                                      ),
+                                                      const SizedBox(width: 4),
+                                                      TextHelper(
+                                                        text:
+                                                            "${m.startTime} - ${m.endTime}",
+                                                        fontsize: 11,
+                                                        color: Colors
+                                                            .blueGrey
+                                                            .shade600,
+                                                        padding:
+                                                            EdgeInsets.zero,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  const SizedBox(height: 2),
+                                                  Row(
+                                                    children: [
+                                                      Icon(
+                                                        Icons
+                                                            .calendar_today_rounded,
+                                                        size: 13,
+                                                        color: Colors
+                                                            .blueGrey
+                                                            .shade400,
+                                                      ),
+                                                      const SizedBox(width: 4),
+                                                      TextHelper(
+                                                        text: "${m.date}",
+                                                        fontsize: 11,
+                                                        color: Colors
+                                                            .blueGrey
+                                                            .shade600,
+                                                        padding:
+                                                            EdgeInsets.zero,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                          const SizedBox(height: 22),
+
+                          // Upcoming Bookings Section
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.refresh,
+                                size: 18,
+                                color: mainStore.theme.value.HeadColor,
+                              ),
+                              const SizedBox(width: 6),
+                              TextHelper(
+                                text: "Upcoming Bookings",
+                                fontweight: FontWeight.w700,
+                                fontsize: 15,
+                                color: Colors.blueGrey.shade900,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          homeController.getUpcomingBooking().isEmpty
+                              ? Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(14),
+                                    border: Border.all(
+                                      color: Colors.grey.shade200,
+                                    ),
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: TextHelper(
+                                    text: "No upcoming bookings found",
+                                    color: Colors.grey.shade500,
+                                    fontsize: 13,
+                                  ),
+                                )
+                              : SizedBox(
+                                  height: 110,
+                                  child: ListView.builder(
+                                    scrollDirection: Axis.horizontal,
+                                    physics: const BouncingScrollPhysics(),
+                                    itemCount: homeController
+                                        .getUpcomingBooking()
+                                        .length,
+                                    itemBuilder: (ctx, index) {
+                                      final m = homeController
+                                          .getUpcomingBooking()[index];
+                                      return GestureDetector(
+                                        onTap: () async {
+                                          try {
+                                            Loader.startLoading();
+                                            final db = await fb.getDB();
+                                            final resp = await db
+                                                .collection('userSubscription')
+                                                .doc(m.subscriptionId)
+                                                .get();
+                                            if (resp.exists) {
+                                              SessionModel m1 = m.copyWith(
+                                                subscriptionNo:
+                                                    UserSubscription.fromJSON(
+                                                      makeMapSerialize(
+                                                        resp.data(),
+                                                      ),
+                                                    ).name,
+                                              );
+                                              homeController.selectedBooking =
+                                                  m1;
+                                              Get.toNamed(
+                                                '/membersessiondetails',
+                                              );
+                                            } else {
+                                              showAlert(
+                                                "No subscription found!",
+                                                AlertType.error,
+                                              );
+                                            }
+                                          } catch (e) {
+                                            showAlert("$e", AlertType.error);
+                                          } finally {
+                                            Loader.stopLoading();
+                                          }
+                                        },
+                                        child: Container(
+                                          width: 175,
+                                          margin: const EdgeInsets.only(
+                                            right: 12,
+                                            top: 4,
+                                            bottom: 4,
+                                          ),
+                                          padding: const EdgeInsets.all(12),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            border: Border.all(
+                                              color: Colors.grey.shade200,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              14,
+                                            ),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black.withAlpha(
+                                                  8,
+                                                ),
+                                                blurRadius: 8,
+                                                offset: const Offset(0, 2),
+                                              ),
+                                            ],
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              TextHelper(
+                                                text:
+                                                    subscriptionController.list
+                                                        .firstWhereOrNull(
+                                                          (s) =>
+                                                              s.id ==
+                                                              m.serviceId,
+                                                        )
+                                                        ?.name ??
+                                                    "Service",
+                                                isWrap: true,
+                                                color: Colors.blueGrey.shade900,
+                                                fontweight: FontWeight.w700,
+                                                fontsize: 13,
+                                                padding: EdgeInsets.zero,
+                                              ),
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      Icon(
+                                                        Icons
+                                                            .access_time_rounded,
+                                                        size: 14,
+                                                        color: Colors
+                                                            .blueGrey
+                                                            .shade400,
+                                                      ),
+                                                      const SizedBox(width: 4),
+                                                      TextHelper(
+                                                        text:
+                                                            "${m.startTime} - ${m.endTime}",
+                                                        fontsize: 11,
+                                                        color: Colors
+                                                            .blueGrey
+                                                            .shade600,
+                                                        padding:
+                                                            EdgeInsets.zero,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  const SizedBox(height: 2),
+                                                  Row(
+                                                    children: [
+                                                      Icon(
+                                                        Icons
+                                                            .calendar_today_rounded,
+                                                        size: 13,
+                                                        color: Colors
+                                                            .blueGrey
+                                                            .shade400,
+                                                      ),
+                                                      const SizedBox(width: 4),
+                                                      TextHelper(
+                                                        text: parseDateToString(
+                                                          data: m.date,
+                                                          formatDate:
+                                                              'dd-MM-yyyy',
+                                                          predefinedDateFormat:
+                                                              'yyyy-MM-dd',
+                                                          defaultValue: '',
+                                                        ),
+                                                        fontsize: 11,
+                                                        color: Colors
+                                                            .blueGrey
+                                                            .shade600,
+                                                        padding:
+                                                            EdgeInsets.zero,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                          const SizedBox(height: 16),
+                        ],
                       ),
                     ),
                   ),

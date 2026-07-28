@@ -52,177 +52,307 @@ class _ServiceViewState extends State<ServiceView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Services')),
+      backgroundColor: mainStore.theme.value.BackgroundColor,
+      appBar: AppBar(
+        title: const Text(
+          'Services',
+          style: TextStyle(fontWeight: FontWeight.w700),
+        ),
+        centerTitle: true,
+        elevation: 0,
+        // backgroundColor: Colors.white,
+        foregroundColor: Colors.blueGrey.shade900,
+      ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           child: GetBuilder<ServiceController>(
             init: service,
             autoRemove: false,
             builder: (service) {
               return Column(
-                spacing: 10,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Modern Header & Search Bar Row
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    spacing: 15,
                     children: [
-                      TextHelper(text: "Available Services", fontweight: FontWeight.w600, fontsize: 16),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          TextHelper(
+                            text: "Available Services",
+                            fontweight: FontWeight.w700,
+                            fontsize: 17,
+                            color: Colors.blueGrey.shade900,
+                            padding: EdgeInsets.zero,
+                          ),
+                          const SizedBox(height: 2),
+                          TextHelper(
+                            text: "Explore and book wellness sessions",
+                            fontsize: 12,
+                            color: Colors.grey.shade600,
+                            padding: EdgeInsets.zero,
+                          ),
+                        ],
+                      ),
 
                       if (showSearch)
                         Expanded(
-                          child: TextBox(
-                            controller: searchController,
-                            autofocus: true,
-                            onValueChange: (v) {
-                              service.searchKey = v;
-                              service.update();
-                            },
-                            trailing: ButtonHelperG(
-                              onTap: () {
-                                setState(() {
-                                  showSearch = !showSearch;
-                                });
-                                searchController.clear();
-                                service.searchKey = "";
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 12),
+                            child: TextBox(
+                              controller: searchController,
+                              autofocus: true,
+                              onValueChange: (v) {
+                                service.searchKey = v;
                                 service.update();
                               },
-                              icon: Icon(MoonIcons.controls_close_24_regular, size: 18, color: mainStore.theme.value.secondaryColor),
-                              background: Colors.transparent,
+                              trailing: ButtonHelperG(
+                                onTap: () {
+                                  setState(() {
+                                    showSearch = false;
+                                  });
+                                  searchController.clear();
+                                  service.searchKey = "";
+                                  service.update();
+                                },
+                                icon: Icon(
+                                  MoonIcons.controls_close_24_regular,
+                                  size: 18,
+                                  color: Colors.blueGrey.shade700,
+                                ),
+                                background: Colors.transparent,
+                              ),
+                              placeholder: "Search...",
                             ),
-                            placeholder: "Search...",
                           ),
-                        ),
-                      if (!showSearch)
+                        )
+                      else
                         ButtonHelperG(
                           onTap: () {
                             setState(() {
-                              showSearch = !showSearch;
+                              showSearch = true;
                             });
                             searchController.clear();
                             service.searchKey = "";
                             service.update();
                           },
-                          icon: Icon(MoonIcons.generic_search_24_regular, color: mainStore.theme.value.secondaryColor),
-                          background: Colors.transparent,
+                          width: 38,
+                          height: 38,
+                          background: Colors.white,
+                          icon: Icon(
+                            MoonIcons.generic_search_24_regular,
+                            color: Colors.blueGrey.shade700,
+                            size: 18,
+                          ),
                           margin: 0,
                         ),
                     ],
                   ),
-                  Divider(),
+                  const SizedBox(height: 14),
+
+                  // Service Cards Grid
                   Expanded(
                     child: SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
                       child: GetBuilder<ServiceController>(
                         init: service,
                         builder: (service) {
-                          return Wrap(
-                            spacing: 20,
-                            runSpacing: 20,
-                            children: [
-                              ...service.services
-                                  .where((w) => w.name.toLowerCase().contains(service.searchKey.toLowerCase()))
-                                  .map(
-                                    (m) => GestureDetector(
-                                      onTap: () {
-                                        service.selectedService = m;
-                                        Get.toNamed('/servicedetailsview');
-                                      },
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          color: m.image == "" ? mainStore.theme.value.secondaryColor : null,
-                                          borderRadius: BorderRadius.circular(10),
-                                          border: Border.all(color: Colors.grey.shade200),
-                                          boxShadow: [BoxShadow(color: Colors.grey.shade300, blurRadius: 4, spreadRadius: 2)],
-                                        ),
-                                        child: ClipRRect(
-                                          borderRadius: BorderRadius.circular(10),
-                                          clipBehavior: Clip.antiAliasWithSaveLayer,
-                                          child: Stack(
-                                            children: [
-                                              CachedNetworkImage(
-                                                imageUrl: m.image,
-                                                fit: BoxFit.cover,
-                                                width: 160,
-                                                height: 160,
-                                                errorWidget: (ctx, _, _) =>
-                                                    Icon(Icons.health_and_safety_rounded, size: 35, color: mainStore.theme.value.BackgroundColor),
-                                              ),
+                          final filteredServices = service.services
+                              .where(
+                                (w) => w.name.toLowerCase().contains(
+                                  service.searchKey.toLowerCase(),
+                                ),
+                              )
+                              .toList();
 
-                                              // Positioned(
-                                              //   bottom: 0,
-                                              //   child: ImageFiltered(
-                                              //     imageFilter: ImageFilter.blur(sigmaX: 5.5, sigmaY: 3, tileMode: TileMode.decal),
-                                              //     child: Container(
-                                              //       width: double.maxFinite,
-                                              //       decoration: BoxDecoration(color: Colors.white.withAlpha(140)),
-                                              //       height: 40,
-                                              //       child: Text(""),
-                                              //     ),
-                                              //   ),
-                                              // ),
-                                              // Positioned(
-                                              //   bottom: 0,
-                                              //   child: Container(
-                                              //     width: double.maxFinite,
-                                              //     decoration: BoxDecoration(color: Colors.white.withAlpha(100)),
-                                              //     height: 40,
-                                              //     child: TextHelper(
-                                              //       text: m.name,
-                                              //       padding: EdgeInsets.symmetric(horizontal: 8),
-                                              //       isWrap: true,
-                                              //       fontsize: 11.5,
-                                              //       fontweight: FontWeight.w600,
-                                              //     ),
-                                              //   ),
-                                              // ),
-                                              Positioned(
-                                                top: 5,
-                                                left: 5,
-                                                child: SizedBox(
-                                                  width: 150,
-                                                  child: TextHelper(
-                                                    text: m.name,
-                                                    color: Colors.white,
-                                                    shadow: [BoxShadow(color: Colors.black, spreadRadius: 10, blurRadius: 10)],
-                                                    fontweight: FontWeight.w600,
-                                                    fontsize: 14,
-                                                    isWrap: true,
-                                                  ),
-                                                ),
-                                              ),
-                                              Positioned(
-                                                bottom: 5,
-                                                left: 5,
-                                                child: ClipRRect(
-                                                  borderRadius: BorderRadius.circular(20),
-                                                  child: BackdropFilter(
-                                                    filter: ImageFilter.blur(sigmaY: 5, sigmaX: 5),
-                                                    child: ButtonHelperG(
-                                                      onTap: () {
-                                                        service.selectedService = m;
-                                                        Get.toNamed('/servicedetailsview');
-                                                      },
-                                                      margin: 0,
-                                                      borderRadius: 20,
-                                                      // background: Colors.grey.withAlpha(50),
-                                                      background: Colors.grey.withAlpha(50),
-                                                      shadow: [],
-                                                      withBorder: true,
-                                                      width: 150,
-                                                      height: 32,
-                                                      label: TextHelper(text: "Book Now!", color: Colors.white),
-                                                      icon: Icon(MoonIcons.arrows_chevron_right_double_24_regular, size: 12, color: Colors.white),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
+                          if (filteredServices.isEmpty) {
+                            return Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(32),
+                              margin: const EdgeInsets.only(top: 40),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(color: Colors.grey.shade200),
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    MoonIcons.generic_ticket_24_regular,
+                                    size: 48,
+                                    color: Colors.grey.shade300,
+                                  ),
+                                  const SizedBox(height: 12),
+                                  TextHelper(
+                                    text: "No services found",
+                                    fontsize: 15,
+                                    fontweight: FontWeight.w600,
+                                    color: Colors.grey.shade600,
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+
+                          return ListView.separated(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: filteredServices.length,
+                            separatorBuilder: (ctx, idx) =>
+                                const SizedBox(height: 10),
+                            itemBuilder: (ctx, index) {
+                              final m = filteredServices[index];
+                              return GestureDetector(
+                                onTap: () {
+                                  service.selectedService = m;
+                                  Get.toNamed('/servicedetailsview');
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(14),
+                                    border: Border.all(
+                                      color: Colors.grey.shade200,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withAlpha(6),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      // Compact Thumbnail Image
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: CachedNetworkImage(
+                                          imageUrl: m.image,
+                                          fit: BoxFit.cover,
+                                          width: 58,
+                                          height: 58,
+                                          errorWidget: (ctx, _, _) => Container(
+                                            width: 58,
+                                            height: 58,
+                                            color: mainStore
+                                                .theme
+                                                .value
+                                                .HeadColor
+                                                .withAlpha(20),
+                                            child: Icon(
+                                              Icons.health_and_safety_rounded,
+                                              size: 28,
+                                              color: mainStore
+                                                  .theme
+                                                  .value
+                                                  .HeadColor,
+                                            ),
                                           ),
                                         ),
                                       ),
-                                    ),
+                                      const SizedBox(width: 12),
+
+                                      // Service Title & Details
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            TextHelper(
+                                              text: m.name,
+                                              fontweight: FontWeight.w700,
+                                              fontsize: 14,
+                                              color: Colors.blueGrey.shade900,
+                                              isWrap: true,
+                                              padding: EdgeInsets.zero,
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Row(
+                                              children: [
+                                                Icon(
+                                                  Icons.verified_rounded,
+                                                  size: 12,
+                                                  color: mainStore
+                                                      .theme
+                                                      .value
+                                                      .HeadColor,
+                                                ),
+                                                const SizedBox(width: 3),
+                                                TextHelper(
+                                                  text:
+                                                      "Tap for details & slots",
+                                                  fontsize: 11,
+                                                  color: Colors.grey.shade600,
+                                                  padding: EdgeInsets.zero,
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+
+                                      // Compact Action Pill Button
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                          vertical: 8,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            colors: [
+                                              mainStore.theme.value.HeadColor,
+                                              mainStore.theme.value.HeadColor
+                                                  .withAlpha(210),
+                                            ],
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.bottomRight,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            20,
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: mainStore
+                                                  .theme
+                                                  .value
+                                                  .HeadColor
+                                                  .withAlpha(50),
+                                              blurRadius: 6,
+                                              offset: const Offset(0, 2),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            TextHelper(
+                                              text: "Book",
+                                              color: Colors.white,
+                                              fontweight: FontWeight.w700,
+                                              fontsize: 12,
+                                              padding: EdgeInsets.zero,
+                                            ),
+                                            const SizedBox(width: 4),
+                                            const Icon(
+                                              MoonIcons
+                                                  .arrows_chevron_right_double_24_regular,
+                                              size: 13,
+                                              color: Colors.white,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                            ],
+                                ),
+                              );
+                            },
                           );
                         },
                       ),

@@ -50,7 +50,12 @@ class _AttendanceState extends State<Attendance> {
 
   String getFormatedTime(String time) {
     String time0 = time;
-    time0 = parseDateToString(data: time, formatDate: 'dd-MM-yyyy hh:mm a', predefinedDateFormat: 'yyyy-MM-dd hh:mm:ss', defaultValue: '');
+    time0 = parseDateToString(
+      data: time,
+      formatDate: 'dd-MM-yyyy hh:mm a',
+      predefinedDateFormat: 'yyyy-MM-dd hh:mm:ss',
+      defaultValue: '',
+    );
     return time0;
   }
 
@@ -87,6 +92,7 @@ class _AttendanceState extends State<Attendance> {
         builder: (attendanceStore) {
           return Container(
             width: MediaQuery.of(context).size.width,
+            padding: EdgeInsets.all(8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               spacing: 5,
@@ -95,8 +101,14 @@ class _AttendanceState extends State<Attendance> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    TextHelper(text: "Attendance List", fontsize: 16, fontweight: FontWeight.w600),
-                    if (!attendanceStore.todayHaveAttendance && auth.state != null && auth.state!.userType != UserType.admin)
+                    TextHelper(
+                      text: "Attendance List",
+                      fontsize: 16,
+                      fontweight: FontWeight.w600,
+                    ),
+                    if (!attendanceStore.todayHaveAttendance &&
+                        auth.state != null &&
+                        auth.state!.userType != UserType.admin)
                       ButtonHelperG(
                         width: 160,
                         onTap: () async {
@@ -110,7 +122,10 @@ class _AttendanceState extends State<Attendance> {
                           }
                         },
                         icon: Icon(Icons.check, color: Colors.white, size: 18),
-                        label: TextHelper(text: "Mark attendance", color: Colors.white),
+                        label: TextHelper(
+                          text: "Mark attendance",
+                          color: Colors.white,
+                        ),
                       ),
                   ],
                 ),
@@ -165,15 +180,24 @@ class _AttendanceState extends State<Attendance> {
                       columnList: [
                         DataGridColumnModel3(
                           showFilter: true,
-                          customFilterCellText: (v) =>
-                              parseDateToString(data: v, formatDate: 'dd-MM-yyyy', predefinedDateFormat: 'yyyy-MM-dd', defaultValue: ''),
+                          customFilterCellText: (v) => parseDateToString(
+                            data: v,
+                            formatDate: 'dd-MM-yyyy',
+                            predefinedDateFormat: 'yyyy-MM-dd',
+                            defaultValue: '',
+                          ),
                           dataField: "date",
                           dataType: CellDataType3.string,
                           title: "Date",
                           customCell: (c) {
                             return TextHelper(
                               // text: DateFormat("dd-MM-yyyy").format((c.cellValue as Timestamp).toDate()),
-                              text: parseDateToString(data: c.cellValue, formatDate: 'dd-MM-yyyy', predefinedDateFormat: 'yyyy-MM-dd', defaultValue: ''),
+                              text: parseDateToString(
+                                data: c.cellValue,
+                                formatDate: 'dd-MM-yyyy',
+                                predefinedDateFormat: 'yyyy-MM-dd',
+                                defaultValue: '',
+                              ),
                               textalign: TextAlign.center,
                               fontsize: 12,
                             );
@@ -185,14 +209,26 @@ class _AttendanceState extends State<Attendance> {
                           title: "Time",
                           customCell: (c) {
                             return TextHelper(
-                              text: DateFormat("hh:mm a").format((c.cellValue as Timestamp).toDate()),
+                              text: DateFormat(
+                                "hh:mm a",
+                              ).format((c.cellValue as Timestamp).toDate()),
                               textalign: TextAlign.center,
                               fontsize: 12,
                             );
                           },
                         ),
-                        DataGridColumnModel3(showFilter: true, dataField: "branchName", dataType: CellDataType3.string, title: "Branch"),
-                        DataGridColumnModel3(showFilter: true, dataField: "userName", dataType: CellDataType3.string, title: "Name"),
+                        DataGridColumnModel3(
+                          showFilter: true,
+                          dataField: "branchName",
+                          dataType: CellDataType3.string,
+                          title: "Branch",
+                        ),
+                        DataGridColumnModel3(
+                          showFilter: true,
+                          dataField: "userName",
+                          dataType: CellDataType3.string,
+                          title: "Name",
+                        ),
                       ],
                       uniqueKey: UniqueKey().toString(),
                       width: MediaQuery.sizeOf(context).width - 10,

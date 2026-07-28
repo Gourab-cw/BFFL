@@ -84,13 +84,18 @@ abstract class FirebaseBaseService extends GetxService {
   late FirebaseMessaging _firebaseMessaging;
 
   // Notification instance for showing notifications
-  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
 
   // Constructor to initialize Firebase
   Future<void> initialize({bool getFCMToken = true}) async {
     try {
-      debugPrint(">>>>>>>>>>>>>>>> coming for firebase initialize <<<<<<<<<<<<<");
-      _firebaseApp = await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+      debugPrint(
+        ">>>>>>>>>>>>>>>> coming for firebase initialize <<<<<<<<<<<<<",
+      );
+      _firebaseApp = await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
 
       if (GetPlatform.isMobile || GetPlatform.isWeb) {
         _firebaseMessaging = FirebaseMessaging.instance;
@@ -107,7 +112,9 @@ abstract class FirebaseBaseService extends GetxService {
         }
       }
     } catch (e) {
-      debugPrint("================= > Firebase Error: $e <=========================");
+      debugPrint(
+        "================= > Firebase Error: $e <=========================",
+      );
     }
     // Optionally, save this token to your server if you want to target specific devices
   }
@@ -116,19 +123,25 @@ abstract class FirebaseBaseService extends GetxService {
   void _configureFirebaseMessaging() {
     // Handle foreground notifications
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      debugPrint("================= > Received message in foreground: ${message.notification?.title} <=========================");
+      debugPrint(
+        "================= > Received message in foreground: ${message.notification?.title} <=========================",
+      );
       _showNotification(message);
     });
 
     // Handle when the app is opened from a notification
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      debugPrint("================= > Opened app from notification: ${message.notification?.title} <=========================");
+      debugPrint(
+        "================= > Opened app from notification: ${message.notification?.title} <=========================",
+      );
       _handleNotification(message);
     });
 
     // Handle background notifications
     if (GetPlatform.isAndroid || GetPlatform.isIOS) {
-      FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+      FirebaseMessaging.onBackgroundMessage(
+        _firebaseMessagingBackgroundHandler,
+      );
     }
   }
 
@@ -139,42 +152,52 @@ abstract class FirebaseBaseService extends GetxService {
     // final InitializationSettings initializationSettings = InitializationSettings(android: initializationSettingsAndroid);
     // flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
-    final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+    final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+        FlutterLocalNotificationsPlugin();
 
     Future<void> initializeNotifications() async {
       // Android
-      const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
+      const AndroidInitializationSettings initializationSettingsAndroid =
+          AndroidInitializationSettings('@mipmap/ic_launcher');
 
       // iOS
-      const DarwinInitializationSettings initializationSettingsIOS = DarwinInitializationSettings(
-        requestAlertPermission: true,
-        requestBadgePermission: true,
-        requestSoundPermission: true,
-      );
+      const DarwinInitializationSettings initializationSettingsIOS =
+          DarwinInitializationSettings(
+            requestAlertPermission: true,
+            requestBadgePermission: true,
+            requestSoundPermission: true,
+          );
 
       // macOS
-      const DarwinInitializationSettings initializationSettingsMacOS = DarwinInitializationSettings();
+      const DarwinInitializationSettings initializationSettingsMacOS =
+          DarwinInitializationSettings();
 
       // Linux
-      final LinuxInitializationSettings initializationSettingsLinux = LinuxInitializationSettings(
-        defaultActionName: 'Open notification',
-        defaultIcon: AssetsLinuxIcon('icons/app_icon.png'), // Use a valid icon
-      );
+      final LinuxInitializationSettings initializationSettingsLinux =
+          LinuxInitializationSettings(
+            defaultActionName: 'Open notification',
+            defaultIcon: AssetsLinuxIcon(
+              'icons/app_icon.png',
+            ), // Use a valid icon
+          );
 
       // Windows
-      WindowsInitializationSettings initializationSettingsWindows = WindowsInitializationSettings(
+      WindowsInitializationSettings
+      initializationSettingsWindows = WindowsInitializationSettings(
         appName: 'SalesZing',
-        appUserModelId: 'com.circuitworldin', // Required if you want toast notifications
+        appUserModelId:
+            'com.circuitworldin', // Required if you want toast notifications
         guid: Uuid().v4(), // A valid UUID for your app instance
       );
 
-      final InitializationSettings initializationSettings = InitializationSettings(
-        android: initializationSettingsAndroid,
-        iOS: initializationSettingsIOS,
-        macOS: initializationSettingsMacOS,
-        linux: initializationSettingsLinux,
-        windows: initializationSettingsWindows,
-      );
+      final InitializationSettings initializationSettings =
+          InitializationSettings(
+            android: initializationSettingsAndroid,
+            iOS: initializationSettingsIOS,
+            macOS: initializationSettingsMacOS,
+            linux: initializationSettingsLinux,
+            windows: initializationSettingsWindows,
+          );
 
       await flutterLocalNotificationsPlugin.initialize(
         initializationSettings,
@@ -189,17 +212,20 @@ abstract class FirebaseBaseService extends GetxService {
   @pragma('vm:entry-point')
   Future<void> _showNotification(RemoteMessage message) async {
     try {
-      const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
-        'firebaseNotification',
-        'firebaseNotificationSalesZingApp',
-        channelDescription: 'Firebase notification for CW SalesZing App',
-        importance: Importance.high,
-        priority: Priority.high,
-        category: AndroidNotificationCategory.social,
-        icon: '@mipmap/ic_launcher',
-        enableLights: true,
+      const AndroidNotificationDetails androidDetails =
+          AndroidNotificationDetails(
+            'firebaseNotification',
+            'firebaseNotificationSalesZingApp',
+            channelDescription: 'Firebase notification for CW SalesZing App',
+            importance: Importance.high,
+            priority: Priority.high,
+            category: AndroidNotificationCategory.social,
+            icon: '@mipmap/ic_launcher',
+            enableLights: true,
+          );
+      const NotificationDetails platformDetails = NotificationDetails(
+        android: androidDetails,
       );
-      const NotificationDetails platformDetails = NotificationDetails(android: androidDetails);
 
       await flutterLocalNotificationsPlugin.show(
         0, // notification id
@@ -215,16 +241,22 @@ abstract class FirebaseBaseService extends GetxService {
 
   // Handle background messages
   @pragma('vm:entry-point')
-  static Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  static Future<void> _firebaseMessagingBackgroundHandler(
+    RemoteMessage message,
+  ) async {
     await Firebase.initializeApp();
-    debugPrint("================= > Handling background message: ${message.messageId}} <=========================");
+    debugPrint(
+      "================= > Handling background message: ${message.messageId}} <=========================",
+    );
     // You can perform background tasks here, such as updating your app data
   }
 
   // Handle notification when the app is opened (from background/terminated state)
   void _handleNotification(RemoteMessage message) {
     // You can handle navigation or other actions here based on the message data
-    debugPrint("================= > Notification data: ${message.data} <=========================");
+    debugPrint(
+      "================= > Notification data: ${message.data} <=========================",
+    );
   }
 
   // Subscribe to a topic for push notifications
@@ -278,16 +310,25 @@ mixin FirebaseLogInService on FirebaseBaseService {
     UserCredential cred = await auth.signInWithProvider(provider);
   }
 
-  Future<User?> makeEmailLogin({required String email, required String password}) async {
+  Future<User?> makeEmailLogin({
+    required String email,
+    required String password,
+  }) async {
     if (!GetUtils.isEmail(email)) {
       return showAlert('Give a valid mail', AlertType.error);
     }
     if (password.length < 6) {
-      return showAlert("Password length should be more then 5", AlertType.error);
+      return showAlert(
+        "Password length should be more then 5",
+        AlertType.error,
+      );
     }
     final auth = await getAuth();
     try {
-      UserCredential uc = await auth.signInWithEmailAndPassword(email: email, password: password);
+      UserCredential uc = await auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
       if (uc.user != null) {
         return uc.user;
       } else {
@@ -313,13 +354,20 @@ mixin FirebaseLogInService on FirebaseBaseService {
     return null;
   }
 
-  Future<User?> createNewUser({required String name, required String email, required String password}) async {
+  Future<User?> createNewUser({
+    required String name,
+    required String email,
+    required String password,
+  }) async {
     if (name.trim().length < 3) {
       return showAlert("Give a valid name!", AlertType.error);
     }
     final auth = await getAuth();
     try {
-      UserCredential uc = await auth.createUserWithEmailAndPassword(email: email, password: password);
+      UserCredential uc = await auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
       await uc.user?.updateDisplayName(name);
       await uc.user?.reload();
       if (uc.user != null) {

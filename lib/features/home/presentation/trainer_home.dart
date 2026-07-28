@@ -25,8 +25,10 @@ class _HomeTrainerState extends State<HomeTrainer> {
   final MainStore mainStore = Get.find<MainStore>();
   final loader = Get.find<AppLoaderController>();
   final auth = Get.find<Authenticator>();
-  final SubscriptionController subscriptionController = Get.find<SubscriptionController>();
-  final SlotDetailsController slotDetailsController = Get.find<SlotDetailsController>();
+  final SubscriptionController subscriptionController =
+      Get.find<SubscriptionController>();
+  final SlotDetailsController slotDetailsController =
+      Get.find<SlotDetailsController>();
 
   late final HomeController homeController;
   final Authenticator user = Get.find<Authenticator>();
@@ -74,393 +76,910 @@ class _HomeTrainerState extends State<HomeTrainer> {
           builder: (subscriptionController) {
             return AppLoader(
               child: Scaffold(
-                body: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          spacing: 5,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(color: getMainStore().theme.value.HeadColor, borderRadius: BorderRadius.circular(40)),
-                              padding: EdgeInsets.all(4),
-                              child: Icon(Icons.person_rounded, color: getMainStore().theme.value.lowShadeColor.withAlpha(200), size: 24),
+                backgroundColor: Colors.transparent,
+                body: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
+                      // Header Bar
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 12,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: Colors.grey.shade200),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withAlpha(8),
+                              blurRadius: 10,
+                              offset: const Offset(0, 2),
                             ),
-                            TextHelper(text: "Hello, ${user.state?.name ?? ""}", fontsize: 15, fontweight: FontWeight.w600),
                           ],
                         ),
-                        ButtonHelperG(background: Colors.transparent, icon: Icon(Icons.notifications)),
-                      ],
-                    ),
-
-                    Expanded(
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.vertical,
-                        child: Column(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            if (auth.state != null && auth.state!.userType == UserType.receptionist)
-                              Wrap(
+                            Row(
+                              children: [
+                                Container(
+                                  width: 42,
+                                  height: 42,
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        getMainStore().theme.value.HeadColor,
+                                        getMainStore().theme.value.HeadColor
+                                            .withAlpha(180),
+                                      ],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                    ),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  padding: const EdgeInsets.all(2),
+                                  child: const CircleAvatar(
+                                    backgroundColor: Colors.white,
+                                    child: Icon(
+                                      Icons.person_rounded,
+                                      color: Colors.blueGrey,
+                                      size: 24,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    TextHelper(
+                                      text: "Hello, ${user.state?.name ?? ""}",
+                                      fontsize: 15,
+                                      fontweight: FontWeight.w700,
+                                      color: Colors.blueGrey.shade900,
+                                      padding: EdgeInsets.zero,
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 2,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.green.shade50,
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: TextHelper(
+                                        text: "Trainer Profile",
+                                        fontsize: 11,
+                                        fontweight: FontWeight.w600,
+                                        color: Colors.green.shade700,
+                                        padding: EdgeInsets.zero,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            ButtonHelperG(
+                              background: Colors.grey.shade100,
+                              width: 38,
+                              height: 38,
+                              icon: Icon(
+                                Icons.notifications_rounded,
+                                color: Colors.blueGrey.shade700,
+                                size: 20,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+
+                      Expanded(
+                        child: SingleChildScrollView(
+                          physics: const BouncingScrollPhysics(),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (auth.state != null &&
+                                  auth.state!.userType == UserType.receptionist)
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 16),
+                                  child: Wrap(
+                                    spacing: 10,
+                                    runSpacing: 10,
+                                    children: [
+                                      ButtonHelperG(
+                                        onTap: () => Get.toNamed("/useradd"),
+                                        height: 44,
+                                        icon: const Icon(
+                                          MoonIcons.generic_user_24_regular,
+                                          color: Colors.white,
+                                          size: 20,
+                                        ),
+                                        label: TextHelper(
+                                          text: "Add Member +",
+                                          fontsize: 13,
+                                          color: Colors.white,
+                                          fontweight: FontWeight.w600,
+                                        ),
+                                        width: 145,
+                                        background: Colors.green.shade600,
+                                      ),
+                                      ButtonHelperG(
+                                        withBorder: true,
+                                        height: 44,
+                                        type: ButtonHelperTypeG.outlined,
+                                        icon: Icon(
+                                          MoonIcons.generic_ticket_24_regular,
+                                          color: Colors.green.shade900,
+                                          size: 20,
+                                        ),
+                                        label: TextHelper(
+                                          text: "Book a service",
+                                          fontsize: 13,
+                                          color: Colors.green.shade900,
+                                          fontweight: FontWeight.w600,
+                                        ),
+                                        width: 145,
+                                        background: Colors.green.shade50,
+                                      ),
+                                      ButtonHelperG(
+                                        onTap: () => Get.toNamed('/memberlist'),
+                                        withBorder: true,
+                                        height: 44,
+                                        type: ButtonHelperTypeG.outlined,
+                                        icon: Icon(
+                                          MoonIcons.generic_users_24_regular,
+                                          color: Colors.green.shade900,
+                                          size: 20,
+                                        ),
+                                        label: TextHelper(
+                                          text: "Member List",
+                                          fontsize: 13,
+                                          color: Colors.green.shade900,
+                                          fontweight: FontWeight.w600,
+                                        ),
+                                        width: 145,
+                                        background: Colors.green.shade50,
+                                      ),
+                                      ButtonHelperG(
+                                        onTap: () => Get.toNamed('/slotmanage'),
+                                        withBorder: true,
+                                        height: 44,
+                                        type: ButtonHelperTypeG.outlined,
+                                        icon: Icon(
+                                          MoonIcons.generic_users_24_regular,
+                                          color: Colors.green.shade900,
+                                          size: 20,
+                                        ),
+                                        label: TextHelper(
+                                          text: "Slot Manage",
+                                          fontsize: 13,
+                                          color: Colors.green.shade900,
+                                          fontweight: FontWeight.w600,
+                                        ),
+                                        width: 145,
+                                        background: Colors.green.shade50,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
+                              // Section Title
+                              Row(
                                 children: [
-                                  ButtonHelperG(
-                                    onTap: () {
-                                      // homeController.init();
-                                      // return;
-                                      Get.toNamed("/useradd");
-                                    },
-                                    height: 45,
-                                    icon: Icon(MoonIcons.generic_user_24_regular, color: Colors.white, size: 28),
-                                    label: TextHelper(text: "Add Member +", fontsize: 14, color: Colors.white, fontweight: FontWeight.w600),
-                                    width: 150,
-                                    background: Colors.green.shade500,
+                                  Icon(
+                                    Icons.fitness_center_rounded,
+                                    size: 18,
+                                    color: getMainStore().theme.value.HeadColor,
                                   ),
-                                  ButtonHelperG(
-                                    withBorder: true,
-                                    height: 45,
-                                    type: ButtonHelperTypeG.outlined,
-                                    icon: Icon(MoonIcons.generic_ticket_24_regular, color: Colors.green.shade900, size: 28),
-                                    label: TextHelper(text: "Book a service", fontsize: 14, color: Colors.green.shade900, fontweight: FontWeight.w600),
-                                    width: 150,
-                                    background: Colors.lightGreenAccent.shade700,
-                                  ),
-                                  ButtonHelperG(
-                                    onTap: () {
-                                      Get.toNamed('/memberlist');
-                                    },
-                                    withBorder: true,
-                                    height: 45,
-                                    type: ButtonHelperTypeG.outlined,
-                                    icon: Icon(MoonIcons.generic_users_24_regular, color: Colors.green.shade900, size: 28),
-                                    label: TextHelper(text: "Member List", fontsize: 14, color: Colors.green.shade900, fontweight: FontWeight.w600),
-                                    width: 150,
-                                    background: Colors.lightGreenAccent.shade700,
-                                  ),
-                                  ButtonHelperG(
-                                    onTap: () {
-                                      Get.toNamed('/slotmanage');
-                                    },
-                                    withBorder: true,
-                                    height: 45,
-                                    type: ButtonHelperTypeG.outlined,
-                                    icon: Icon(MoonIcons.generic_users_24_regular, color: Colors.green.shade900, size: 28),
-                                    label: TextHelper(text: "Slot Manage", fontsize: 14, color: Colors.green.shade900, fontweight: FontWeight.w600),
-                                    width: 150,
-                                    background: Colors.lightGreenAccent.shade700,
+                                  const SizedBox(width: 6),
+                                  TextHelper(
+                                    text: "Upcoming Trainer Slots",
+                                    fontweight: FontWeight.w700,
+                                    fontsize: 15,
+                                    color: Colors.blueGrey.shade900,
                                   ),
                                 ],
                               ),
-                            // const SizedBox(height: 30),
-                            TextHelper(text: "Upcoming slots,", fontweight: FontWeight.w600, fontsize: 14, color: Colors.blueGrey.shade800),
-                            SizedBox(
-                              height: 110,
-                              child: ListView.builder(
-                                itemCount: homeController.bookings.length,
-                                scrollDirection: Axis.horizontal,
-                                itemBuilder: (ctx, index) {
-                                  final m = homeController.bookings[index];
-                                  return GestureDetector(
-                                    onTap: () async {
-                                      try {
-                                        final slotCtrl = Get.find<SlotDetailsController>();
-                                        slotCtrl.slot = m;
-                                        loader.startLoading();
-                                        await slotCtrl.getSlotDetails();
-                                        Get.toNamed('/slotdetailstrainerview');
-                                      } catch (e) {
-                                        showAlert("$e", AlertType.error);
-                                      } finally {
-                                        loader.stopLoading();
-                                      }
-                                    },
-                                    child: Container(
-                                      margin: EdgeInsets.all(10),
-                                      decoration: BoxDecoration(
-                                        color: mainStore.theme.value.mediumShadeColor.withAlpha(50),
-                                        border: Border.all(color: Colors.green.shade50),
-                                        borderRadius: BorderRadius.circular(10),
+                              const SizedBox(height: 10),
+
+                              SizedBox(
+                                height: 115,
+                                child: homeController.bookings.isEmpty
+                                    ? Container(
+                                        width: double.infinity,
+                                        padding: const EdgeInsets.all(16),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(
+                                            14,
+                                          ),
+                                          border: Border.all(
+                                            color: Colors.grey.shade200,
+                                          ),
+                                        ),
+                                        alignment: Alignment.center,
+                                        child: TextHelper(
+                                          text:
+                                              "No upcoming trainer slots found",
+                                          color: Colors.grey.shade500,
+                                          fontsize: 13,
+                                        ),
+                                      )
+                                    : ListView.builder(
+                                        itemCount:
+                                            homeController.bookings.length,
+                                        scrollDirection: Axis.horizontal,
+                                        physics: const BouncingScrollPhysics(),
+                                        itemBuilder: (ctx, index) {
+                                          final m =
+                                              homeController.bookings[index];
+                                          final statusText = getStatus(m);
+                                          final isCompleted = statusText
+                                              .toLowerCase()
+                                              .contains('complete');
+                                          final isOngoing = statusText
+                                              .toLowerCase()
+                                              .contains('ongoing');
+                                          return GestureDetector(
+                                            onTap: () async {
+                                              try {
+                                                final slotCtrl =
+                                                    Get.find<
+                                                      SlotDetailsController
+                                                    >();
+                                                slotCtrl.slot = m;
+                                                loader.startLoading();
+                                                await slotCtrl.getSlotDetails();
+                                                Get.toNamed(
+                                                  '/slotdetailstrainerview',
+                                                );
+                                              } catch (e) {
+                                                showAlert(
+                                                  "$e",
+                                                  AlertType.error,
+                                                );
+                                              } finally {
+                                                loader.stopLoading();
+                                              }
+                                            },
+                                            child: Container(
+                                              width: 175,
+                                              margin: const EdgeInsets.only(
+                                                right: 12,
+                                                top: 4,
+                                                bottom: 4,
+                                              ),
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                border: Border.all(
+                                                  color: Colors.grey.shade200,
+                                                ),
+                                                borderRadius:
+                                                    BorderRadius.circular(14),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.black
+                                                        .withAlpha(8),
+                                                    blurRadius: 8,
+                                                    offset: const Offset(0, 2),
+                                                  ),
+                                                ],
+                                              ),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                          10,
+                                                        ),
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
+                                                      children: [
+                                                        TextHelper(
+                                                          text:
+                                                              subscriptionController
+                                                                  .list
+                                                                  .firstWhereOrNull(
+                                                                    (s) =>
+                                                                        s.id ==
+                                                                        m.serviceId,
+                                                                  )
+                                                                  ?.name ??
+                                                              "Slot",
+                                                          isWrap: true,
+                                                          color: Colors
+                                                              .blueGrey
+                                                              .shade900,
+                                                          fontweight:
+                                                              FontWeight.w700,
+                                                          fontsize: 13,
+                                                          padding:
+                                                              EdgeInsets.zero,
+                                                        ),
+                                                        const SizedBox(
+                                                          height: 4,
+                                                        ),
+                                                        Row(
+                                                          children: [
+                                                            Icon(
+                                                              Icons
+                                                                  .access_time_rounded,
+                                                              size: 14,
+                                                              color: Colors
+                                                                  .blueGrey
+                                                                  .shade400,
+                                                            ),
+                                                            const SizedBox(
+                                                              width: 4,
+                                                            ),
+                                                            TextHelper(
+                                                              text:
+                                                                  "${m.startTime} - ${m.endTime}",
+                                                              fontsize: 11,
+                                                              color: Colors
+                                                                  .blueGrey
+                                                                  .shade600,
+                                                              padding:
+                                                                  EdgeInsets
+                                                                      .zero,
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        const SizedBox(
+                                                          height: 2,
+                                                        ),
+                                                        Row(
+                                                          children: [
+                                                            Icon(
+                                                              Icons
+                                                                  .calendar_today_rounded,
+                                                              size: 13,
+                                                              color: Colors
+                                                                  .blueGrey
+                                                                  .shade400,
+                                                            ),
+                                                            const SizedBox(
+                                                              width: 4,
+                                                            ),
+                                                            TextHelper(
+                                                              text: parseDateToString(
+                                                                data: m.date,
+                                                                formatDate:
+                                                                    'dd-MM-yyyy',
+                                                                predefinedDateFormat:
+                                                                    'yyyy-MM-dd',
+                                                                defaultValue:
+                                                                    '',
+                                                              ),
+                                                              fontsize: 11,
+                                                              color: Colors
+                                                                  .blueGrey
+                                                                  .shade600,
+                                                              padding:
+                                                                  EdgeInsets
+                                                                      .zero,
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  Container(
+                                                    width: double.infinity,
+                                                    padding:
+                                                        const EdgeInsets.symmetric(
+                                                          vertical: 4,
+                                                          horizontal: 10,
+                                                        ),
+                                                    decoration: BoxDecoration(
+                                                      color: isCompleted
+                                                          ? Colors.green.shade50
+                                                          : isOngoing
+                                                          ? Colors
+                                                                .orange
+                                                                .shade50
+                                                          : Colors.blue.shade50,
+                                                      borderRadius:
+                                                          const BorderRadius.only(
+                                                            bottomLeft:
+                                                                Radius.circular(
+                                                                  13,
+                                                                ),
+                                                            bottomRight:
+                                                                Radius.circular(
+                                                                  13,
+                                                                ),
+                                                          ),
+                                                    ),
+                                                    child: TextHelper(
+                                                      text: statusText,
+                                                      fontsize: 11,
+                                                      fontweight:
+                                                          FontWeight.w600,
+                                                      color: isCompleted
+                                                          ? Colors
+                                                                .green
+                                                                .shade700
+                                                          : isOngoing
+                                                          ? Colors
+                                                                .orange
+                                                                .shade800
+                                                          : Colors
+                                                                .blue
+                                                                .shade700,
+                                                      padding: EdgeInsets.zero,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          );
+                                        },
                                       ),
-                                      child: Stack(
-                                        clipBehavior: Clip.antiAlias,
-                                        children: [
-                                          Container(
-                                            padding: EdgeInsets.all(10),
+                              ),
+                              const SizedBox(height: 20),
+
+                              // Today's Booking Section & Chart
+                              Container(
+                                padding: const EdgeInsets.all(14),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(16),
+                                  color: Colors.white,
+                                  border: Border.all(
+                                    color: Colors.grey.shade200,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withAlpha(8),
+                                      blurRadius: 10,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.all(6),
+                                          decoration: BoxDecoration(
+                                            color: getMainStore()
+                                                .theme
+                                                .value
+                                                .HeadColor
+                                                .withAlpha(20),
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
+                                          ),
+                                          child: Image(
+                                            image: const AssetImage(
+                                              "assets/booking.png",
+                                            ),
+                                            color: getMainStore()
+                                                .theme
+                                                .value
+                                                .HeadColor,
+                                            width: 18,
+                                            height: 18,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        TextHelper(
+                                          text: "Today's Booking Analytics",
+                                          fontweight: FontWeight.w700,
+                                          fontsize: 14,
+                                          color: Colors.blueGrey.shade900,
+                                        ),
+                                      ],
+                                    ),
+                                    const Divider(height: 20),
+                                    SizedBox(
+                                      height: 150,
+                                      child: AreaChartHelper(
+                                        customTooltip: (d) {
+                                          return Container(
+                                            color: Colors.white,
+                                            padding: const EdgeInsets.all(10),
                                             child: Column(
                                               mainAxisSize: MainAxisSize.min,
-                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
                                               children: [
-                                                TextHelper(
-                                                  text: subscriptionController.list.firstWhereOrNull((s) => s.id == m.serviceId)?.name ?? "",
-                                                  isWrap: true,
-                                                  color: Colors.blueGrey.shade800,
-                                                  fontweight: FontWeight.w600,
-                                                ),
                                                 Row(
-                                                  spacing: 5,
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
                                                   children: [
-                                                    Icon(Icons.watch_later_outlined, size: 17, color: getMainStore().theme.value.LightTextColor.withAlpha(150)),
+                                                    const Icon(
+                                                      Icons
+                                                          .watch_later_outlined,
+                                                      size: 18,
+                                                    ),
                                                     TextHelper(
-                                                      text: "${m.startTime} - ${m.endTime}",
-                                                      width: 80,
-                                                      fontsize: 12,
-                                                      color: getMainStore().theme.value.LightTextColor,
+                                                      text: d.x,
+                                                      width: 40,
+                                                      fontweight:
+                                                          FontWeight.w600,
+                                                      textalign:
+                                                          TextAlign.center,
                                                     ),
                                                   ],
                                                 ),
+                                                const SizedBox(
+                                                  width: 60,
+                                                  child: Divider(),
+                                                ),
                                                 Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
                                                   spacing: 5,
                                                   children: [
-                                                    Icon(
-                                                      Icons.calendar_month_rounded,
-                                                      size: 17,
-                                                      color: getMainStore().theme.value.LightTextColor.withAlpha(150),
+                                                    Image(
+                                                      image: const AssetImage(
+                                                        "assets/booking.png",
+                                                      ),
+                                                      color: Colors
+                                                          .blueGrey
+                                                          .shade700,
+                                                      width: 18,
+                                                      height: 20,
                                                     ),
                                                     TextHelper(
-                                                      text: parseDateToString(
-                                                        data: m.date,
-                                                        formatDate: 'dd-MM-yyyy',
-                                                        predefinedDateFormat: 'yyyy-MM-dd',
-                                                        defaultValue: '',
-                                                      ),
-                                                      width: 80,
-                                                      fontsize: 12,
-                                                      color: getMainStore().theme.value.LightTextColor,
+                                                      padding: EdgeInsets.zero,
+                                                      text: parseInt(
+                                                        data: d.y,
+                                                        defaultInt: 0,
+                                                      ).toString(),
+                                                      fontweight:
+                                                          FontWeight.w600,
+                                                      textalign:
+                                                          TextAlign.center,
                                                     ),
                                                   ],
                                                 ),
                                               ],
                                             ),
-                                          ),
-                                          Positioned(
-                                            bottom: 0,
-                                            width: double.maxFinite,
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                color: mainStore.theme.value.HeadColor.withAlpha(
-                                                  getStatus(m).toLowerCase().contains('complete')
-                                                      ? 140
-                                                      : getStatus(m).toLowerCase().contains('ongoing')
-                                                      ? 20
-                                                      : 70,
-                                                ),
-                                              ),
-                                              child: TextHelper(
-                                                text: getStatus(m),
-                                                fontsize: 11.5,
-                                                fontweight: FontWeight.w600,
-                                                padding: EdgeInsets.only(left: 10),
-                                                color: getStatus(m).toLowerCase().contains('ongoing')
-                                                    ? mainStore.theme.value.HeadColor.withAlpha(120)
-                                                    : mainStore.theme.value.BackgroundColor,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                            const SizedBox(height: 15),
-                            Container(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Container(
-                                    margin: EdgeInsets.symmetric(vertical: 5),
-                                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: Colors.white,
-                                      border: Border.all(color: Colors.green.shade50),
-                                    ),
-                                    child: Column(
-                                      children: [
-                                        Row(
-                                          spacing: 5,
-                                          children: [
-                                            Image(image: AssetImage("assets/booking.png"), color: getMainStore().theme.value.HeadColor, width: 20, height: 20),
-                                            TextHelper(text: "Today's Booking", fontweight: FontWeight.w600),
+                                          );
+                                        },
+                                        tooltipColor: getMainStore()
+                                            .theme
+                                            .value
+                                            .mediumShadeColor,
+                                        borderColor: getMainStore()
+                                            .theme
+                                            .value
+                                            .mediumShadeColor,
+                                        gradient: LinearGradient(
+                                          begin: Alignment.bottomCenter,
+                                          colors: [
+                                            getMainStore()
+                                                .theme
+                                                .value
+                                                .lowShadeColor,
+                                            getMainStore()
+                                                .theme
+                                                .value
+                                                .lowShadeColor,
                                           ],
                                         ),
-                                        Divider(),
-                                        SizedBox(
-                                          height: 150,
-                                          child: AreaChartHelper(
-                                            // borderDrawMode: BorderDrawMode.top,
-                                            customTooltip: (d) {
-                                              return Container(
-                                                color: Colors.white,
-                                                padding: EdgeInsets.all(10),
-                                                child: Column(
-                                                  mainAxisSize: MainAxisSize.min,
-                                                  mainAxisAlignment: MainAxisAlignment.center,
-                                                  children: [
-                                                    Row(
-                                                      mainAxisSize: MainAxisSize.min,
-                                                      children: [
-                                                        Icon(Icons.watch_later_outlined, size: 18),
-                                                        TextHelper(text: d.x, width: 40, fontweight: FontWeight.w600, textalign: TextAlign.center),
-                                                      ],
-                                                    ),
-                                                    SizedBox(width: 60, child: Divider()),
-                                                    Row(
-                                                      mainAxisSize: MainAxisSize.min,
-                                                      spacing: 5,
-                                                      children: [
-                                                        Image(image: AssetImage("assets/booking.png"), color: Colors.blueGrey.shade700, width: 18, height: 20),
-                                                        TextHelper(
-                                                          padding: EdgeInsets.zero,
-                                                          text: parseInt(data: d.y, defaultInt: 0).toString(),
-
-                                                          fontweight: FontWeight.w600,
-                                                          textalign: TextAlign.center,
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ],
-                                                ),
-                                              );
-                                            },
-                                            // isHorizontal: false,
-                                            tooltipColor: getMainStore().theme.value.mediumShadeColor,
-                                            borderColor: getMainStore().theme.value.mediumShadeColor,
-                                            gradient: LinearGradient(
-                                              begin: AlignmentGeometry.bottomCenter,
-                                              colors: [getMainStore().theme.value.lowShadeColor, getMainStore().theme.value.lowShadeColor],
-                                            ),
-                                            showBorder: false,
-                                            showYAxis: true,
-                                            dataSource: homeController.getHourlyBooking(),
-                                            chartTitle: "Hourly Booking",
-                                          ),
-                                        ),
-                                        const SizedBox(height: 20),
-                                        Padding(
-                                          padding: EdgeInsets.all(5),
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: homeController.getTodaysBooking().map<Widget>((m) {
-                                              return Obx(
-                                                () => Column(
-                                                  mainAxisSize: MainAxisSize.min,
-                                                  children: [
-                                                    Row(
-                                                      children: [
-                                                        Expanded(
-                                                          child: Row(
-                                                            spacing: 5,
-                                                            children: [
-                                                              Icon(
-                                                                MoonIcons.generic_ticket_24_regular,
-                                                                color: homeController.selectedIndex.value == m.id
-                                                                    ? getMainStore().theme.value.HeadColor
-                                                                    : Colors.grey.shade700,
-                                                              ),
-                                                              Expanded(
-                                                                child: TextHelper(
-                                                                  text: m.serviceName,
-                                                                  fontweight: FontWeight.w500,
-                                                                  color: homeController.selectedIndex.value == m.id
-                                                                      ? getMainStore().theme.value.HeadColor
-                                                                      : Colors.grey.shade700,
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                        TextHelper(
-                                                          text: m.totalBooked.toString(),
-                                                          fontsize: 14,
-                                                          fontweight: FontWeight.w500,
-                                                          color: homeController.selectedIndex.value == m.id
-                                                              ? getMainStore().theme.value.HeadColor
-                                                              : Colors.grey.shade900,
-                                                        ),
-                                                        ButtonHelperG(
-                                                          onTap: () {
-                                                            if (homeController.selectedIndex.value == m.id) {
-                                                              homeController.selectedIndex.value = -1;
-                                                            } else {
-                                                              homeController.selectedIndex.value = m.id;
-                                                            }
-                                                          },
-                                                          height: 35,
-                                                          padding: EdgeInsets.zero,
-                                                          margin: 0,
-                                                          background: Colors.transparent,
-                                                          icon: Icon(homeController.selectedIndex.value == m.id ? Icons.arrow_drop_up : Icons.arrow_drop_down),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    if (homeController.selectedIndex.value == m.id)
-                                                      ConstrainedBox(
-                                                        constraints: BoxConstraints(maxHeight: 200),
-                                                        child: DataGridHelper3(
-                                                          fontSize: 12,
-                                                          rowHeight: 25,
-                                                          headerColor: Colors.transparent,
-                                                          // headerFontSize: 11,
-                                                          dataSource: m.slots.map((m) => m.toJSON()).toList(),
-                                                          columnList: [
-                                                            DataGridColumnModel3(
-                                                              dataField: "slot",
-                                                              title: 'Slot',
-                                                              customCell: (c) {
-                                                                return GestureDetector(
-                                                                  onTap: () async {
-                                                                    try {
-                                                                      Loader.startLoading();
-                                                                      final fb = Get.find<FB>();
-                                                                      final db = await fb.getDB();
-                                                                      final resp = await db.collection('slots').doc(c.rowValue['slotId']).get();
-                                                                      if (!resp.exists) {
-                                                                        throw Exception('No slot data found!');
-                                                                      }
-                                                                      await slotDetailsController.getSlotDetails(selectedSlot: SlotModel.fromFirestore(resp));
-                                                                      Get.toNamed('/slotdetailsreceptionist');
-                                                                    } catch (e) {
-                                                                      showAlert("$e", AlertType.error);
-                                                                    } finally {
-                                                                      Loader.stopLoading();
-                                                                    }
-                                                                  },
-                                                                  child: TextHelper(text: c.cellValue, textalign: TextAlign.center, fontsize: 12),
-                                                                );
-                                                              },
-                                                              dataType: CellDataType3.string,
-                                                            ),
-                                                            DataGridColumnModel3(dataField: "booked", title: 'Booked', dataType: CellDataType3.string),
-                                                            DataGridColumnModel3(
-                                                              dataField: "totalAttendance",
-                                                              title: 'Attended',
-                                                              dataType: CellDataType3.string,
-                                                            ),
-                                                          ],
-                                                          uniqueKey: UniqueKey().toString(),
-                                                          width: MediaQuery.sizeOf(context).width * 0.8,
-                                                        ),
-                                                      ),
-                                                  ],
-                                                ),
-                                              );
-                                            }).toList(),
-                                          ),
-                                        ),
-                                      ],
+                                        showBorder: false,
+                                        showYAxis: true,
+                                        dataSource: homeController
+                                            .getHourlyBooking(),
+                                        chartTitle: "Hourly Booking",
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                    const SizedBox(height: 16),
+                                    Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: homeController.getTodaysBooking().map<Widget>((
+                                        m,
+                                      ) {
+                                        return Obx(
+                                          () => Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Container(
+                                                margin:
+                                                    const EdgeInsets.symmetric(
+                                                      vertical: 4,
+                                                    ),
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 10,
+                                                      vertical: 8,
+                                                    ),
+                                                decoration: BoxDecoration(
+                                                  color:
+                                                      homeController
+                                                              .selectedIndex
+                                                              .value ==
+                                                          m.id
+                                                      ? getMainStore()
+                                                            .theme
+                                                            .value
+                                                            .HeadColor
+                                                            .withAlpha(15)
+                                                      : Colors.grey.shade50,
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  border: Border.all(
+                                                    color:
+                                                        homeController
+                                                                .selectedIndex
+                                                                .value ==
+                                                            m.id
+                                                        ? getMainStore()
+                                                              .theme
+                                                              .value
+                                                              .HeadColor
+                                                              .withAlpha(80)
+                                                        : Colors.grey.shade200,
+                                                  ),
+                                                ),
+                                                child: Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child: Row(
+                                                        children: [
+                                                          Icon(
+                                                            MoonIcons
+                                                                .generic_ticket_24_regular,
+                                                            size: 20,
+                                                            color:
+                                                                homeController
+                                                                        .selectedIndex
+                                                                        .value ==
+                                                                    m.id
+                                                                ? getMainStore()
+                                                                      .theme
+                                                                      .value
+                                                                      .HeadColor
+                                                                : Colors
+                                                                      .grey
+                                                                      .shade700,
+                                                          ),
+                                                          const SizedBox(
+                                                            width: 8,
+                                                          ),
+                                                          Expanded(
+                                                            child: TextHelper(
+                                                              text:
+                                                                  m.serviceName,
+                                                              fontweight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                              fontsize: 13,
+                                                              color:
+                                                                  homeController
+                                                                          .selectedIndex
+                                                                          .value ==
+                                                                      m.id
+                                                                  ? getMainStore()
+                                                                        .theme
+                                                                        .value
+                                                                        .HeadColor
+                                                                  : Colors
+                                                                        .grey
+                                                                        .shade900,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    Container(
+                                                      padding:
+                                                          const EdgeInsets.symmetric(
+                                                            horizontal: 8,
+                                                            vertical: 2,
+                                                          ),
+                                                      decoration: BoxDecoration(
+                                                        color: Colors
+                                                            .blueGrey
+                                                            .shade100,
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              10,
+                                                            ),
+                                                      ),
+                                                      child: TextHelper(
+                                                        text: m.totalBooked
+                                                            .toString(),
+                                                        fontsize: 12,
+                                                        fontweight:
+                                                            FontWeight.w700,
+                                                        color: Colors
+                                                            .blueGrey
+                                                            .shade900,
+                                                        padding:
+                                                            EdgeInsets.zero,
+                                                      ),
+                                                    ),
+                                                    const SizedBox(width: 6),
+                                                    ButtonHelperG(
+                                                      onTap: () {
+                                                        if (homeController
+                                                                .selectedIndex
+                                                                .value ==
+                                                            m.id) {
+                                                          homeController
+                                                                  .selectedIndex
+                                                                  .value =
+                                                              -1;
+                                                        } else {
+                                                          homeController
+                                                                  .selectedIndex
+                                                                  .value =
+                                                              m.id;
+                                                        }
+                                                      },
+                                                      height: 32,
+                                                      padding: EdgeInsets.zero,
+                                                      margin: 0,
+                                                      background:
+                                                          Colors.transparent,
+                                                      icon: Icon(
+                                                        homeController
+                                                                    .selectedIndex
+                                                                    .value ==
+                                                                m.id
+                                                            ? Icons
+                                                                  .arrow_drop_up
+                                                            : Icons
+                                                                  .arrow_drop_down,
+                                                        color: Colors
+                                                            .blueGrey
+                                                            .shade800,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              if (homeController
+                                                      .selectedIndex
+                                                      .value ==
+                                                  m.id)
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                        top: 6,
+                                                        bottom: 8,
+                                                      ),
+                                                  child: ConstrainedBox(
+                                                    constraints:
+                                                        const BoxConstraints(
+                                                          maxHeight: 200,
+                                                        ),
+                                                    child: DataGridHelper3(
+                                                      fontSize: 12,
+                                                      rowHeight: 28,
+                                                      headerColor:
+                                                          Colors.grey.shade100,
+                                                      dataSource: m.slots
+                                                          .map(
+                                                            (m) => m.toJSON(),
+                                                          )
+                                                          .toList(),
+                                                      columnList: [
+                                                        DataGridColumnModel3(
+                                                          dataField: "slot",
+                                                          title: 'Slot',
+                                                          customCell: (c) {
+                                                            return GestureDetector(
+                                                              onTap: () async {
+                                                                try {
+                                                                  Loader.startLoading();
+                                                                  final fb =
+                                                                      Get.find<
+                                                                        FB
+                                                                      >();
+                                                                  final db =
+                                                                      await fb
+                                                                          .getDB();
+                                                                  final resp = await db
+                                                                      .collection(
+                                                                        'slots',
+                                                                      )
+                                                                      .doc(
+                                                                        c.rowValue['slotId'],
+                                                                      )
+                                                                      .get();
+                                                                  if (!resp
+                                                                      .exists) {
+                                                                    throw Exception(
+                                                                      'No slot data found!',
+                                                                    );
+                                                                  }
+                                                                  await slotDetailsController.getSlotDetails(
+                                                                    selectedSlot:
+                                                                        SlotModel.fromFirestore(
+                                                                          resp,
+                                                                        ),
+                                                                  );
+                                                                  Get.toNamed(
+                                                                    '/slotdetailsreceptionist',
+                                                                  );
+                                                                } catch (e) {
+                                                                  showAlert(
+                                                                    "$e",
+                                                                    AlertType
+                                                                        .error,
+                                                                  );
+                                                                } finally {
+                                                                  Loader.stopLoading();
+                                                                }
+                                                              },
+                                                              child: TextHelper(
+                                                                text:
+                                                                    c.cellValue,
+                                                                textalign:
+                                                                    TextAlign
+                                                                        .center,
+                                                                fontsize: 12,
+                                                              ),
+                                                            );
+                                                          },
+                                                          dataType:
+                                                              CellDataType3
+                                                                  .string,
+                                                        ),
+                                                        DataGridColumnModel3(
+                                                          dataField: "booked",
+                                                          title: 'Booked',
+                                                          dataType:
+                                                              CellDataType3
+                                                                  .string,
+                                                        ),
+                                                        DataGridColumnModel3(
+                                                          dataField:
+                                                              "totalAttendance",
+                                                          title: 'Attended',
+                                                          dataType:
+                                                              CellDataType3
+                                                                  .string,
+                                                        ),
+                                                      ],
+                                                      uniqueKey: UniqueKey()
+                                                          .toString(),
+                                                      width:
+                                                          MediaQuery.sizeOf(
+                                                            context,
+                                                          ).width *
+                                                          0.8,
+                                                    ),
+                                                  ),
+                                                ),
+                                            ],
+                                          ),
+                                        );
+                                      }).toList(),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-
-                            // Button Row
-                          ],
+                              const SizedBox(height: 16),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             );

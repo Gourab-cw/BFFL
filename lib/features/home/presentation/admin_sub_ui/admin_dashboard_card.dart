@@ -37,52 +37,67 @@ class _AdminDashboardCardState extends State<AdminDashboardCard> {
   Widget build(BuildContext context) {
     return CardHelper(
       onTap: widget.onTap,
-      width: widget.extra == null ? 130 : 300,
-      height: 110,
-      padding: EdgeInsets.all(8),
+      width: widget.extra == null ? 140 : 310,
+      height: 115,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       child: Skeletonizer(
         enabled: widget.enabled,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
-                    width: 30,
-                    height: 30,
-                    decoration: BoxDecoration(color: widget.iconBgColor, borderRadius: BorderRadius.circular(10)),
+                    width: 34,
+                    height: 34,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: widget.iconBgColor,
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: widget.iconBgColor.withAlpha(50),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
                     child: widget.icon,
                   ),
-                  SizedBox(height: 11),
+                  const SizedBox(height: 8),
                   Column(
-                    spacing: 0,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       TextHelper(
                         text: widget.title,
-                        // textalign: TextAlign.center,
                         fontsize: 11,
-                        color: Colors.grey,
-                        padding: EdgeInsets.symmetric(horizontal: 2),
+                        color: Colors.blueGrey.shade400,
+                        fontweight: FontWeight.w500,
+                        padding: EdgeInsets.zero,
                       ),
+                      const SizedBox(height: 2),
                       TextHelper(
                         text: widget.content,
-                        padding: EdgeInsets.symmetric(horizontal: 2),
+                        padding: EdgeInsets.zero,
                         fontsize: widget.contentFontSize,
                         color: Colors.blueGrey.shade900,
-                        fontweight: FontWeight.w600,
-                        // textalign: TextAlign.center,
+                        fontweight: FontWeight.w700,
                       ),
                     ],
                   ),
                 ],
               ),
             ),
-            if (widget.extra != null) widget.extra!,
+            if (widget.extra != null) ...[
+              const SizedBox(width: 8),
+              widget.extra!,
+            ],
           ],
         ),
       ),

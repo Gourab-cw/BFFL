@@ -90,53 +90,56 @@ class _BottomNavbarTrainerState extends State<BottomNavbarTrainer> {
     final menus = widget.menus;
     final calcWidth = MediaQuery.sizeOf(context).width / (4 + 1);
     return Obx(
-      () => BottomAppBar(
-        shape: const CircularNotchedRectangle(),
-        elevation: 0,
-        height: 60,
-        notchMargin: 3,
-        padding: const EdgeInsets.all(0),
-        // color: const Color.fromARGB(255, 151, 239, 160),
+      () => Container(
+        height: 64,
+        margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.grey.shade200),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(12),
+              blurRadius: 15,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             ...List.generate(menus.length, (i) {
               final m = menus[i];
+              final isSelected = mainStore.bottomNavBarIndex.value == i;
               return GestureDetector(
                 onTap: () {
                   SystemSound.play(SystemSoundType.click);
                   mainStore.bottomNavBarIndex.value = i;
-                  // Get.toNamed("/home");
                 },
-                child: SizedBox(
-                  width: MediaQuery.sizeOf(context).width / (menus.length + 1),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 250),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: isSelected ? mainStore.theme.value.HeadColor.withAlpha(20) : Colors.transparent,
+                    borderRadius: BorderRadius.circular(14),
+                  ),
                   child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 500),
-                        curve: Curves.fastEaseInToSlowEaseOut,
-                        height: 28,
-                        width: calcWidth > 35 ? 35 : calcWidth,
-                        decoration: BoxDecoration(
-                          color: mainStore.bottomNavBarIndex.value == i ? mainStore.theme.value.BackgroundShadeColor.withAlpha(100) : Colors.transparent,
-                          borderRadius: BorderRadius.circular(100),
-                        ),
-                        child: Icon(
-                          m.values.toList()[0].icon,
-                          size: m.values.toList()[0].size,
-                          color: mainStore.bottomNavBarIndex.value == i ? mainStore.theme.value.DarkTextColor : mainStore.theme.value.DarkTextColor,
-                        ),
+                      Icon(
+                        m.values.toList()[0].icon,
+                        size: isSelected ? 22 : 20,
+                        color: isSelected ? mainStore.theme.value.HeadColor : Colors.grey.shade600,
                       ),
+                      const SizedBox(height: 2),
                       TextHelper(
                         text: parseString(data: m.keys.toList()[0], defaultValue: ''),
-                        fontweight: mainStore.bottomNavBarIndex.value == i ? FontWeight.w600 : FontWeight.w500,
-                        fontsize: mainStore.bottomNavBarIndex.value == i ? 11 : 10,
-                        width: calcWidth,
-                        isWrap: true,
-                        color: mainStore.theme.value.DarkTextColor,
+                        fontweight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                        fontsize: isSelected ? 11 : 10,
+                        color: isSelected ? mainStore.theme.value.HeadColor : Colors.grey.shade600,
                         textalign: TextAlign.center,
                       ),
                     ],
@@ -148,33 +151,30 @@ class _BottomNavbarTrainerState extends State<BottomNavbarTrainer> {
               onTap: () async {
                 await showLogoutPopup();
               },
-              child: SizedBox(
-                width: MediaQuery.sizeOf(context).width / (menus.length + 1),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 250),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.red.shade50,
+                  borderRadius: BorderRadius.circular(14),
+                ),
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Container(
-                      height: 28,
-                      width: calcWidth > 40 ? 40 : calcWidth,
-                      decoration: BoxDecoration(
-                        color: mainStore.bottomNavBarIndex.value == 10 ? Colors.white.withAlpha(160) : Colors.transparent,
-                        borderRadius: BorderRadius.circular(100),
-                      ),
-                      child: Icon(
-                        Icons.logout,
-                        size: 17,
-                        color: mainStore.bottomNavBarIndex.value == 10 ? mainStore.theme.value.HeadColor : mainStore.theme.value.BackgroundColor,
-                      ),
+                    Icon(
+                      Icons.logout_rounded,
+                      size: 18,
+                      color: Colors.red.shade700,
                     ),
+                    const SizedBox(height: 2),
                     TextHelper(
-                      text: parseString(data: 'Logout', defaultValue: ''),
+                      text: 'Logout',
                       fontsize: 10,
-                      color: mainStore.bottomNavBarIndex.value == 10 ? mainStore.theme.value.HeadColor : mainStore.theme.value.BackgroundColor,
-                      width: calcWidth,
-                      isWrap: true,
+                      color: Colors.red.shade700,
                       textalign: TextAlign.center,
-                      fontweight: FontWeight.w500,
+                      fontweight: FontWeight.w600,
                     ),
                   ],
                 ),

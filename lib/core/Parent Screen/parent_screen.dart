@@ -37,12 +37,43 @@ class _ParentScreenState extends State<ParentScreen> {
   final MainStore mainStore = Get.find<MainStore>();
   final Authenticator userRef = Get.find<Authenticator>();
   late final EdgeInsets safePadding = MediaQuery.paddingOf(context);
-  final List<Widget> _pages = [Home(), DailySchedule(), Members(), Attendance(), StaffRegister(), Home()];
-  final List<Widget> _branchManagerPages = [Home(), DailySchedule(), Attendance(), CalenderReport(), Master()];
-  final List<Widget> _trainerPages = [HomeTrainer(), SlotDetailsRegister(), Attendance(), HomeTrainer()];
-  final List<Widget> _memberPages = [HomeMember(), ServiceView(), MemberDetails()];
-  final List<Widget> _adminPages = [HomeAdmin(), CalenderReport(), Master(), Attendance()];
-  final List<Widget> _accPages = [AccSubscriptionList(), AccountantHistory(), Attendance()];
+  final List<Widget> _pages = [
+    Home(),
+    DailySchedule(),
+    Members(),
+    Attendance(),
+    StaffRegister(),
+    Home(),
+  ];
+  final List<Widget> _branchManagerPages = [
+    Home(),
+    DailySchedule(),
+    Attendance(),
+    CalenderReport(),
+    Master(),
+  ];
+  final List<Widget> _trainerPages = [
+    HomeTrainer(),
+    SlotDetailsRegister(),
+    Attendance(),
+    HomeTrainer(),
+  ];
+  final List<Widget> _memberPages = [
+    HomeMember(),
+    ServiceView(),
+    MemberDetails(),
+  ];
+  final List<Widget> _adminPages = [
+    HomeAdmin(),
+    CalenderReport(),
+    Master(),
+    Attendance(),
+  ];
+  final List<Widget> _accPages = [
+    AccSubscriptionList(),
+    AccountantHistory(),
+    Attendance(),
+  ];
   List<Map<String, Icon>> branchManagerMenus = [
     {"Home": Icon(MoonIcons.generic_home_24_regular)},
     {"Schedule": Icon(MoonIcons.time_calendar_24_regular)},
@@ -154,17 +185,28 @@ class _ParentScreenState extends State<ParentScreen> {
             autoRemove: false,
             builder: (context) {
               return Scaffold(
-                bottomNavigationBar: userRef.state == null ? null : getBottomNavBar(),
-                body: Padding(
-                  padding: EdgeInsets.only(top: safePadding.top, bottom: safePadding.bottom, left: safePadding.left + 5, right: safePadding.right + 5),
-                  child: userRef.state == null ? Login() : Obx(() => getPages()[mainStore.bottomNavBarIndex.value]),
+                backgroundColor: mainStore.theme.value.BackgroundColor,
+                bottomNavigationBar: userRef.state == null
+                    ? null
+                    : getBottomNavBar(),
+                body: SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 0,
+                      vertical: 0,
+                    ),
+                    child: userRef.state == null
+                        ? const Login()
+                        : Obx(
+                            () => getPages()[mainStore.bottomNavBarIndex.value],
+                          ),
+                  ),
                 ),
               );
             },
           );
         },
       ),
-      // ),
     );
   }
 }

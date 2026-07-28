@@ -64,397 +64,377 @@ class _HomeAdminState extends State<HomeAdmin> {
       autoRemove: false,
       builder: (adminHomeController) {
         return Scaffold(
+          backgroundColor: Colors.transparent,
           body: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
               child: Column(
-                spacing: 10,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          TextHelper(text: 'Overview', fontsize: 11, color: mainStore.theme.value.HeadColor.withAlpha(250)),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [TextHelper(text: 'Welcome, ${auth.state!.name}', fontweight: FontWeight.w600, fontsize: 20)],
-                          ),
-                        ],
-                      ),
-                      ButtonHelperG(
-                        onTap: () {
-                          settingFetchingService();
-                        },
-                        width: 35,
-                        height: 35,
-                        background: mainStore.theme.value.mediumShadeColor,
-                        icon: Icon(Icons.refresh, size: 20),
-                      ),
-                    ],
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(5.0),
+                  // Modern Admin Header
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.grey.shade200),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withAlpha(8),
+                          blurRadius: 10,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Expanded(
-                          child: Wrap(
-                            runSpacing: 0,
-                            spacing: 35,
-                            runAlignment: WrapAlignment.center,
-                            crossAxisAlignment: WrapCrossAlignment.center,
-                            alignment: WrapAlignment.center,
-                            children: [
-                              FutureBuilder(
-                                future: _getDashboardData,
-                                builder: (context, asyncSnapshot) {
-                                  bool waiting = false;
-                                  String content = '';
-                                  if (asyncSnapshot.connectionState == ConnectionState.waiting) {
-                                    waiting = true;
-                                  } else {
-                                    waiting = false;
-                                  }
-                                  if (asyncSnapshot.hasError) {
-                                    showAlert('${asyncSnapshot.error}', AlertType.error);
-                                    content = 'Error';
-                                  } else {
-                                    content = parseString(data: asyncSnapshot.data, defaultValue: '0');
-                                  }
-                                  return AdminDashboardCard(
-                                    onTap: () {
-                                      Get.toNamed('/memberlist');
-                                    },
-                                    icon: Icon(MoonIcons.generic_users_24_regular),
-                                    enabled: waiting,
-                                    iconBgColor: Colors.purple.shade50,
-                                    title: 'Active Members',
-                                    content: content,
-                                  );
-                                },
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: mainStore.theme.value.HeadColor.withAlpha(20),
+                                borderRadius: BorderRadius.circular(10),
                               ),
-                              FutureBuilder(
-                                future: _getDashboardDataActiveSubs,
-                                builder: (context, asyncSnapshot) {
-                                  bool waiting = false;
-                                  String content = '';
-                                  if (asyncSnapshot.connectionState == ConnectionState.waiting) {
-                                    waiting = true;
-                                  } else {
-                                    waiting = false;
-                                  }
-                                  if (asyncSnapshot.hasError) {
-                                    showAlert('${asyncSnapshot.error}', AlertType.error);
-                                    content = 'Error';
-                                  } else {
-                                    content = parseString(data: asyncSnapshot.data, defaultValue: '0');
-                                  }
-                                  return AdminDashboardCard(
-                                    onTap: () {
-                                      Get.toNamed('/memberbookinghistory', parameters: {"withAppBar": "1"});
-                                    },
-                                    icon: Icon(FontAwesomeIcons.certificate, size: 12, color: Colors.blue.shade600),
-                                    enabled: waiting,
-                                    iconBgColor: Colors.blue.shade50,
-                                    title: 'Active Subscription',
-                                    content: content,
-                                  );
-                                },
+                              child: TextHelper(
+                                text: 'ADMIN OVERVIEW',
+                                fontsize: 10,
+                                fontweight: FontWeight.w700,
+                                color: mainStore.theme.value.HeadColor,
+                                padding: EdgeInsets.zero,
                               ),
-                              FutureBuilder(
-                                future: _getDashboardDataTodaySession,
+                            ),
+                            const SizedBox(height: 4),
+                            TextHelper(
+                              text: 'Welcome, ${auth.state!.name}',
+                              fontweight: FontWeight.w700,
+                              fontsize: 18,
+                              color: Colors.blueGrey.shade900,
+                              padding: EdgeInsets.zero,
+                            ),
+                          ],
+                        ),
+                        ButtonHelperG(
+                          onTap: () {
+                            settingFetchingService();
+                          },
+                          width: 38,
+                          height: 38,
+                          background: Colors.grey.shade100,
+                          icon: Icon(Icons.refresh_rounded, color: Colors.blueGrey.shade700, size: 20),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Dashboard Cards Grid
+                  Center(
+                    child: Wrap(
+                      runSpacing: 14,
+                      spacing: 14,
+                      alignment: WrapAlignment.center,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        FutureBuilder(
+                          future: _getDashboardData,
+                          builder: (context, asyncSnapshot) {
+                            bool waiting = asyncSnapshot.connectionState == ConnectionState.waiting;
+                            String content = '';
+                            if (asyncSnapshot.hasError) {
+                              showAlert('${asyncSnapshot.error}', AlertType.error);
+                              content = 'Error';
+                            } else {
+                              content = parseString(data: asyncSnapshot.data, defaultValue: '0');
+                            }
+                            return AdminDashboardCard(
+                              onTap: () => Get.toNamed('/memberlist'),
+                              icon: Icon(MoonIcons.generic_users_24_regular, color: Colors.purple.shade700, size: 20),
+                              enabled: waiting,
+                              iconBgColor: Colors.purple.shade50,
+                              title: 'Active Members',
+                              content: content,
+                            );
+                          },
+                        ),
+                        FutureBuilder(
+                          future: _getDashboardDataActiveSubs,
+                          builder: (context, asyncSnapshot) {
+                            bool waiting = asyncSnapshot.connectionState == ConnectionState.waiting;
+                            String content = '';
+                            if (asyncSnapshot.hasError) {
+                              showAlert('${asyncSnapshot.error}', AlertType.error);
+                              content = 'Error';
+                            } else {
+                              content = parseString(data: asyncSnapshot.data, defaultValue: '0');
+                            }
+                            return AdminDashboardCard(
+                              onTap: () => Get.toNamed('/memberbookinghistory', parameters: {"withAppBar": "1"}),
+                              icon: Icon(FontAwesomeIcons.certificate, size: 14, color: Colors.blue.shade700),
+                              enabled: waiting,
+                              iconBgColor: Colors.blue.shade50,
+                              title: 'Active Subscription',
+                              content: content,
+                            );
+                          },
+                        ),
+                        FutureBuilder(
+                          future: _getDashboardDataTodaySession,
+                          builder: (context, asyncSnapshot) {
+                            bool waiting = asyncSnapshot.connectionState == ConnectionState.waiting;
+                            String content = '';
+                            if (asyncSnapshot.hasError) {
+                              showAlert('${asyncSnapshot.error}', AlertType.error);
+                              content = 'Error';
+                            } else {
+                              content = parseString(data: asyncSnapshot.data, defaultValue: '0');
+                            }
+                            return AdminDashboardCard(
+                              onTap: () => Get.toNamed('/dailyschedule'),
+                              icon: Icon(FontAwesomeIcons.calendarPlus, size: 14, color: Colors.orange.shade700),
+                              enabled: waiting,
+                              iconBgColor: Colors.orange.shade50,
+                              title: "Today's Session",
+                              content: content,
+                            );
+                          },
+                        ),
+                        FutureBuilder(
+                          future: _getDashboardDataServiceCount,
+                          builder: (context, asyncSnapshot) {
+                            bool waiting = asyncSnapshot.connectionState == ConnectionState.waiting;
+                            String content = '';
+                            if (asyncSnapshot.hasError) {
+                              showAlert('${asyncSnapshot.error}', AlertType.error);
+                              content = 'Error';
+                            } else {
+                              content = parseString(data: asyncSnapshot.data, defaultValue: '0');
+                            }
+                            return AdminDashboardCard(
+                              onTap: () => Get.toNamed('/serviceview'),
+                              icon: Icon(FontAwesomeIcons.ticket, size: 14, color: Colors.blueAccent.shade700),
+                              enabled: waiting,
+                              iconBgColor: Colors.blueAccent.shade100.withAlpha(50),
+                              title: "Total Service",
+                              content: content,
+                            );
+                          },
+                        ),
+                        FutureBuilder(
+                          future: _getDashboardDataBookingCount,
+                          builder: (context, asyncSnapshot) {
+                            bool waiting = asyncSnapshot.connectionState == ConnectionState.waiting;
+                            String content = '';
+                            if (asyncSnapshot.hasError) {
+                              showAlert('${asyncSnapshot.error}', AlertType.error);
+                              content = 'Error';
+                            } else {
+                              content = parseString(data: asyncSnapshot.data, defaultValue: '0');
+                            }
+                            return AdminDashboardCard(
+                              onTap: () {
+                                slotRegisterController.selectedDate = adminHomeController.dashboardDate;
+                                Get.toNamed('/slotregister');
+                              },
+                              icon: Icon(FontAwesomeIcons.calendarPlus, size: 14, color: Colors.pink.shade700),
+                              enabled: waiting,
+                              iconBgColor: Colors.pink.shade50,
+                              title: "Booking Count",
+                              content: content,
+                              extra: FutureBuilder(
+                                future: _getDashboardDataSessionGraph,
                                 builder: (context, asyncSnapshot) {
-                                  bool waiting = false;
-                                  String content = '';
-                                  if (asyncSnapshot.connectionState == ConnectionState.waiting) {
-                                    waiting = true;
-                                  } else {
-                                    waiting = false;
-                                  }
+                                  List<ChartData> data = [];
+                                  bool waiting = asyncSnapshot.connectionState == ConnectionState.waiting;
                                   if (asyncSnapshot.hasError) {
                                     showAlert('${asyncSnapshot.error}', AlertType.error);
-                                    content = 'Error';
-                                  } else {
-                                    content = parseString(data: asyncSnapshot.data, defaultValue: '0');
+                                  } else if (asyncSnapshot.data != null) {
+                                    data = asyncSnapshot.data!;
                                   }
-                                  return AdminDashboardCard(
-                                    onTap: () {
-                                      Get.toNamed('/dailyschedule');
-                                    },
-                                    icon: Icon(FontAwesomeIcons.calendarPlus, size: 16, color: Colors.orange.shade600),
-                                    enabled: waiting,
-                                    iconBgColor: Colors.orange.shade50,
-                                    title: "Today's Session",
-                                    content: content,
-                                  );
-                                },
-                              ),
-                              FutureBuilder(
-                                future: _getDashboardDataServiceCount,
-                                builder: (context, asyncSnapshot) {
-                                  bool waiting = false;
-                                  String content = '';
-                                  if (asyncSnapshot.connectionState == ConnectionState.waiting) {
-                                    waiting = true;
-                                  } else {
-                                    waiting = false;
-                                  }
-                                  if (asyncSnapshot.hasError) {
-                                    showAlert('${asyncSnapshot.error}', AlertType.error);
-                                    content = 'Error';
-                                  } else {
-                                    content = parseString(data: asyncSnapshot.data, defaultValue: '0');
-                                  }
-                                  return AdminDashboardCard(
-                                    onTap: () {
-                                      Get.toNamed('/serviceview');
-                                    },
-                                    icon: Icon(FontAwesomeIcons.ticket, size: 16, color: Colors.blueAccent.shade700),
-                                    enabled: waiting,
-                                    iconBgColor: Colors.blueAccent.shade100.withAlpha(50),
-                                    title: "Total Service",
-                                    content: content,
-                                  );
-                                },
-                              ),
-                              FutureBuilder(
-                                future: _getDashboardDataBookingCount,
-                                builder: (context, asyncSnapshot) {
-                                  bool waiting = false;
-                                  String content = '';
-                                  if (asyncSnapshot.connectionState == ConnectionState.waiting) {
-                                    waiting = true;
-                                  } else {
-                                    waiting = false;
-                                  }
-                                  if (asyncSnapshot.hasError) {
-                                    showAlert('${asyncSnapshot.error}', AlertType.error);
-                                    content = 'Error';
-                                  } else {
-                                    content = parseString(data: asyncSnapshot.data, defaultValue: '0');
-                                  }
-                                  return AdminDashboardCard(
-                                    onTap: () {
-                                      slotRegisterController.selectedDate = adminHomeController.dashboardDate;
-                                      Get.toNamed('/slotregister');
-                                    },
-                                    icon: Icon(FontAwesomeIcons.calendarPlus, size: 16, color: Colors.pink.shade600),
-                                    enabled: waiting,
-                                    iconBgColor: Colors.pink.shade50,
-                                    title: "Booking Count",
-                                    content: content,
-                                    extra: FutureBuilder(
-                                      future: _getDashboardDataSessionGraph,
-                                      builder: (context, asyncSnapshot) {
-                                        List<ChartData> data = [];
-                                        bool waiting = false;
-                                        if (asyncSnapshot.connectionState == ConnectionState.waiting) {
-                                          waiting = true;
-                                        } else {
-                                          waiting = false;
-                                        }
-                                        if (asyncSnapshot.hasError) {
-                                          showAlert('${asyncSnapshot.error}', AlertType.error);
-                                        } else if (asyncSnapshot.data != null) {
-                                          data = asyncSnapshot.data!;
-                                        }
-                                        return Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          crossAxisAlignment: CrossAxisAlignment.end,
-                                          children: [
-                                            ButtonHelperG(
-                                              onTap: () async {
-                                                await showDatePickerHelper(
-                                                  context: context,
-                                                  onValueChange: (date) {
-                                                    adminHomeController.dashboardDate = date;
-                                                    adminHomeController.update();
-                                                    setState(() {
-                                                      _getDashboardDataBookingCount = adminHomeController.getDashboardDataBookingCount();
-                                                      _getDashboardDataSessionGraph = adminHomeController.getDashboardDataSessionGraph();
-                                                    });
-                                                  },
-                                                  selectedDateRange: adminHomeController.dashboardDate,
-                                                );
-                                              },
-                                              label: Row(
-                                                mainAxisAlignment: MainAxisAlignment.end,
-                                                children: [
-                                                  TextHelper(
-                                                    text: adminHomeController.dashboardDate.start == adminHomeController.dashboardDate.end
-                                                        ? DateFormat('dd-MM-yy').format(adminHomeController.dashboardDate.start)
-                                                        : '${DateFormat('dd-MM-yy').format(adminHomeController.dashboardDate.start)} - ${DateFormat('dd-MM-yy').format(adminHomeController.dashboardDate.end)}',
-                                                    fontsize: 10,
-                                                    width: 115,
-                                                    padding: EdgeInsets.zero,
-                                                    textalign: TextAlign.right,
-                                                    isWrap: true,
-                                                  ),
-                                                  Icon(MoonIcons.time_calendar_24_regular, color: Colors.pink.shade700, size: 20),
-                                                ],
-                                              ),
-                                              margin: 0,
-                                              width: 135,
-                                              padding: EdgeInsets.zero,
-                                              height: 25,
-                                              background: Colors.transparent,
-                                            ),
-                                            SizedBox(
-                                              width: 120,
-                                              height: 50,
-                                              child: ClipRRect(
-                                                child: Skeletonizer(
-                                                  enabled: waiting,
-                                                  child: AreaChartHelper(
-                                                    borderColor: Colors.pink.shade300,
-                                                    borderDrawMode: BorderDrawMode.top,
-                                                    gradient: LinearGradient(
-                                                      begin: Alignment.topCenter,
-                                                      end: Alignment.bottomCenter,
-                                                      colors: [Colors.pink.shade50, Colors.white],
-                                                    ),
-                                                    dataSource: data,
-                                                    enableTooltip: false,
-                                                    chartTitle: '',
-                                                    showToolTip: false,
-                                                    showBorder: false,
-                                                    showXAxis: false,
-                                                    showYAxis: false,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    ),
-                                  );
-                                },
-                              ),
-                              FutureBuilder(
-                                future: _getDashboardDataRevenue,
-                                builder: (context, asyncSnapshot) {
-                                  bool waiting = false;
-                                  String content = '';
-                                  if (asyncSnapshot.connectionState == ConnectionState.waiting) {
-                                    waiting = true;
-                                  } else {
-                                    waiting = false;
-                                  }
-                                  if (asyncSnapshot.hasError) {
-                                    showAlert('${asyncSnapshot.error}', AlertType.error);
-                                    content = 'Error';
-                                  } else {
-                                    content = currenyFormater(value: asyncSnapshot.data, withDrCr: false);
-                                  }
-                                  return AdminDashboardCard(
-                                    onTap: () {
-                                      Get.toNamed('/accountantHistory');
-                                    },
-                                    icon: Icon(FontAwesomeIcons.moneyBill1, size: 16, color: Colors.green.shade600),
-                                    enabled: waiting,
-                                    iconBgColor: Colors.green.shade50,
-                                    title: "Revenue",
-                                    content: content,
-                                    contentFontSize: 14,
-                                    extra: Container(
-                                      width: 125,
-                                      child: FutureBuilder(
-                                        future: _getDashboardDataRevenueGraph,
-                                        builder: (context, asyncSnapshot) {
-                                          List<ChartData> data = [];
-                                          bool waiting = false;
-                                          if (asyncSnapshot.connectionState == ConnectionState.waiting) {
-                                            waiting = true;
-                                          } else {
-                                            waiting = false;
-                                          }
-                                          if (asyncSnapshot.hasError) {
-                                            showAlert('${asyncSnapshot.error}', AlertType.error);
-                                          } else if (asyncSnapshot.data != null) {
-                                            data = asyncSnapshot.data!;
-                                          }
-                                          return Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            crossAxisAlignment: CrossAxisAlignment.end,
-                                            children: [
-                                              ButtonHelperG(
-                                                onTap: () async {
-                                                  await showDatePickerHelper(
-                                                    context: context,
-                                                    onValueChange: (date) {
-                                                      adminHomeController.revenueDateRange = date;
-                                                      adminHomeController.update();
-                                                      setState(() {
-                                                        _getDashboardDataRevenue = adminHomeController.getDashboardDataRevenue();
-                                                        _getDashboardDataRevenueGraph = adminHomeController.getDashboardDataRevenueGraph();
-                                                      });
-                                                    },
-                                                    selectedDateRange: adminHomeController.revenueDateRange,
-                                                  );
-                                                },
-                                                label: Row(
-                                                  mainAxisAlignment: MainAxisAlignment.end,
-                                                  children: [
-                                                    TextHelper(
-                                                      text: adminHomeController.revenueDateRange.start == adminHomeController.revenueDateRange.end
-                                                          ? DateFormat('dd-MM-yy').format(adminHomeController.revenueDateRange.start)
-                                                          : '${DateFormat('dd-MM-yy').format(adminHomeController.revenueDateRange.start)} - ${DateFormat('dd-MM-yy').format(adminHomeController.revenueDateRange.end)}',
-                                                      fontsize: 10,
-                                                      width: 100,
-                                                      padding: EdgeInsets.zero,
-                                                      textalign: TextAlign.right,
-                                                      isWrap: true,
-                                                    ),
-                                                    Icon(MoonIcons.time_calendar_24_regular, color: Colors.green.shade700, size: 20),
-                                                  ],
-                                                ),
-                                                margin: 0,
-                                                width: 135,
-                                                padding: EdgeInsets.zero,
-                                                height: 25,
-                                                background: Colors.transparent,
-                                              ),
-                                              SizedBox(
-                                                width: 135,
-                                                height: 50,
-                                                child: ClipRRect(
-                                                  child: Skeletonizer(
-                                                    enabled: waiting,
-                                                    child: AreaChartHelper(
-                                                      borderColor: Colors.green.shade300,
-                                                      borderDrawMode: BorderDrawMode.top,
-                                                      gradient: LinearGradient(
-                                                        begin: Alignment.topCenter,
-                                                        end: Alignment.bottomCenter,
-                                                        colors: [Colors.green.shade100, Colors.white],
-                                                      ),
-                                                      dataSource: data,
-                                                      enableTooltip: false,
-                                                      chartTitle: '',
-                                                      showToolTip: false,
-                                                      showBorder: false,
-                                                      showXAxis: false,
-                                                      showYAxis: false,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
+                                  return Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      ButtonHelperG(
+                                        onTap: () async {
+                                          await showDatePickerHelper(
+                                            context: context,
+                                            onValueChange: (date) {
+                                              adminHomeController.dashboardDate = date;
+                                              adminHomeController.update();
+                                              setState(() {
+                                                _getDashboardDataBookingCount = adminHomeController.getDashboardDataBookingCount();
+                                                _getDashboardDataSessionGraph = adminHomeController.getDashboardDataSessionGraph();
+                                              });
+                                            },
+                                            selectedDateRange: adminHomeController.dashboardDate,
                                           );
                                         },
+                                        label: Row(
+                                          mainAxisAlignment: MainAxisAlignment.end,
+                                          children: [
+                                            TextHelper(
+                                              text: adminHomeController.dashboardDate.start == adminHomeController.dashboardDate.end
+                                                  ? DateFormat('dd-MM-yy').format(adminHomeController.dashboardDate.start)
+                                                  : '${DateFormat('dd-MM-yy').format(adminHomeController.dashboardDate.start)} - ${DateFormat('dd-MM-yy').format(adminHomeController.dashboardDate.end)}',
+                                              fontsize: 10,
+                                              width: 115,
+                                              padding: EdgeInsets.zero,
+                                              textalign: TextAlign.right,
+                                              isWrap: true,
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Icon(MoonIcons.time_calendar_24_regular, color: Colors.pink.shade700, size: 16),
+                                          ],
+                                        ),
+                                        margin: 0,
+                                        width: 135,
+                                        padding: EdgeInsets.zero,
+                                        height: 25,
+                                        background: Colors.transparent,
                                       ),
-                                    ),
+                                      SizedBox(
+                                        width: 120,
+                                        height: 50,
+                                        child: ClipRRect(
+                                          child: Skeletonizer(
+                                            enabled: waiting,
+                                            child: AreaChartHelper(
+                                              borderColor: Colors.pink.shade300,
+                                              borderDrawMode: BorderDrawMode.top,
+                                              gradient: LinearGradient(
+                                                begin: Alignment.topCenter,
+                                                end: Alignment.bottomCenter,
+                                                colors: [Colors.pink.shade50, Colors.white],
+                                              ),
+                                              dataSource: data,
+                                              enableTooltip: false,
+                                              chartTitle: '',
+                                              showToolTip: false,
+                                              showBorder: false,
+                                              showXAxis: false,
+                                              showYAxis: false,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   );
                                 },
                               ),
-                            ],
-                          ),
+                            );
+                          },
+                        ),
+                        FutureBuilder(
+                          future: _getDashboardDataRevenue,
+                          builder: (context, asyncSnapshot) {
+                            bool waiting = asyncSnapshot.connectionState == ConnectionState.waiting;
+                            String content = '';
+                            if (asyncSnapshot.hasError) {
+                              showAlert('${asyncSnapshot.error}', AlertType.error);
+                              content = 'Error';
+                            } else {
+                              content = currenyFormater(value: asyncSnapshot.data, withDrCr: false);
+                            }
+                            return AdminDashboardCard(
+                              onTap: () => Get.toNamed('/accountantHistory'),
+                              icon: Icon(FontAwesomeIcons.moneyBill1, size: 14, color: Colors.green.shade700),
+                              enabled: waiting,
+                              iconBgColor: Colors.green.shade50,
+                              title: "Revenue",
+                              content: content,
+                              contentFontSize: 14,
+                              extra: Container(
+                                width: 125,
+                                child: FutureBuilder(
+                                  future: _getDashboardDataRevenueGraph,
+                                  builder: (context, asyncSnapshot) {
+                                    List<ChartData> data = [];
+                                    bool waiting = asyncSnapshot.connectionState == ConnectionState.waiting;
+                                    if (asyncSnapshot.hasError) {
+                                      showAlert('${asyncSnapshot.error}', AlertType.error);
+                                    } else if (asyncSnapshot.data != null) {
+                                      data = asyncSnapshot.data!;
+                                    }
+                                    return Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment: CrossAxisAlignment.end,
+                                      children: [
+                                        ButtonHelperG(
+                                          onTap: () async {
+                                            await showDatePickerHelper(
+                                              context: context,
+                                              onValueChange: (date) {
+                                                adminHomeController.revenueDateRange = date;
+                                                adminHomeController.update();
+                                                setState(() {
+                                                  _getDashboardDataRevenue = adminHomeController.getDashboardDataRevenue();
+                                                  _getDashboardDataRevenueGraph = adminHomeController.getDashboardDataRevenueGraph();
+                                                });
+                                              },
+                                              selectedDateRange: adminHomeController.revenueDateRange,
+                                            );
+                                          },
+                                          label: Row(
+                                            mainAxisAlignment: MainAxisAlignment.end,
+                                            children: [
+                                              TextHelper(
+                                                text: adminHomeController.revenueDateRange.start == adminHomeController.revenueDateRange.end
+                                                    ? DateFormat('dd-MM-yy').format(adminHomeController.revenueDateRange.start)
+                                                    : '${DateFormat('dd-MM-yy').format(adminHomeController.revenueDateRange.start)} - ${DateFormat('dd-MM-yy').format(adminHomeController.revenueDateRange.end)}',
+                                                fontsize: 10,
+                                                width: 100,
+                                                padding: EdgeInsets.zero,
+                                                textalign: TextAlign.right,
+                                                isWrap: true,
+                                              ),
+                                              const SizedBox(width: 4),
+                                              Icon(MoonIcons.time_calendar_24_regular, color: Colors.green.shade700, size: 16),
+                                            ],
+                                          ),
+                                          margin: 0,
+                                          width: 135,
+                                          padding: EdgeInsets.zero,
+                                          height: 25,
+                                          background: Colors.transparent,
+                                        ),
+                                        SizedBox(
+                                          width: 135,
+                                          height: 50,
+                                          child: ClipRRect(
+                                            child: Skeletonizer(
+                                              enabled: waiting,
+                                              child: AreaChartHelper(
+                                                borderColor: Colors.green.shade300,
+                                                borderDrawMode: BorderDrawMode.top,
+                                                gradient: LinearGradient(
+                                                  begin: Alignment.topCenter,
+                                                  end: Alignment.bottomCenter,
+                                                  colors: [Colors.green.shade100, Colors.white],
+                                                ),
+                                                dataSource: data,
+                                                enableTooltip: false,
+                                                chartTitle: '',
+                                                showToolTip: false,
+                                                showBorder: false,
+                                                showXAxis: false,
+                                                showYAxis: false,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                ),
+                              ),
+                            );
+                          },
                         ),
                       ],
                     ),

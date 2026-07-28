@@ -56,7 +56,10 @@ class _MembersState extends State<Members> {
                     leftPadding: 20,
                     placeholder: "Search member",
                     fontSize: 13,
-                    leading: Icon(MoonIcons.generic_search_24_regular, color: Colors.grey),
+                    leading: Icon(
+                      MoonIcons.generic_search_24_regular,
+                      color: Colors.grey,
+                    ),
                     controller: memberController.search,
                     onValueChange: (v) async {
                       try {
@@ -70,7 +73,11 @@ class _MembersState extends State<Members> {
                         : SizedBox(
                             height: 38,
                             width: 40,
-                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.grey, padding: EdgeInsets.all(8)),
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.grey,
+                              padding: EdgeInsets.all(8),
+                            ),
                           ),
                   ),
                 ),
@@ -89,28 +96,48 @@ class _MembersState extends State<Members> {
                           padding: EdgeInsets.all(5),
                           margin: EdgeInsets.symmetric(vertical: 5),
                           decoration: BoxDecoration(
-                            color: !user.isApproved ? Colors.blueGrey.shade100.withAlpha(100) : mainStore.theme.value.mediumShadeColor.withAlpha(80),
+                            color: !user.isApproved
+                                ? Colors.blueGrey.shade100.withAlpha(100)
+                                : mainStore.theme.value.mediumShadeColor
+                                      .withAlpha(80),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Row(
                             spacing: 5,
                             children: [
                               Container(
-                                padding: EdgeInsets.all(user.profileImage.isNotEmpty ? 1 : 8),
+                                padding: EdgeInsets.all(
+                                  user.profileImage.isNotEmpty ? 1 : 8,
+                                ),
                                 width: 40,
                                 height: 40,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(10),
-                                  color: user.isApproved ? mainStore.theme.value.mediumShadeColor : Colors.blueGrey.shade200.withAlpha(100),
+                                  color: user.isApproved
+                                      ? mainStore.theme.value.mediumShadeColor
+                                      : Colors.blueGrey.shade200.withAlpha(100),
                                 ),
                                 child: user.profileImage.isNotEmpty
                                     ? ClipRRect(
                                         borderRadius: BorderRadius.circular(10),
                                         child: CachedNetworkImage(
                                           imageUrl: user.profileImage,
-                                          progressIndicatorBuilder: (context, url, downloadProgress) =>
-                                              CircularProgressIndicator(value: downloadProgress.progress, color: Colors.grey, padding: EdgeInsets.all(10)),
-                                          errorWidget: (context, url, error) => Icon(MoonIcons.generic_user_24_regular),
+                                          progressIndicatorBuilder:
+                                              (
+                                                context,
+                                                url,
+                                                downloadProgress,
+                                              ) => CircularProgressIndicator(
+                                                value:
+                                                    downloadProgress.progress,
+                                                color: Colors.grey,
+                                                padding: EdgeInsets.all(10),
+                                              ),
+                                          errorWidget: (context, url, error) =>
+                                              Icon(
+                                                MoonIcons
+                                                    .generic_user_24_regular,
+                                              ),
 
                                           fit: BoxFit.cover,
                                         ),
@@ -120,17 +147,32 @@ class _MembersState extends State<Members> {
                               Expanded(
                                 child: Column(
                                   children: [
-                                    TextHelper(text: user.name, fontsize: 13, fontweight: FontWeight.w500),
-                                    TextHelper(text: "${user.address}, ${user.pincode}, ${user.city}", fontsize: 11.5, color: Colors.blueGrey.shade500),
+                                    TextHelper(
+                                      text: user.name,
+                                      fontsize: 13,
+                                      fontweight: FontWeight.w500,
+                                    ),
+                                    TextHelper(
+                                      text:
+                                          "${user.address}, ${user.pincode}, ${user.city}",
+                                      fontsize: 11.5,
+                                      color: Colors.blueGrey.shade500,
+                                    ),
                                   ],
                                 ),
                               ),
                               if (user.mobile != "")
                                 ButtonHelperG(
                                   onTap: () {
-                                    makePhoneCall(user.mobile1 != "" ? '${user.mobile},${user.mobile1}' : user.mobile, context);
+                                    makePhoneCall(
+                                      user.mobile1 != ""
+                                          ? '${user.mobile},${user.mobile1}'
+                                          : user.mobile,
+                                      context,
+                                    );
                                   },
-                                  background: mainStore.theme.value.mediumShadeColor,
+                                  background:
+                                      mainStore.theme.value.mediumShadeColor,
                                   width: 35,
                                   height: 35,
                                   label: Icon(Icons.phone, size: 16),
