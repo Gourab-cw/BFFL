@@ -1,10 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:healthandwellness/features/user_subscription/data/user_subscription.dart';
 
 import '../../../core/utility/helper.dart';
 
 part 'payment_model.freezed.dart';
 part 'payment_model.g.dart';
+
+List<UserSubscription>? _subscriptionFromJson(dynamic json) {
+  if (json == null) return null;
+  return makeListSerialize(json).map((m)=>UserSubscription.fromJSON(m)).toList();
+}
+
+List<Map<String, dynamic>>? _subscriptionToJson(List<UserSubscription>? subscription) {
+  if (subscription == null) return null;
+  return subscription.map((m)=>m.toJSON()).toList(); // if available
+}
 
 @freezed
 abstract class PaymentModel with _$PaymentModel {
@@ -33,6 +44,7 @@ abstract class PaymentModel with _$PaymentModel {
     @JsonKey(name: 'voucherAmount', fromJson: parseDoubleV2) required double voucherAmount,
     @JsonKey(name: 'voucherId', fromJson: parseStringV2) required String voucherId,
     @JsonKey(name: 'voucherNumber', fromJson: parseStringV2) required String voucherNumber,
+    @JsonKey(name: 'subscriptions', fromJson: _subscriptionFromJson, toJson: _subscriptionToJson) List<UserSubscription>? subscriptions,
     @Default(true) bool isActive,
   }) = _PaymentModel;
 

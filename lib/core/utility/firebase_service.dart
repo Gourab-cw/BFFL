@@ -250,11 +250,10 @@ abstract class FirebaseBaseService extends GetxService {
     Dio dio = Dio();
     try {
       final response = await dio.post(
-        'http://localhost:4000/sendnotification',
+        'https://saleszing.info/bfll/sendnotification',
         data: message,
         options: Options(headers: {}),
       );
-      logG(response);
     } catch (e) {
       print(e);
     }

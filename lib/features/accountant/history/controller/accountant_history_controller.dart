@@ -31,9 +31,9 @@ class AccountantHistoryController extends GetxController {
     if (user.userType != UserType.admin) {
       query = query.where('branchId', isEqualTo: user.branchId);
     }
-    if (user.userType == UserType.accountant) {
-      query = query.where('accountantId', isEqualTo: user.id);
-    }
+    // if (user.userType == UserType.accountant) {
+    //   query = query.where('accountantId', isEqualTo: user.id);
+    // }
 
     query = query.orderBy('createdAt', descending: true);
     if (lastDocumentSnapshot != null) {

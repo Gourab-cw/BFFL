@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:healthandwellness/app/Datagrid3.dart';
 import 'package:healthandwellness/app/mainstore.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
 import 'package:healthandwellness/core/voucher/controller/voucher_controller.dart';
@@ -41,10 +42,28 @@ class _AccSubscriptionDetailsState extends State<AccSubscriptionDetails> {
           await accSubController.loadPaymentModes(v.paymentMethods);
           await accSubController.loadChargesLedgers();
           // logG(subController.list.firstWhereOrNull((s) => s.id == accSubController.selectedUser!.subscriptionId));
-          accSubController.getCalculationDetails(
-            selectedUser: accSubController.selectedUser!,
-            service: subController.list.firstWhereOrNull((s) => s.id == accSubController.selectedUser!.subscriptionId)!,
-          );
+          if (accSubController.selectedUser != null && accSubController.selectedUser!.subscriptions.isNotEmpty) {
+            List<GSTDetails> itemsGst = [];
+            for (final f in accSubController.selectedUser!.subscriptions) {
+              itemsGst.add(
+                accSubController.getCalculationDetails(selectedUser: f, service: subController.list.firstWhereOrNull((s) => s.id == f.subscriptionId)!),
+              );
+            }
+            if (itemsGst.isNotEmpty) {
+              accSubController.gstDetails = GSTDetails(
+                gstPer: itemsGst.first.gstPer,
+                withGST: itemsGst.first.withGST,
+                totalAmount: itemsGst.map((m) => m.totalAmount).fold(0.0, (a, b) => a + b),
+                grossAmount: itemsGst.map((m) => m.grossAmount).fold(0.0, (a, b) => a + b),
+                gstAmount: itemsGst.map((m) => m.gstAmount).fold(0.0, (a, b) => a + b),
+                netAmount: itemsGst.map((m) => m.netAmount).fold(0.0, (a, b) => a + b),
+                discPer: itemsGst.map((m) => m.discPer).fold(0.0, (a, b) => a + b) / itemsGst.length,
+                discAmount: itemsGst.map((m) => m.discAmount).fold(0.0, (a, b) => a + b),
+                discountWithGST: itemsGst.first.discountWithGST,
+              );
+              accSubController.update();
+            }
+          }
 
           accSubController.update();
         } else {
@@ -112,146 +131,228 @@ class _AccSubscriptionDetailsState extends State<AccSubscriptionDetails> {
                         Row(
                           spacing: 6,
                           children: [
-                            TextHelper(text: "Id :", width: 95, fontsize: 12, fontweight: FontWeight.w600, color: Colors.grey.shade600),
+                            TextHelper(text: "Id :", width: 30, fontsize: 12, fontweight: FontWeight.w600, color: Colors.grey.shade600),
                             TextHelper(text: us.name, fontsize: 12),
                           ],
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          spacing: 6,
-                          children: [
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              spacing: 6,
-                              children: [
-                                TextHelper(text: "Service :", width: 95, fontsize: 12, fontweight: FontWeight.w600, color: Colors.grey.shade600),
-                                TextHelper(text: subController.list.firstWhereOrNull((s) => s.id == us.subscriptionId)?.name ?? "", fontsize: 12),
-                              ],
-                            ),
 
-                            Container(
-                              padding: EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                              decoration: BoxDecoration(color: getMainStore().theme.value.lowShadeColor),
-                              child: TextHelper(text: us.isActive ? "Active" : "Not Active", color: getMainStore().theme.value.HeadColor, fontsize: 11),
-                            ),
-                          ],
+                        SizedBox(
+                          height: 150,
+                          child: Builder(
+                            builder: (context) {
+                              List<Map<String, dynamic>> list = accSubController.selectedUser!.subscriptions.map((m) => m.toJSON()).toList();
+                              return DataGridHelper3(
+                                dataSource: list,
+                                headerColor: Colors.blueGrey.shade50.withAlpha(70),
+                                rowHeight: 50,
+                                showAlternateColor: false,
+                                fontSize: 10.5,
+                                headerFontColor: Colors.blueGrey.shade400,
+                                columnList: [
+                                  DataGridColumnModel3(
+                                    dataField: "name",
+                                    dataType: CellDataType3.string,
+                                    width: MediaQuery.sizeOf(context).width * 0.4,
+                                    title: "Service",
+                                    customCell: (c) {
+                                      return Container(
+                                        child: Column(
+                                          children: [
+                                            TextHelper(
+                                              text: subController.list.firstWhereOrNull((s) => s.id == c.rowValue['subscriptionId'])?.name ?? "",
+                                              fontsize: 11,
+                                              isWrap: true,
+                                              fontweight: FontWeight.w600,
+                                            ),
+                                            TextHelper(
+                                              text:
+                                                  '${parseDateToString(data: c.rowValue['startDate'], formatDate: "dd-MM-yyyy", predefinedDateFormat: "yyyy-MM-dd", defaultValue: "")}  -  ${parseDateToString(data: c.rowValue['endDate'], formatDate: "dd-MM-yyyy", predefinedDateFormat: "yyyy-MM-dd", defaultValue: "")}',
+                                              fontsize: 10,
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                  DataGridColumnModel3(
+                                    dataField: "amount",
+                                    title: "Amount",
+                                    dataType: CellDataType3.string,
+                                    customCell: (c) {
+                                      return TextHelper(
+                                        text: currenyFormater(value: c.rowValue['netAmount'], withDrCr: false),
+                                        fontsize: 11,
+                                        textalign: TextAlign.center,
+                                      );
+                                    },
+                                  ),
+                                  DataGridColumnModel3(
+                                    dataField: "discount",
+                                    title: "Discount",
+                                    dataType: CellDataType3.string,
+                                    customCell: (c) {
+                                      return TextHelper(
+                                        text: currenyFormater(value: c.rowValue['discAmount'], withDrCr: false),
+                                        fontsize: 11,
+                                        textalign: TextAlign.center,
+                                      );
+                                    },
+                                  ),
+                                  DataGridColumnModel3(
+                                    dataField: "dueAmount",
+                                    title: "Due Amount",
+                                    dataType: CellDataType3.string,
+                                    customCell: (c) {
+                                      return TextHelper(
+                                        text: currenyFormater(value: c.rowValue['dueAmount'], withDrCr: false),
+                                        fontsize: 11,
+                                        textalign: TextAlign.center,
+                                      );
+                                    },
+                                  ),
+                                ],
+                                uniqueKey: "items",
+                                width: MediaQuery.sizeOf(context).width * 0.96,
+                              );
+                            },
+                          ),
                         ),
-                        Row(
-                          spacing: 6,
-                          children: [
-                            TextHelper(text: "Per session :", width: 95, fontsize: 12, fontweight: FontWeight.w600, color: Colors.grey.shade600),
-                            TextHelper(
-                              text: currenyFormater(
-                                value: subController.list.firstWhereOrNull((s) => s.id == us.subscriptionId)?.amount.toString(),
-                                withDrCr: false,
-                              ),
-                              fontsize: 12,
-                            ),
-                          ],
-                        ),
-                        Row(
-                          spacing: 6,
-                          children: [
-                            TextHelper(text: "Full Package :", width: 95, fontsize: 12, fontweight: FontWeight.w600, color: Colors.grey.shade600),
-                            TextHelper(
-                              text: currenyFormater(
-                                value: subController.list.firstWhereOrNull((s) => s.id == us.subscriptionId)?.totalAmount.toString(),
-                                withDrCr: false,
-                              ),
-                              fontsize: 12,
-                            ),
-                          ],
-                        ),
-
-                        Row(
-                          spacing: 0,
-                          children: [
-                            Row(
-                              spacing: 6,
-                              children: [
-                                TextHelper(text: "Booking Type :", width: 95, fontsize: 12, fontweight: FontWeight.w600, color: Colors.grey.shade600),
-                                TextHelper(
-                                  text: parseString(data: us.isFullPackage ? "Package" : "Custom", defaultValue: '0'),
-                                  fontsize: 12,
-                                  width: 96,
-                                ),
-                              ],
-                            ),
-                            Row(
-                              spacing: 6,
-                              children: [
-                                TextHelper(text: "Session Count :", width: 95, fontsize: 12, fontweight: FontWeight.w600, color: Colors.grey.shade600),
-                                TextHelper(
-                                  text: parseString(data: us.totalSessions, defaultValue: '0'),
-                                  fontsize: 12,
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        Row(
-                          spacing: 30,
-                          children: [
-                            Row(
-                              spacing: 6,
-                              children: [
-                                TextHelper(text: "Start Date :", width: 95, fontsize: 12, fontweight: FontWeight.w600, color: Colors.grey.shade600),
-                                TextHelper(
-                                  text: parseDateToString(data: us.startDate, formatDate: 'dd-MM-yyyy', predefinedDateFormat: 'yyyy-MM-dd', defaultValue: ''),
-                                  fontsize: 12,
-                                ),
-                              ],
-                            ),
-                            Row(
-                              spacing: 6,
-                              children: [
-                                TextHelper(text: "End Date :", width: 65, fontsize: 12, fontweight: FontWeight.w600, color: Colors.grey.shade600),
-                                TextHelper(
-                                  text: parseDateToString(data: us.endDate, formatDate: 'dd-MM-yyyy', predefinedDateFormat: 'yyyy-MM-dd', defaultValue: ''),
-                                  fontsize: 12,
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
+                        // Row(
+                        //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        //   spacing: 6,
+                        //   children: [
+                        //     Row(
+                        //       mainAxisSize: MainAxisSize.min,
+                        //       spacing: 6,
+                        //       children: [
+                        //         TextHelper(text: "Service :", width: 95, fontsize: 12, fontweight: FontWeight.w600, color: Colors.grey.shade600),
+                        //         TextHelper(text: subController.list.firstWhereOrNull((s) => s.id == us.subscriptionId)?.name ?? "", fontsize: 12),
+                        //       ],
+                        //     ),
+                        //
+                        //     Container(
+                        //       padding: EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                        //       decoration: BoxDecoration(color: getMainStore().theme.value.lowShadeColor),
+                        //       child: TextHelper(text: us.isActive ? "Active" : "Not Active", color: getMainStore().theme.value.HeadColor, fontsize: 11),
+                        //     ),
+                        //   ],
+                        // ),
+                        // Row(
+                        //   spacing: 6,
+                        //   children: [
+                        //     TextHelper(text: "Per session :", width: 95, fontsize: 12, fontweight: FontWeight.w600, color: Colors.grey.shade600),
+                        //     TextHelper(
+                        //       text: currenyFormater(
+                        //         value: subController.list.firstWhereOrNull((s) => s.id == us.subscriptionId)?.amount.toString(),
+                        //         withDrCr: false,
+                        //       ),
+                        //       fontsize: 12,
+                        //     ),
+                        //   ],
+                        // ),
+                        // Row(
+                        //   spacing: 6,
+                        //   children: [
+                        //     TextHelper(text: "Full Package :", width: 95, fontsize: 12, fontweight: FontWeight.w600, color: Colors.grey.shade600),
+                        //     TextHelper(
+                        //       text: currenyFormater(
+                        //         value: subController.list.firstWhereOrNull((s) => s.id == us.subscriptionId)?.totalAmount.toString(),
+                        //         withDrCr: false,
+                        //       ),
+                        //       fontsize: 12,
+                        //     ),
+                        //   ],
+                        // ),
+                        //
+                        // Row(
+                        //   spacing: 0,
+                        //   children: [
+                        //     Row(
+                        //       spacing: 6,
+                        //       children: [
+                        //         TextHelper(text: "Booking Type :", width: 95, fontsize: 12, fontweight: FontWeight.w600, color: Colors.grey.shade600),
+                        //         TextHelper(
+                        //           text: parseString(data: us.isFullPackage ? "Package" : "Custom", defaultValue: '0'),
+                        //           fontsize: 12,
+                        //           width: 96,
+                        //         ),
+                        //       ],
+                        //     ),
+                        //     Row(
+                        //       spacing: 6,
+                        //       children: [
+                        //         TextHelper(text: "Session Count :", width: 95, fontsize: 12, fontweight: FontWeight.w600, color: Colors.grey.shade600),
+                        //         TextHelper(
+                        //           text: parseString(data: us.totalSessions, defaultValue: '0'),
+                        //           fontsize: 12,
+                        //         ),
+                        //       ],
+                        //     ),
+                        //   ],
+                        // ),
+                        // Row(
+                        //   spacing: 30,
+                        //   children: [
+                        //     Row(
+                        //       spacing: 6,
+                        //       children: [
+                        //         TextHelper(text: "Start Date :", width: 95, fontsize: 12, fontweight: FontWeight.w600, color: Colors.grey.shade600),
+                        //         TextHelper(
+                        //           text: parseDateToString(data: us.startDate, formatDate: 'dd-MM-yyyy', predefinedDateFormat: 'yyyy-MM-dd', defaultValue: ''),
+                        //           fontsize: 12,
+                        //         ),
+                        //       ],
+                        //     ),
+                        //     Row(
+                        //       spacing: 6,
+                        //       children: [
+                        //         TextHelper(text: "End Date :", width: 65, fontsize: 12, fontweight: FontWeight.w600, color: Colors.grey.shade600),
+                        //         TextHelper(
+                        //           text: parseDateToString(data: us.endDate, formatDate: 'dd-MM-yyyy', predefinedDateFormat: 'yyyy-MM-dd', defaultValue: ''),
+                        //           fontsize: 12,
+                        //         ),
+                        //       ],
+                        //     ),
+                        //   ],
+                        // ),
                         Column(
                           mainAxisSize: MainAxisSize.min,
                           spacing: 2,
                           children: [
                             TextHelper(text: 'Amount', fontsize: 12, fontweight: FontWeight.w600, textalign: TextAlign.right, padding: EdgeInsets.zero),
                             Divider(),
-                            if (!us.discountWithGST && accSubController.voucher != null && accSubController.voucher!.withDiscount)
-                              Row(
-                                spacing: 20,
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  TextHelper(text: 'Total Amount :', fontsize: 12),
-                                  TextHelper(
-                                    text: currenyFormater(value: us.totalAmount, withDrCr: false),
-                                    width: 150,
-                                    fontweight: FontWeight.w600,
-                                    fontsize: 12,
-                                    color: Colors.grey.shade700,
-                                    textalign: TextAlign.right,
-                                  ),
-                                ],
-                              ),
-                            if (!us.discountWithGST && accSubController.voucher != null && accSubController.voucher!.withDiscount)
-                              Row(
-                                spacing: 20,
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  TextHelper(text: 'Discount :', fontsize: 12, color: getMainStore().theme.value.HeadColor.withAlpha(200)),
-                                  TextHelper(
-                                    text: currenyFormater(value: us.discAmount, withDrCr: false),
-                                    width: 150,
-                                    fontweight: FontWeight.w600,
-                                    fontsize: 12,
-                                    color: getMainStore().theme.value.HeadColor.withAlpha(200),
-                                    textalign: TextAlign.right,
-                                  ),
-                                ],
-                              ),
+                            // if (accSubController.voucher != null && accSubController.voucher!.withDiscount)
+                            //   Row(
+                            //     spacing: 20,
+                            //     mainAxisAlignment: MainAxisAlignment.end,
+                            //     children: [
+                            //       TextHelper(text: 'Total Amount :', fontsize: 12),
+                            //       TextHelper(
+                            //         text: currenyFormater(value: us.totalAmount, withDrCr: false),
+                            //         width: 150,
+                            //         fontweight: FontWeight.w600,
+                            //         fontsize: 12,
+                            //         color: Colors.grey.shade700,
+                            //         textalign: TextAlign.right,
+                            //       ),
+                            //     ],
+                            //   ),
+                            // if (accSubController.voucher != null && accSubController.voucher!.withDiscount)
+                            //   Row(
+                            //     spacing: 20,
+                            //     mainAxisAlignment: MainAxisAlignment.end,
+                            //     children: [
+                            //       TextHelper(text: 'Discount :', fontsize: 12, color: getMainStore().theme.value.HeadColor.withAlpha(200)),
+                            //       TextHelper(
+                            //         text: currenyFormater(value: us.discAmount, withDrCr: false),
+                            //         width: 150,
+                            //         fontweight: FontWeight.w600,
+                            //         fontsize: 12,
+                            //         color: getMainStore().theme.value.HeadColor.withAlpha(200),
+                            //         textalign: TextAlign.right,
+                            //       ),
+                            //     ],
+                            //   ),
                             Row(
                               spacing: 20,
                               mainAxisAlignment: MainAxisAlignment.end,
@@ -282,22 +383,22 @@ class _AccSubscriptionDetailsState extends State<AccSubscriptionDetails> {
                                 ),
                               ],
                             ),
-                            if (us.discountWithGST)
-                              Row(
-                                spacing: 20,
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  TextHelper(text: 'Discount :', fontsize: 12, color: getMainStore().theme.value.HeadColor.withAlpha(200)),
-                                  TextHelper(
-                                    text: currenyFormater(value: us.discAmount, withDrCr: false),
-                                    width: 150,
-                                    fontweight: FontWeight.w600,
-                                    fontsize: 12,
-                                    color: getMainStore().theme.value.HeadColor.withAlpha(200),
-                                    textalign: TextAlign.right,
-                                  ),
-                                ],
-                              ),
+
+                            Row(
+                              spacing: 20,
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                TextHelper(text: 'Discount :', fontsize: 12, color: getMainStore().theme.value.HeadColor.withAlpha(200)),
+                                TextHelper(
+                                  text: currenyFormater(value: us.discAmount, withDrCr: false),
+                                  width: 150,
+                                  fontweight: FontWeight.w600,
+                                  fontsize: 12,
+                                  color: getMainStore().theme.value.HeadColor.withAlpha(200),
+                                  textalign: TextAlign.right,
+                                ),
+                              ],
+                            ),
                             Row(
                               spacing: 20,
                               mainAxisAlignment: MainAxisAlignment.end,
@@ -424,7 +525,8 @@ class _AccSubscriptionDetailsState extends State<AccSubscriptionDetails> {
                                   ),
                                   ButtonHelperG(
                                     onTap: () {
-                                      accSubController.amount.text = (us.dueAmount - balance < 0 ? 0 : us.dueAmount - balance).toStringAsFixed(2);
+                                      accSubController.amount.text = (us.dueAmount).toStringAsFixed(2);
+                                      // accSubController.amount.text = (us.dueAmount - balance < 0 ? 0 : us.dueAmount - balance).toStringAsFixed(2);
                                     },
                                     width: 80,
                                     height: 30,
@@ -449,15 +551,15 @@ class _AccSubscriptionDetailsState extends State<AccSubscriptionDetails> {
                             ButtonHelperG(
                               onTap: () async {
                                 try {
-                                  final s = subController.list.firstWhereOrNull((s) => s.id == us.subscriptionId);
-                                  if (s == null) {
-                                    showAlert("No subscription found!", AlertType.error);
-                                    return;
-                                  }
+                                  // final s = subController.list.firstWhereOrNull((s) => s.id == us.subscriptionId);
+                                  // if (s == null) {
+                                  //   showAlert("No subscription found!", AlertType.error);
+                                  //   return;
+                                  // }
                                   loader.startLoading();
                                   await accSubController.makePaid(
                                     selectedUser: us,
-                                    service: s,
+                                    // service: s,
                                     txnValue: txnController.text,
                                     remarks: remarksController.text.trim(),
                                   );

@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io' show Platform; // Only works on non-web platforms
+import 'dart:io' show Platform, File; // Only works on non-web platforms
 import 'dart:math';
 import 'dart:ui' as ui;
 
@@ -8,8 +8,9 @@ import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crypto/crypto.dart';
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:dio/dio.dart' as _dio;
+import 'package:dio/dio.dart' as Dio;
 import 'package:easy_debounce/easy_debounce.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -21,7 +22,9 @@ import 'package:healthandwellness/app/mainstore.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 import 'package:moon_design/moon_design.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:syncfusion_flutter_charts/charts.dart' hide Position;
 import 'package:ussd_phone_call_sms/ussd_phone_call_sms.dart';
 
@@ -67,7 +70,7 @@ class CustomResponse {
   dynamic data;
   Object? error;
   String response;
-  _dio.Response<dynamic>? raw;
+  Dio.Response<dynamic>? raw;
   CustomResponse({required this.success, this.data, this.error, required this.response, this.raw});
 }
 
@@ -3119,3 +3122,118 @@ class CardHelper extends StatelessWidget {
 Timestamp timestampFromJson(dynamic json) => json as Timestamp;
 
 Timestamp timestampToJson(Timestamp timestamp) => timestamp;
+
+class DownloadFileResponse {
+  final XFile file;
+  final String fileName;
+  final bool success;
+  final String response;
+  DownloadFileResponse({required this.file, required this.fileName, required this.success, required this.response});
+}
+
+class FileHandlerG {
+  Future<String> getAppDirectory() async {
+    return await getApplicationDocumentsDirectory().then((e) => e.path);
+  }
+
+  Future<bool> saveFile({required Uint8List file, required String fileName}) async {
+    try {
+      String path = await getAppDirectory();
+      File f = await File('$path/$fileName').create();
+      await f.writeAsBytes(file);
+      return true;
+    } catch (e) {
+      return throw ('$e');
+    }
+  }
+
+  Future<DownloadFileResponse> downloadAndShare({
+    required String filePathWithName,
+    required String url,
+    void Function(double progress)? downloadProgress,
+    bool shareAfterDownload = false,
+  }) async {
+    try {
+      Dio.Dio dio = Dio.Dio();
+
+      String path = await getAppDirectory();
+
+      final fullPath = "$path/$filePathWithName";
+
+      await dio.download(
+        url,
+        fullPath,
+        onReceiveProgress: (receivedBytes, totalBytes) {
+          if (downloadProgress != null && totalBytes != -1) {
+            downloadProgress(receivedBytes / totalBytes);
+          }
+        },
+      );
+
+      final file = XFile(fullPath);
+
+      if (shareAfterDownload) {
+        await SharePlus.instance.share(ShareParams(title: filePathWithName, files: [file]));
+      }
+
+      return DownloadFileResponse(file: file, fileName: filePathWithName, success: true, response: 'File Download Successfully!');
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
+
+  Future<DownloadFileResponse> downloadAndSaveFile({
+    required String filePathWithName,
+    required String url,
+    Map<String, dynamic>? query,
+    void Function(double progress)? downloadProgress,
+    bool shareAfterDownload = false,
+  }) async {
+    try {
+      Dio.Dio dio = Dio.Dio();
+      XFile? file;
+      String path = await getAppDirectory();
+      await dio
+          .download(
+            url,
+            "$path/$filePathWithName",
+            queryParameters: query,
+            onReceiveProgress: (receivedBytes, totalBytes) {
+              if (downloadProgress != null) {
+                downloadProgress(receivedBytes / totalBytes);
+              }
+            },
+          )
+          .catchError((e) {
+            return Exception(e);
+          })
+          .whenComplete(() async {
+            file = XFile("$path/$filePathWithName");
+            Uint8List dataList = await file!.readAsBytes();
+            String? outputFile = await FilePicker.platform.saveFile(
+              dialogTitle: 'Choose location to save the file',
+              fileName: GetPlatform.isDesktop ? "${filePathWithName.replaceAll('/', '').replaceAll('PDF', '')}.pdf" : "$filePathWithName.pdf",
+              bytes: dataList,
+            );
+            if (outputFile == null) {
+              Exception("Error! file not saved!");
+            }
+            // file = XFile("$path/$filePathWithName");
+            // if (shareAfterDownload && file != null) {
+            //   await SharePlus.instance
+            //       .share(ShareParams(
+            //           title: filePathWithName,
+            //           files: [file!],
+            //           previewThumbnail: file))
+            //       .catchError((e) {
+            //     return throw (e);
+            //   });
+            // }
+            // showPdf("$path/${collectionStore.selectedPartyData.value['name'].toString().toLowerCase().replaceAll(' ', '')}.pdf",collectionStore.selectedPartyData.value['name']);
+          });
+      return DownloadFileResponse(file: file!, fileName: filePathWithName, success: true, response: 'File Download Successfully!');
+    } catch (e) {
+      return throw ('$e');
+    }
+  }
+}

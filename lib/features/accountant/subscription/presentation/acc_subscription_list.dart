@@ -4,11 +4,11 @@ import 'package:healthandwellness/app/mainstore.dart';
 import 'package:healthandwellness/core/utility/app_loader.dart';
 import 'package:healthandwellness/features/accountant/subscription/controller/acc_subscription_controller.dart';
 import 'package:healthandwellness/features/subscriptions/controller/subscription_controller.dart';
+import 'package:healthandwellness/features/user_subscription/data/multi_subscription.dart';
 import 'package:intl/intl.dart';
 import 'package:moon_design/moon_design.dart';
 
 import '../../../../core/utility/helper.dart';
-import '../../../user_subscription/data/user_subscription.dart';
 
 class AccSubscriptionList extends StatefulWidget {
   const AccSubscriptionList({super.key});
@@ -22,8 +22,8 @@ class _AccSubscriptionListState extends State<AccSubscriptionList> {
   final mainStore = Get.find<MainStore>();
   final subController = Get.find<SubscriptionController>();
   final loader = Get.find<AppLoaderController>();
-  Widget getTypeWidget(UserSubscription us) {
-    if (us.isPaidSubscription) {
+  Widget getTypeWidget(MultiSubscription us) {
+    if (us.subscriptions.any((m) => m.isPaidSubscription)) {
       return Container(
         padding: EdgeInsets.symmetric(vertical: 2, horizontal: 5),
         decoration: BoxDecoration(color: mainStore.theme.value.mediumShadeColor, borderRadius: BorderRadius.circular(10)),
@@ -98,11 +98,11 @@ class _AccSubscriptionListState extends State<AccSubscriptionList> {
                 child: Builder(
                   builder: (context) {
                     String search = accSubController.search.text.trim().toLowerCase().replaceAll(" ", "");
-                    List<UserSubscription> allList = accSubController.list;
+                    List<MultiSubscription> allList = accSubController.list;
                     allList = allList
                         .where(
                           (w) =>
-                              w.subscriptionName.toLowerCase().contains(search) ||
+                              w.subscriptions.map((m) => m.subscriptionName).join(",").toLowerCase().contains(search) ||
                               w.name.toLowerCase().contains(search) ||
                               w.userName.toLowerCase().contains(search),
                         )
@@ -111,7 +111,7 @@ class _AccSubscriptionListState extends State<AccSubscriptionList> {
                     return ListView.builder(
                       itemCount: allList.length,
                       itemBuilder: (_, index) {
-                        UserSubscription us = allList[index];
+                        MultiSubscription us = allList[index];
                         return GestureDetector(
                           onTap: () async {
                             try {
@@ -141,20 +141,24 @@ class _AccSubscriptionListState extends State<AccSubscriptionList> {
                                         Wrap(
                                           children: [
                                             TextHelper(text: us.name, fontweight: FontWeight.w600),
-                                            TextHelper(text: "${us.userName} ( ${us.subscriptionName} )", fontweight: FontWeight.w400, fontsize: 11),
-                                          ],
-                                        ),
-
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
                                             TextHelper(
-                                              text:
-                                                  'Start: ${parseDateToString(data: us.startDate, formatDate: 'dd-MM-yyyy', predefinedDateFormat: 'yyyy-MM-dd', defaultValue: '')}',
+                                              text: "${us.userName} ( ${us.subscriptions.map((m) => m.subscriptionName).join(", ")} )",
+                                              fontweight: FontWeight.w400,
                                               fontsize: 11,
                                             ),
                                           ],
                                         ),
+                                        //
+                                        // Row(
+                                        //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        //   children: [
+                                        //     TextHelper(
+                                        //       text:
+                                        //           'Start: ${parseDateToString(data: us.startDate, formatDate: 'dd-MM-yyyy', predefinedDateFormat: 'yyyy-MM-dd', defaultValue: '')}',
+                                        //       fontsize: 11,
+                                        //     ),
+                                        //   ],
+                                        // ),
                                       ],
                                     ),
                                   ),

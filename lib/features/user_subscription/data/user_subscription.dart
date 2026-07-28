@@ -37,6 +37,7 @@ class UserSubscription {
   final double taxAmount;
   final double netAmount;
   final double dueAmount;
+  final double paidAmount;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -66,6 +67,7 @@ class UserSubscription {
     required this.isPaidSubscription,
     required this.isFullPackage,
     required this.discAmount,
+    this.paidAmount = 0,
     required this.discPer,
     required this.totalAmount,
     required this.grossAmount,
@@ -94,7 +96,7 @@ class UserSubscription {
       usedSessions: parseInt(data: data["usedSessions"], defaultInt: 0),
       remainingSessions: parseInt(data: data["remainingSessions"], defaultInt: 0),
 
-      // price: parseDouble(data: data["price"], defaultValue: 0.0),
+      paidAmount: parseDouble(data: data["paidAmount"], defaultValue: 0.0),
       isActive: parseBool(data: data["isActive"], defaultValue: false),
       isPosted: parseBool(data: data["isPosted"], defaultValue: false),
 
@@ -146,6 +148,7 @@ class UserSubscription {
       "isFullPackage": isFullPackage,
       "discAmount": discAmount,
       "discPer": discPer,
+      "paidAmount": paidAmount,
       "totalAmount": totalAmount,
       "grossAmount": grossAmount,
       "taxAmount": taxAmount,
@@ -182,6 +185,7 @@ class UserSubscription {
     int? subscriptionTotalDays,
     double? subscriptionTotalAmount,
     double? subscriptionAmount,
+    double? paidAmount,
     bool? isPaidSubscription,
     bool? isFullPackage,
     bool? discountWithGST,
@@ -225,6 +229,7 @@ class UserSubscription {
       taxAmount: taxAmount ?? this.taxAmount,
       netAmount: netAmount ?? this.netAmount,
       dueAmount: dueAmount ?? this.dueAmount,
+      paidAmount: paidAmount ?? this.paidAmount,
       discountWithGST: discountWithGST ?? this.discountWithGST,
     );
   }

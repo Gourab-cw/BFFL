@@ -5,6 +5,7 @@ import 'package:healthandwellness/core/utility/firebase_service.dart';
 import 'package:healthandwellness/core/voucher/model/voucher_model.dart';
 import 'package:healthandwellness/features/Service/data/service.dart';
 import 'package:healthandwellness/features/login/data/user.dart';
+import 'package:healthandwellness/features/user_subscription/data/multi_subscription.dart';
 import 'package:healthandwellness/features/user_subscription/data/user_subscription.dart';
 import 'package:ulid/ulid.dart';
 import 'package:uuid/uuid.dart';
@@ -51,10 +52,10 @@ class AccSubscriptionController extends GetxController {
   UserG? selectedPaymentMode;
   List<UserG> paymentModes = [];
   List<UserG> chargesLedgers = [];
-  List<UserSubscription> list = [];
+  List<MultiSubscription> list = [];
   final fb = Get.find<FB>();
 
-  UserSubscription? selectedUser;
+  MultiSubscription? selectedUser;
 
   GSTDetails gstDetails = GSTDetails.empty();
 
@@ -75,7 +76,59 @@ class AccSubscriptionController extends GetxController {
           .limit(15)
           .orderBy('createdAt')
           .get();
-      list = resp.docs.map((m) => UserSubscription.fromJSON(makeMapSerialize(m.data()))).toList();
+      final userSubscriptions = resp.docs.map((m) => UserSubscription.fromJSON(makeMapSerialize(m.data()))).toList();
+
+      Map<String, List<UserSubscription>> groupBySubscription = {};
+      for (final UserSubscription u in userSubscriptions) {
+        if (groupBySubscription[u.name] != null) {
+          groupBySubscription[u.name]!.add(u);
+        } else {
+          groupBySubscription[u.name] = [u];
+        }
+      }
+      List<MultiSubscription> mList = [];
+      for (String key in groupBySubscription.keys) {
+        UserSubscription usf = groupBySubscription[key]!.first;
+        double discAmount = 0;
+        double discPer = 0;
+        double totalAmount = 0;
+        double grossAmount = 0;
+        double taxAmount = 0;
+        double netAmount = 0;
+        double dueAmount = 0;
+        for (final m in groupBySubscription[key]!) {
+          discAmount += m.discAmount;
+          totalAmount += m.totalAmount;
+          grossAmount += m.grossAmount;
+          taxAmount += m.taxAmount;
+          netAmount += m.netAmount;
+          dueAmount += m.dueAmount;
+          discPer += m.discPer;
+        }
+        discPer = discPer / groupBySubscription[key]!.length;
+        mList.add(
+          MultiSubscription(
+            id: usf.name,
+            voucherTypeId: usf.voucherTypeId,
+            voucherTypeName: usf.voucherTypeName,
+            userId: usf.userId,
+            userName: usf.userName,
+            branchId: usf.branchId,
+            name: usf.name,
+            createdAt: usf.createdAt,
+            updatedAt: usf.updatedAt,
+            discAmount: discAmount,
+            discPer: discPer,
+            totalAmount: totalAmount,
+            grossAmount: grossAmount,
+            taxAmount: taxAmount,
+            netAmount: netAmount,
+            dueAmount: dueAmount,
+            subscriptions: groupBySubscription[key]!,
+          ),
+        );
+      }
+      list = mList;
       update();
     } catch (e) {
       showAlert("$e", AlertType.error);
@@ -112,7 +165,7 @@ class AccSubscriptionController extends GetxController {
     }
   }
 
-  Future<void> getDetails(UserSubscription us) async {
+  Future<void> getDetails(MultiSubscription us) async {
     try {
       final db = await fb.getDB();
       final auth = Get.find<Authenticator>();
@@ -219,7 +272,8 @@ class AccSubscriptionController extends GetxController {
     );
   }
 
-  Future<void> makePaid({required UserSubscription selectedUser, required ServiceModel service, required String txnValue, required String remarks}) async {
+  Future<void> makePaid({required MultiSubscription selectedUser, required String txnValue, required String remarks}) async {
+    // Future<void> makePaid({required MultiSubscription selectedUser, required ServiceModel service, required String txnValue, required String remarks}) async {
     final db = await fb.getDB();
     final batch = db.batch();
     final auth = Get.find<Authenticator>();
@@ -298,29 +352,43 @@ class AccSubscriptionController extends GetxController {
 
     final now = Timestamp.fromDate(DateTime.now());
     String uID = Uuid().v4();
-    batch.update(db.collection('userSubscription').doc(selectedUser.id), {
-      'isActive': true,
-      'dueAmount': advanceAmount > 0 ? 0 : FieldValue.increment(-paidAmount),
-    });
+    double paidAmountCalc = paidAmount;
+    List<Map<String, dynamic>> subscriptions = selectedUser.subscriptions.map((m) => m.toJSON()).toList();
+    for (int i = 0; i < subscriptions.length; i++) {
+      final f = subscriptions[i];
+      if (paidAmountCalc <= 0) {
+        subscriptions[i]['paidAmount'] = 0;
+        continue;
+      }
+      final dueAmount = parseDouble(data: f['dueAmount']);
+      final due = dueAmount > paidAmountCalc ? (dueAmount - paidAmountCalc) : 0;
+      double paidAmountCalc0 = paidAmountCalc;
+      paidAmountCalc0 = dueAmount > paidAmountCalc0 ? paidAmountCalc0 : dueAmount;
+      paidAmountCalc = dueAmount > paidAmountCalc ? 0 : (paidAmountCalc - dueAmount);
+
+      subscriptions[i]['paidAmount'] = paidAmountCalc0;
+      batch.update(db.collection('userSubscription').doc(f['id']), {'isActive': true, 'dueAmount': due});
+    }
+
     batch.set(db.collection('payment').doc(uID), {
       'id': uID,
       'branchId': auth.state!.branchId,
       'companyId': auth.state!.companyId,
       'userId': selectedUser.userId,
       'userName': selectedUser.userName,
-      'serviceId': selectedUser.subscriptionId,
-      'serviceName': selectedUser.subscriptionName,
+      // 'services': selectedUser.subscriptions.map((m) => m.toJSON()).toList(),
       'subscriptionId': selectedUser.id,
-      'subscriptionName': selectedUser.name,
       'voucherNumber': voucherNumber,
       'voucherId': voucher!.id,
       'voucherAmount': selectedUser.netAmount,
       'paidAmount': paidAmount,
       'advanceAmount': advanceAmount,
       'grossAmount': selectedUser.grossAmount,
-      'gstPer': service.gstPer,
+      // 'gstPer': service.gstPer,
       'gstAmount': selectedUser.taxAmount,
       'netAmount': selectedUser.netAmount,
+      'dueAmount': selectedUser.dueAmount,
+      'subscriptions': subscriptions,
       'paymentModeName': selectedPaymentMode!.name,
       'paymentModeId': selectedPaymentMode!.id,
       'isPosted': false,
@@ -347,8 +415,7 @@ class AccSubscriptionController extends GetxController {
         'voucherTypeId': voucher!.id,
         'voucherTypeName': voucher!.name,
         'voucherNo': selectedUser.name,
-        'subscriptionId': selectedUser.subscriptionId,
-        'subscriptionName': selectedUser.subscriptionName,
+        'subscriptionId': selectedUser.name,
         'amount': parseDouble(data: advanceAmount).toPrecision(2),
         'ledgerId': advanceUser.id,
         'ledgerName': advanceUser.name,
@@ -372,8 +439,7 @@ class AccSubscriptionController extends GetxController {
         'voucherTypeId': voucher!.id,
         'voucherTypeName': voucher!.name,
         'voucherNo': selectedUser.name,
-        'subscriptionId': selectedUser.subscriptionId,
-        'subscriptionName': selectedUser.subscriptionName,
+        'subscriptionId': selectedUser.name,
         'amount': parseDouble(data: paymentByAdvanceAmount).toPrecision(2),
         'ledgerId': advanceUser.id,
         'ledgerName': advanceUser.name,
@@ -393,8 +459,7 @@ class AccSubscriptionController extends GetxController {
       'voucherTypeId': voucher!.id,
       'voucherTypeName': voucher!.name,
       'voucherNo': selectedUser.name,
-      'subscriptionId': selectedUser.subscriptionId,
-      'subscriptionName': selectedUser.subscriptionName,
+      'subscriptionId': selectedUser.name,
       'amount': parseDouble(data: advanceAmount > 0 ? paidAmount - advanceAmount : paidAmount).toPrecision(2),
       'ledgerId': selectedUser.userId,
       'ledgerName': selectedUser.userName,
@@ -414,8 +479,7 @@ class AccSubscriptionController extends GetxController {
         'voucherTypeId': voucher!.id,
         'voucherTypeName': voucher!.name,
         'voucherNo': selectedUser.name,
-        'subscriptionId': selectedUser.subscriptionId,
-        'subscriptionName': selectedUser.subscriptionName,
+        'subscriptionId': selectedUser.name,
         'amount': parseDouble(data: paidAmount).toPrecision(2),
         'ledgerId': selectedPaymentMode!.id,
         'ledgerName': selectedPaymentMode!.name,

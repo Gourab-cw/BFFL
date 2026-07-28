@@ -67,6 +67,7 @@ class MyApp extends StatelessWidget {
           textTheme: GoogleFonts.monaSansTextTheme(ThemeData.light().textTheme),
           colorScheme: ColorScheme.fromSeed(seedColor: mainStore.theme.value.BackgroundColor),
         ),
+        debugShowCheckedModeBanner: false,
         initialRoute: '/',
         getPages: routes,
         initialBinding: InitBindings(),

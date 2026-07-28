@@ -170,6 +170,35 @@ class _HomeState extends State<Home> {
                                       width: 150,
                                       background: mainStore.theme.value.secondaryColor.withAlpha(50),
                                     ),
+                                    ButtonHelperG(
+                                      onTap: () {
+                                        Get.toNamed('/accsubscriptionlist');
+                                      },
+                                      withBorder: true,
+                                      height: 45,
+                                      type: ButtonHelperTypeG.outlined,
+                                      icon: Icon(MoonIcons.travel_bill_24_regular, color: mainStore.theme.value.HeadColor, size: 28),
+                                      label: TextHelper(text: "Pay Bills", fontsize: 14, color: mainStore.theme.value.HeadColor, fontweight: FontWeight.w600),
+                                      width: 150,
+                                      background: mainStore.theme.value.secondaryColor.withAlpha(50),
+                                    ),
+                                    ButtonHelperG(
+                                      onTap: () {
+                                        Get.toNamed('/accountantHistory');
+                                      },
+                                      withBorder: true,
+                                      height: 45,
+                                      type: ButtonHelperTypeG.outlined,
+                                      icon: Icon(MoonIcons.travel_bill_24_regular, color: mainStore.theme.value.HeadColor, size: 28),
+                                      label: TextHelper(
+                                        text: "Bill Register",
+                                        fontsize: 14,
+                                        color: mainStore.theme.value.HeadColor,
+                                        fontweight: FontWeight.w600,
+                                      ),
+                                      width: 150,
+                                      background: mainStore.theme.value.secondaryColor.withAlpha(50),
+                                    ),
                                     if (auth.state != null && auth.state!.userType == UserType.admin || auth.state!.userType == UserType.branchManager)
                                       ButtonHelperG(
                                         onTap: () {

@@ -32,6 +32,7 @@ _PaymentModel _$PaymentModelFromJson(Map<String, dynamic> json) =>
       voucherAmount: parseDoubleV2(json['voucherAmount']),
       voucherId: parseStringV2(json['voucherId']),
       voucherNumber: parseStringV2(json['voucherNumber']),
+      subscriptions: _subscriptionFromJson(json['subscriptions']),
       isActive: json['isActive'] as bool? ?? true,
     );
 
@@ -61,5 +62,6 @@ Map<String, dynamic> _$PaymentModelToJson(_PaymentModel instance) =>
       'voucherAmount': instance.voucherAmount,
       'voucherId': instance.voucherId,
       'voucherNumber': instance.voucherNumber,
+      'subscriptions': _subscriptionToJson(instance.subscriptions),
       'isActive': instance.isActive,
     };

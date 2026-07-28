@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:healthandwellness/app/Datagrid3.dart';
 import 'package:healthandwellness/app/mainstore.dart';
 import 'package:healthandwellness/core/utility/app_loader.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
@@ -45,7 +47,28 @@ class _PaymentDetailsState extends State<PaymentDetails> {
           return Center(child: TextHelper(text: "No Payment Found!"));
         }
         return Scaffold(
-          appBar: AppBar(title: Text('Payment Details')),
+          appBar: AppBar(
+            title: Text('Payment Details'),
+            actions: [
+              ButtonHelperG(
+                shadow: [],
+                width: 35,
+                height: 35,
+                background: mainStore.theme.value.BackgroundColor.withAlpha(40),
+                onTap: () async {
+                  try {
+                    Loader.startLoading();
+                    await pc.downloadPDF();
+                  } catch (e) {
+                    showAlert('$e', AlertType.error);
+                  } finally {
+                    Loader.stopLoading();
+                  }
+                },
+                icon: Icon(FontAwesomeIcons.solidFilePdf),
+              ),
+            ],
+          ),
           body: SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -70,7 +93,7 @@ class _PaymentDetailsState extends State<PaymentDetails> {
                       Row(
                         children: [
                           TextHelper(text: 'Subscription ID : '),
-                          TextHelper(text: item.subscriptionName, fontweight: FontWeight.w600),
+                          TextHelper(text: item.subscriptionId, fontweight: FontWeight.w600),
                         ],
                       ),
                       Row(
@@ -81,16 +104,70 @@ class _PaymentDetailsState extends State<PaymentDetails> {
                       ),
                     ],
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          TextHelper(text: 'Service : '),
-                          TextHelper(text: item.serviceName, fontweight: FontWeight.w600),
-                        ],
-                      ),
-                    ],
+                  SizedBox(
+                    height: 200,
+                    child: Builder(
+                      builder: (context) {
+                        List<Map<String, dynamic>> list = item.subscriptions?.map((m) => m.toJSON()).toList() ?? [];
+                        return DataGridHelper3(
+                          dataSource: list,
+                          headerColor: Colors.blueGrey.shade50.withAlpha(70),
+                          rowHeight: 50,
+                          showAlternateColor: false,
+                          fontSize: 10.5,
+                          headerFontColor: Colors.blueGrey.shade400,
+                          columnList: [
+                            DataGridColumnModel3(
+                              dataField: "name",
+                              dataType: CellDataType3.string,
+                              width: MediaQuery.sizeOf(context).width * 0.4,
+                              title: "Service",
+                              customCell: (c) {
+                                return Container(
+                                  child: Column(
+                                    children: [
+                                      TextHelper(text: c.rowValue['subscriptionName'] ?? "", fontsize: 11, isWrap: true, fontweight: FontWeight.w600),
+                                      TextHelper(
+                                        text:
+                                            '${parseDateToString(data: c.rowValue['startDate'], formatDate: "dd-MM-yyyy", predefinedDateFormat: "yyyy-MM-dd", defaultValue: "")}  -  ${parseDateToString(data: c.rowValue['endDate'], formatDate: "dd-MM-yyyy", predefinedDateFormat: "yyyy-MM-dd", defaultValue: "")}',
+                                        fontsize: 10,
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                            DataGridColumnModel3(
+                              dataField: "dueAmount",
+                              title: "Due Amount",
+                              dataType: CellDataType3.string,
+                              customCell: (c) {
+                                return TextHelper(
+                                  text: currenyFormater(value: c.rowValue['dueAmount'], withDrCr: false),
+                                  fontsize: 11,
+                                  textalign: TextAlign.center,
+                                );
+                              },
+                            ),
+                            DataGridColumnModel3(
+                              dataField: "paidAmount",
+                              title: "Paid Amount",
+
+                              dataType: CellDataType3.string,
+                              customCell: (c) {
+                                return TextHelper(
+                                  text: currenyFormater(value: c.rowValue['paidAmount'], withDrCr: false),
+                                  fontsize: 11,
+                                  textalign: TextAlign.center,
+                                );
+                              },
+                            ),
+                          ],
+                          uniqueKey: "items",
+                          width: MediaQuery.sizeOf(context).width * 0.96,
+                        );
+                      },
+                    ),
                   ),
                   Row(
                     children: [
