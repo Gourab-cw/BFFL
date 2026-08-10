@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:healthandwellness/features/login/repository/authenticator.dart';
@@ -85,11 +86,26 @@ class _MemberDocumentsDetailsState extends State<MemberDocumentsDetails> {
                                 maxScale: PhotoViewComputedScale.covered * 4,
                               )
                             : data is XFile
-                            ? PhotoView(
-                                imageProvider: FileImage(File(data.path)),
-                                minScale: PhotoViewComputedScale.contained,
-                                maxScale: PhotoViewComputedScale.covered * 4,
-                              )
+                            ? GetPlatform.isWeb
+                                  ? FutureBuilder<Uint8List>(
+                                      future: data.readAsBytes(),
+                                      builder: (context, snapshot) {
+                                        if (!snapshot.hasData) {
+                                          return const Center(child: CircularProgressIndicator());
+                                        }
+
+                                        return PhotoView(
+                                          imageProvider: MemoryImage(snapshot.data!),
+                                          minScale: PhotoViewComputedScale.contained,
+                                          maxScale: PhotoViewComputedScale.covered * 4,
+                                        );
+                                      },
+                                    )
+                                  : PhotoView(
+                                      imageProvider: FileImage(File(data.path)),
+                                      minScale: PhotoViewComputedScale.contained,
+                                      maxScale: PhotoViewComputedScale.covered * 4,
+                                    )
                             : SizedBox.shrink(),
                       ),
                     ],
@@ -267,7 +283,18 @@ class _MemberDocumentsDetailsState extends State<MemberDocumentsDetails> {
                                     children: [
                                       ClipRRect(
                                         borderRadius: BorderRadius.circular(10),
-                                        child: Image.file(File(m.path), fit: BoxFit.fill, height: 80, width: 70),
+                                        child: GetPlatform.isWeb
+                                            ? FutureBuilder<Uint8List>(
+                                                future: m.readAsBytes(),
+                                                builder: (context, snapshot) {
+                                                  if (!snapshot.hasData) {
+                                                    return const SizedBox(height: 80, width: 70);
+                                                  }
+
+                                                  return Image.memory(snapshot.data!, fit: BoxFit.fill, height: 80, width: 70);
+                                                },
+                                              )
+                                            : Image.file(File(m.path), fit: BoxFit.fill, height: 80, width: 70),
                                       ),
                                       Positioned(
                                         bottom: 0,

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:healthandwellness/app/mainstore.dart';
 import 'package:intl/intl.dart';
 import 'package:moon_design/moon_design.dart';
 
@@ -212,13 +211,17 @@ class DateRangePicker extends StatefulHookWidget {
   final bool autofocus;
   final bool withSingleSelect;
   final Color backgroundColor;
-  Color? fontColor;
   Widget? leading;
-  DateTime? firstDate;
-  DateTime? lastDate;
   bool withClear;
   final Widget? leadingIcon;
   bool disable;
+
+  DateTime? firstDate;
+  DateTime? lastDate;
+
+  Color? fontColor;
+
+  bool withPopupMode;
   DateRangePicker({
     super.key,
     this.selectedDateRange,
@@ -227,17 +230,18 @@ class DateRangePicker extends StatefulHookWidget {
     this.height = 50,
     this.leading,
     this.backgroundColor = Colors.white,
+    this.fontColor,
+    this.withPopupMode = false,
     this.withBorder = false,
     this.disable = false,
-    this.firstDate,
-    this.lastDate,
-    this.fontColor,
     this.withClear = false,
     this.autofocus = false,
     this.withSingleSelect = false,
     this.leadingIcon = const Icon(MoonIcons.time_calendar_24_regular),
     this.placeholder = "Select Date Range",
     this.dateFormat = "dd-MM-yyyy",
+    this.firstDate,
+    this.lastDate,
   });
 
   @override
@@ -376,9 +380,9 @@ class _DateRangePickerState extends State<DateRangePicker> {
                       config: CalendarDatePicker2Config(
                         allowSameValueSelection: true,
                         dynamicCalendarRows: true,
-                        daySplashColor: getMainStore().theme.value.HeadColor.withAlpha(100),
-                        selectedDayHighlightColor: getMainStore().theme.value.secondaryColor.withAlpha(100),
-                        selectedRangeHighlightColor: getMainStore().theme.value.secondaryColor.withAlpha(100),
+                        daySplashColor: Colors.blue.shade100,
+                        selectedDayHighlightColor: Colors.blueAccent.shade200,
+                        selectedRangeHighlightColor: Colors.blueAccent.shade100.withAlpha(40),
                         rangeBidirectional: true,
                         animateToDisplayedMonthDate: true,
                         calendarType: CalendarDatePicker2Type.range,
@@ -386,7 +390,6 @@ class _DateRangePickerState extends State<DateRangePicker> {
                         firstDayOfWeek: 1,
                         firstDate: widget.firstDate,
                         lastDate: widget.lastDate,
-                        // dayTextStyle: TextStyle(color: widget.fontColor),
                       ),
                       // value: widget.selectedDateRange != null ? [widget.selectedDateRange!.start, widget.selectedDateRange!.end] : [DateTime.now()],
                       value: selectedDateRange != null ? [selectedDateRange!.start, selectedDateRange!.end] : [DateTime.now()],
@@ -418,7 +421,7 @@ class _DateRangePickerState extends State<DateRangePicker> {
                     ),
                     const SizedBox(height: 10),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         MoonTextButton(
                           onTap: () {
@@ -433,23 +436,19 @@ class _DateRangePickerState extends State<DateRangePicker> {
                           },
                           label: const Text("Select Today"),
                         ),
-                        Row(
-                          children: [
-                            MoonTextButton(
-                              onTap: () {
-                                if (selectedDateRange != null && widget.onValueChange != null) {
-                                  setState(() {
-                                    widget.selectedDateRange = selectedDateRange;
-                                  });
-                                  widget.onValueChange!(selectedDateRange!);
-                                }
-                                goBack(context);
-                              },
-                              label: const Text("Ok"),
-                            ),
-                            MoonTextButton(onTap: () => goBack(context), label: const Text("Cancel")),
-                          ],
+                        MoonTextButton(
+                          onTap: () {
+                            if (selectedDateRange != null && widget.onValueChange != null) {
+                              setState(() {
+                                widget.selectedDateRange = selectedDateRange;
+                              });
+                              widget.onValueChange!(selectedDateRange!);
+                            }
+                            goBack(context);
+                          },
+                          label: const Text("Ok"),
                         ),
+                        MoonTextButton(onTap: () => goBack(context), label: const Text("Cancel")),
                       ],
                     ),
                     const SizedBox(height: 10),
@@ -487,6 +486,55 @@ class _DateRangePickerState extends State<DateRangePicker> {
       }
       return null;
     }, [widget.selectedDateRange]);
+    if (widget.withPopupMode) {
+      return Row(
+        children: [
+          widget.leading ?? Container(),
+          MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: TextBox(
+              height: widget.height,
+              width:
+                  (widget.selectedDateRange != null &&
+                      widget.selectedDateRange?.start.year == widget.selectedDateRange?.end.year &&
+                      widget.selectedDateRange?.start.day == widget.selectedDateRange?.end.day &&
+                      widget.selectedDateRange?.start.month == widget.selectedDateRange?.end.month)
+                  ? 200
+                  : widget.width,
+              onValueChange: (v) {},
+              onTap: () {
+                if (!widget.withPopupMode) {
+                  return;
+                }
+                if (!widget.disable) showDatePicker(context);
+              },
+              autofocus: widget.autofocus,
+              readonly: true,
+              fontWeight: FontWeight.w600,
+              selectTextOnFocus: false,
+              backgroundColor: widget.backgroundColor,
+              leading: widget.leadingIcon,
+              withBorder: widget.withBorder,
+              controller: textboxcontroller,
+              placeholder: widget.placeholder,
+              trailing: (widget.withClear)
+                  ? ButtonHelperG(
+                      margin: 0,
+                      onTap: () {
+                        textboxcontroller.text = '';
+                        widget.onValueChange!(DateTimeRange(start: DateTime.now(), end: DateTime.now()));
+                      },
+                      background: Colors.transparent,
+                      icon: const Icon(FontAwesomeIcons.xmark, color: Colors.blueGrey, size: 14),
+                    )
+                  : null,
+              // padding: EdgeInsets.only(left: 20),
+              // alignment: Alignment.centerLeft,
+            ),
+          ),
+        ],
+      );
+    }
     return Row(
       children: [
         widget.leading ?? Container(),
@@ -506,8 +554,8 @@ class _DateRangePickerState extends State<DateRangePicker> {
               if (!widget.disable) showDatePicker(context);
             },
             autofocus: widget.autofocus,
-            readonly: true,
             fontColor: widget.fontColor,
+            readonly: true,
             fontWeight: FontWeight.w600,
             selectTextOnFocus: false,
             backgroundColor: widget.backgroundColor,
@@ -526,6 +574,7 @@ class _DateRangePickerState extends State<DateRangePicker> {
                     icon: const Icon(FontAwesomeIcons.xmark, color: Colors.blueGrey, size: 14),
                   )
                 : null,
+            fontSize: 12.8,
             // padding: EdgeInsets.only(left: 20),
             // alignment: Alignment.centerLeft,
           ),

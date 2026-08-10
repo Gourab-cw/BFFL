@@ -53,6 +53,8 @@ class _MemberPaymentDetailsState extends State<MemberPaymentDetails> {
               },
               height: 80,
               backgroundColor: mainStore.theme.value.lowShadeColor,
+              boxShadow: [],
+              margin: EdgeInsets.all(5),
               child: Column(
                 children: [
                   Row(
@@ -98,10 +100,7 @@ class _MemberPaymentDetailsState extends State<MemberPaymentDetails> {
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      TextHelper(text: "Service: ${payment.serviceName}", fontsize: 12),
-                      TextHelper(text: "Subscription ID: ${payment.subscriptionName}", fontsize: 12),
-                    ],
+                    children: [TextHelper(text: "Subscription: ${payment.subscriptionId}", fontsize: 11, fontweight: FontWeight.w600)],
                   ),
                 ],
               ),

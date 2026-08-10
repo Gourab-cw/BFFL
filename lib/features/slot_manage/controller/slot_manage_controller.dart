@@ -376,6 +376,12 @@ class SlotController extends GetxController {
     holidayList = (await db.collection('holiday').where('branchId', isEqualTo: auth.branch!.id).get()).docs
         .map((m) => HolidayModel.fromFirebase(makeMapSerialize(m.data()), m.id))
         .toList();
+    if (auth.company != null) {
+      dailyStart = auth.company!.dayStart;
+      dailyEnd = auth.company!.dayEnd;
+      period.text = parseString(data: auth.company!.slotTimeInMin, defaultValue: '60');
+    }
+    update();
     super.onInit();
   }
 }

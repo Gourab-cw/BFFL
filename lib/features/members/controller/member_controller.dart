@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:get/get_state_manager/src/simple/list_notifier.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
@@ -119,12 +120,18 @@ class MemberController extends GetxController {
     if (selectedUser == null) {
       return;
     }
-    File file = File(data.path);
+    Uint8List? bytes;
+    if (GetPlatform.isWeb) {
+      bytes = await data.readAsBytes();
+    } else {
+      File file = File(data.path);
+      bytes = await file.readAsBytes();
+    }
     final fb = Get.find<FB>();
     final storage = await fb.getStorage();
     Reference ref = storage.ref().child('${selectedUser!.id}/documents/${data.name}');
     try {
-      UploadTask uploadTask = ref.putData(await file.readAsBytes());
+      UploadTask uploadTask = ref.putData(bytes);
       await uploadTask;
       final path = await ref.getDownloadURL();
       selectedUser!.documents.remove(data);
@@ -184,7 +191,7 @@ class MemberController extends GetxController {
     }
     final fb = Get.find<FB>();
     final db = await fb.getDB();
-    final resp = await db.collection('payment').where('userId', isEqualTo: selectedUser!.id).get();
+    final resp = await db.collection('payment').where('userId', isEqualTo: selectedUser!.id).orderBy('createdAt', descending: true).get();
     payments = resp.docs.map((doc) => PaymentModel.fromJson(makeMapSerialize(doc.data()))).toList();
     update();
   }

@@ -212,7 +212,7 @@ class _MemberBookingHistoryState extends State<MemberBookingHistory> {
                                           child: Column(
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
-                                              Row(
+                                              Wrap(
                                                 spacing: 10,
                                                 children: [
                                                   TextHelper(text: us.name, fontweight: FontWeight.w600, fontsize: 12),
@@ -222,7 +222,7 @@ class _MemberBookingHistoryState extends State<MemberBookingHistory> {
                                                       if (text != "") {
                                                         text = "( $text )";
                                                       }
-                                                      return TextHelper(text: text, fontweight: FontWeight.w400, fontsize: 10.5);
+                                                      return TextHelper(text: text, fontweight: FontWeight.w400, fontsize: 10.5, isWrap: true);
                                                     },
                                                   ),
                                                 ],

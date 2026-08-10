@@ -25,6 +25,17 @@ class _AccSubscriptionDetailsState extends State<AccSubscriptionDetails> {
   final loader = Get.find<AppLoaderController>();
   final remarksController = TextEditingController();
   final txnController = TextEditingController();
+  bool showDetails = false;
+
+  Widget makeSummaryCell(String v) {
+    return TextHelper(
+      text: currenyFormater(value: v, withDrCr: false, withCurrency: false),
+      fontsize: 11,
+      color: getMainStore().theme.value.HeadColor,
+      fontweight: FontWeight.w600,
+      textalign: TextAlign.center,
+    );
+  }
 
   @override
   void initState() {
@@ -129,55 +140,229 @@ class _AccSubscriptionDetailsState extends State<AccSubscriptionDetails> {
                         ),
                         Divider(),
                         Row(
-                          spacing: 6,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            TextHelper(text: "Id :", width: 30, fontsize: 12, fontweight: FontWeight.w600, color: Colors.grey.shade600),
-                            TextHelper(text: us.name, fontsize: 12),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              spacing: 6,
+                              children: [
+                                TextHelper(text: "Subscription Id :", width: 110, fontsize: 12, fontweight: FontWeight.w600, color: Colors.grey.shade600),
+                                TextHelper(text: us.name, fontsize: 12),
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                TextHelper(text: "Show Details :", fontweight: FontWeight.w600, fontsize: 12, color: Colors.grey.shade600),
+                                Transform.scale(
+                                  scale: 0.6,
+                                  child: Switch(
+                                    value: showDetails,
+                                    activeThumbColor: getMainStore().theme.value.HeadColor,
+                                    onChanged: (v) => setState(() {
+                                      showDetails = v;
+                                    }),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ],
                         ),
-
+                        // Column(
+                        //   mainAxisSize: MainAxisSize.min,
+                        //   spacing: 1,
+                        //   children: [
+                        //     TextHelper(text: 'Bill Details', fontsize: 12, fontweight: FontWeight.w600, textalign: TextAlign.left, padding: EdgeInsets.zero),
+                        //     Divider(),
+                        //     // if (accSubController.voucher != null && accSubController.voucher!.withDiscount)
+                        //     //   Row(
+                        //     //     spacing: 20,
+                        //     //     mainAxisAlignment: MainAxisAlignment.end,
+                        //     //     children: [
+                        //     //       TextHelper(text: 'Total Amount :', fontsize: 12),
+                        //     //       TextHelper(
+                        //     //         text: currenyFormater(value: us.totalAmount, withDrCr: false),
+                        //     //         width: 150,
+                        //     //         fontweight: FontWeight.w600,
+                        //     //         fontsize: 12,
+                        //     //         color: Colors.grey.shade700,
+                        //     //         textalign: TextAlign.right,
+                        //     //       ),
+                        //     //     ],
+                        //     //   ),
+                        //     // if (accSubController.voucher != null && accSubController.voucher!.withDiscount)
+                        //     //   Row(
+                        //     //     spacing: 20,
+                        //     //     mainAxisAlignment: MainAxisAlignment.end,
+                        //     //     children: [
+                        //     //       TextHelper(text: 'Discount :', fontsize: 12, color: getMainStore().theme.value.HeadColor.withAlpha(200)),
+                        //     //       TextHelper(
+                        //     //         text: currenyFormater(value: us.discAmount, withDrCr: false),
+                        //     //         width: 150,
+                        //     //         fontweight: FontWeight.w600,
+                        //     //         fontsize: 12,
+                        //     //         color: getMainStore().theme.value.HeadColor.withAlpha(200),
+                        //     //         textalign: TextAlign.right,
+                        //     //       ),
+                        //     //     ],
+                        //     //   ),
+                        //     Row(
+                        //       spacing: 20,
+                        //       mainAxisAlignment: MainAxisAlignment.start,
+                        //       children: [
+                        //         TextHelper(text: 'Gross Amount :', fontsize: 12, width: 95),
+                        //         TextHelper(
+                        //           text: currenyFormater(value: us.grossAmount, withDrCr: false),
+                        //           width: 150,
+                        //           fontweight: FontWeight.w600,
+                        //           fontsize: 12,
+                        //           color: Colors.grey.shade700,
+                        //           textalign: TextAlign.right,
+                        //         ),
+                        //       ],
+                        //     ),
+                        //     Row(
+                        //       spacing: 20,
+                        //       mainAxisAlignment: MainAxisAlignment.start,
+                        //       children: [
+                        //         TextHelper(text: 'Tax Amount :', fontsize: 12, width: 95),
+                        //         TextHelper(
+                        //           text: currenyFormater(value: us.taxAmount, withDrCr: false),
+                        //           width: 150,
+                        //           textalign: TextAlign.right,
+                        //           fontweight: FontWeight.w600,
+                        //           color: Colors.grey.shade700,
+                        //           fontsize: 12,
+                        //         ),
+                        //       ],
+                        //     ),
+                        //
+                        //     Row(
+                        //       spacing: 20,
+                        //       mainAxisAlignment: MainAxisAlignment.start,
+                        //       children: [
+                        //         TextHelper(text: 'Discount :', fontsize: 12, color: getMainStore().theme.value.HeadColor.withAlpha(200), width: 95),
+                        //         TextHelper(
+                        //           text: currenyFormater(value: us.discAmount, withDrCr: false),
+                        //           width: 150,
+                        //           fontweight: FontWeight.w600,
+                        //           fontsize: 12,
+                        //           color: getMainStore().theme.value.HeadColor.withAlpha(200),
+                        //           textalign: TextAlign.right,
+                        //         ),
+                        //       ],
+                        //     ),
+                        //     Row(
+                        //       spacing: 20,
+                        //       mainAxisAlignment: MainAxisAlignment.start,
+                        //       children: [
+                        //         TextHelper(text: 'Net Amount :', fontsize: 12, width: 95),
+                        //         TextHelper(
+                        //           text: currenyFormater(value: us.netAmount, withDrCr: false),
+                        //           width: 150,
+                        //           fontsize: 12,
+                        //           textalign: TextAlign.right,
+                        //           fontweight: FontWeight.w600,
+                        //           color: Colors.grey.shade700,
+                        //         ),
+                        //       ],
+                        //     ),
+                        //     Divider(),
+                        //   ],
+                        // ),
                         SizedBox(
-                          height: 150,
+                          height: 200,
                           child: Builder(
                             builder: (context) {
-                              List<Map<String, dynamic>> list = accSubController.selectedUser!.subscriptions.map((m) => m.toJSON()).toList();
+                              List<Map<String, dynamic>> list = accSubController.selectedUser!.subscriptions
+                                  .map((m) => {...m.toJSON(), "taxableAmount": m.netAmount + m.discAmount})
+                                  .toList();
                               return DataGridHelper3(
                                 dataSource: list,
                                 headerColor: Colors.blueGrey.shade50.withAlpha(70),
                                 rowHeight: 50,
                                 showAlternateColor: false,
+                                showBorderVertical: true,
+                                columnFixCount: ((MediaQuery.sizeOf(context).width * 0.4) + 400) < Get.width
+                                    ? 0
+                                    : showDetails
+                                    ? 1
+                                    : 0,
                                 fontSize: 10.5,
                                 headerFontColor: Colors.blueGrey.shade400,
+                                showFooter: true,
                                 columnList: [
                                   DataGridColumnModel3(
                                     dataField: "name",
                                     dataType: CellDataType3.string,
-                                    width: MediaQuery.sizeOf(context).width * 0.4,
+                                    width: ((MediaQuery.sizeOf(context).width * 0.4) + 400) < Get.width ? null : MediaQuery.sizeOf(context).width * 0.4,
                                     title: "Service",
+                                    withSummery: false,
+                                    summeryType: SummeryType3.count,
                                     customCell: (c) {
-                                      return Container(
-                                        child: Column(
-                                          children: [
-                                            TextHelper(
-                                              text: subController.list.firstWhereOrNull((s) => s.id == c.rowValue['subscriptionId'])?.name ?? "",
-                                              fontsize: 11,
-                                              isWrap: true,
-                                              fontweight: FontWeight.w600,
-                                            ),
-                                            TextHelper(
-                                              text:
-                                                  '${parseDateToString(data: c.rowValue['startDate'], formatDate: "dd-MM-yyyy", predefinedDateFormat: "yyyy-MM-dd", defaultValue: "")}  -  ${parseDateToString(data: c.rowValue['endDate'], formatDate: "dd-MM-yyyy", predefinedDateFormat: "yyyy-MM-dd", defaultValue: "")}',
-                                              fontsize: 10,
-                                            ),
-                                          ],
-                                        ),
+                                      return Column(
+                                        children: [
+                                          TextHelper(
+                                            text: subController.list.firstWhereOrNull((s) => s.id == c.rowValue['subscriptionId'])?.name ?? "",
+                                            fontsize: 11,
+                                            isWrap: true,
+                                            fontweight: FontWeight.w600,
+                                          ),
+                                          TextHelper(
+                                            text:
+                                                '${parseDateToString(data: c.rowValue['startDate'], formatDate: "dd-MM-yyyy", predefinedDateFormat: "yyyy-MM-dd", defaultValue: "")}  -  ${parseDateToString(data: c.rowValue['endDate'], formatDate: "dd-MM-yyyy", predefinedDateFormat: "yyyy-MM-dd", defaultValue: "")}',
+                                            fontsize: 10,
+                                          ),
+                                        ],
                                       );
                                     },
                                   ),
+                                  if (showDetails)
+                                    DataGridColumnModel3(
+                                      dataField: "taxableAmount",
+                                      title: "Amount",
+                                      dataType: CellDataType3.int,
+                                      withSummery: true,
+                                      summeryType: SummeryType3.sum,
+                                      width: 80,
+                                      customCell: (c) {
+                                        return TextHelper(
+                                          text: currenyFormater(
+                                            value: parseDouble(data: c.rowValue['netAmount']) + parseDouble(data: c.rowValue['discAmount']),
+                                            withDrCr: false,
+                                          ),
+                                          fontsize: 11,
+                                          textalign: TextAlign.center,
+                                        );
+                                      },
+                                      customSummaryCell: makeSummaryCell,
+                                    ),
+                                  if (showDetails)
+                                    DataGridColumnModel3(
+                                      dataField: "discAmount",
+                                      width: 70,
+                                      title: "Disc Amt",
+                                      summeryType: SummeryType3.sum,
+                                      withSummery: true,
+                                      customSummaryCell: makeSummaryCell,
+                                      dataType: CellDataType3.int,
+
+                                      customCell: (c) {
+                                        return TextHelper(
+                                          text: currenyFormater(value: c.rowValue['discAmount'], withDrCr: false),
+                                          fontsize: 11,
+                                          textalign: TextAlign.center,
+                                          color: getMainStore().theme.value.HeadColor,
+                                        );
+                                      },
+                                    ),
                                   DataGridColumnModel3(
                                     dataField: "amount",
-                                    title: "Amount",
-                                    dataType: CellDataType3.string,
+                                    width: 80,
+                                    title: "Bill Amt",
+                                    summeryType: SummeryType3.sum,
+                                    withSummery: true,
+                                    dataType: CellDataType3.int,
+                                    customSummaryCell: makeSummaryCell,
                                     customCell: (c) {
                                       return TextHelper(
                                         text: currenyFormater(value: c.rowValue['netAmount'], withDrCr: false),
@@ -187,12 +372,17 @@ class _AccSubscriptionDetailsState extends State<AccSubscriptionDetails> {
                                     },
                                   ),
                                   DataGridColumnModel3(
-                                    dataField: "discount",
-                                    title: "Discount",
-                                    dataType: CellDataType3.string,
+                                    dataField: "paidAmount",
+                                    width: 80,
+                                    title: "Paid Amt",
+                                    summeryType: SummeryType3.sum,
+                                    withSummery: true,
+                                    dataType: CellDataType3.int,
+                                    textAlign: CellTextAlignment3.center,
+                                    customSummaryCell: makeSummaryCell,
                                     customCell: (c) {
                                       return TextHelper(
-                                        text: currenyFormater(value: c.rowValue['discAmount'], withDrCr: false),
+                                        text: currenyFormater(value: c.rowValue['paidAmount'], withDrCr: false),
                                         fontsize: 11,
                                         textalign: TextAlign.center,
                                       );
@@ -200,23 +390,37 @@ class _AccSubscriptionDetailsState extends State<AccSubscriptionDetails> {
                                   ),
                                   DataGridColumnModel3(
                                     dataField: "dueAmount",
-                                    title: "Due Amount",
-                                    dataType: CellDataType3.string,
+                                    width: 80,
+                                    title: "Due Amt",
+                                    withSummery: true,
+                                    customSummaryCell: (String v) {
+                                      return TextHelper(
+                                        text: currenyFormater(value: v, withDrCr: false, withCurrency: false),
+                                        fontsize: 11,
+                                        color: Colors.deepOrangeAccent.shade700,
+                                        fontweight: FontWeight.w600,
+                                        textalign: TextAlign.center,
+                                      );
+                                    },
+                                    summeryType: SummeryType3.sum,
+                                    dataType: CellDataType3.int,
                                     customCell: (c) {
                                       return TextHelper(
                                         text: currenyFormater(value: c.rowValue['dueAmount'], withDrCr: false),
                                         fontsize: 11,
+                                        color: Colors.deepOrangeAccent.shade700,
                                         textalign: TextAlign.center,
                                       );
                                     },
                                   ),
                                 ],
                                 uniqueKey: "items",
-                                width: MediaQuery.sizeOf(context).width * 0.96,
+                                width: MediaQuery.sizeOf(context).width * 0.98,
                               );
                             },
                           ),
                         ),
+
                         // Row(
                         //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         //   spacing: 6,
@@ -315,108 +519,6 @@ class _AccSubscriptionDetailsState extends State<AccSubscriptionDetails> {
                         //     ),
                         //   ],
                         // ),
-                        Column(
-                          mainAxisSize: MainAxisSize.min,
-                          spacing: 2,
-                          children: [
-                            TextHelper(text: 'Amount', fontsize: 12, fontweight: FontWeight.w600, textalign: TextAlign.right, padding: EdgeInsets.zero),
-                            Divider(),
-                            // if (accSubController.voucher != null && accSubController.voucher!.withDiscount)
-                            //   Row(
-                            //     spacing: 20,
-                            //     mainAxisAlignment: MainAxisAlignment.end,
-                            //     children: [
-                            //       TextHelper(text: 'Total Amount :', fontsize: 12),
-                            //       TextHelper(
-                            //         text: currenyFormater(value: us.totalAmount, withDrCr: false),
-                            //         width: 150,
-                            //         fontweight: FontWeight.w600,
-                            //         fontsize: 12,
-                            //         color: Colors.grey.shade700,
-                            //         textalign: TextAlign.right,
-                            //       ),
-                            //     ],
-                            //   ),
-                            // if (accSubController.voucher != null && accSubController.voucher!.withDiscount)
-                            //   Row(
-                            //     spacing: 20,
-                            //     mainAxisAlignment: MainAxisAlignment.end,
-                            //     children: [
-                            //       TextHelper(text: 'Discount :', fontsize: 12, color: getMainStore().theme.value.HeadColor.withAlpha(200)),
-                            //       TextHelper(
-                            //         text: currenyFormater(value: us.discAmount, withDrCr: false),
-                            //         width: 150,
-                            //         fontweight: FontWeight.w600,
-                            //         fontsize: 12,
-                            //         color: getMainStore().theme.value.HeadColor.withAlpha(200),
-                            //         textalign: TextAlign.right,
-                            //       ),
-                            //     ],
-                            //   ),
-                            Row(
-                              spacing: 20,
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                TextHelper(text: 'Gross Amount :', fontsize: 12),
-                                TextHelper(
-                                  text: currenyFormater(value: us.grossAmount, withDrCr: false),
-                                  width: 150,
-                                  fontweight: FontWeight.w600,
-                                  fontsize: 12,
-                                  color: Colors.grey.shade700,
-                                  textalign: TextAlign.right,
-                                ),
-                              ],
-                            ),
-                            Row(
-                              spacing: 20,
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                TextHelper(text: 'Tax Amount :', fontsize: 12),
-                                TextHelper(
-                                  text: currenyFormater(value: us.taxAmount, withDrCr: false),
-                                  width: 150,
-                                  textalign: TextAlign.right,
-                                  fontweight: FontWeight.w600,
-                                  color: Colors.grey.shade700,
-                                  fontsize: 12,
-                                ),
-                              ],
-                            ),
-
-                            Row(
-                              spacing: 20,
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                TextHelper(text: 'Discount :', fontsize: 12, color: getMainStore().theme.value.HeadColor.withAlpha(200)),
-                                TextHelper(
-                                  text: currenyFormater(value: us.discAmount, withDrCr: false),
-                                  width: 150,
-                                  fontweight: FontWeight.w600,
-                                  fontsize: 12,
-                                  color: getMainStore().theme.value.HeadColor.withAlpha(200),
-                                  textalign: TextAlign.right,
-                                ),
-                              ],
-                            ),
-                            Row(
-                              spacing: 20,
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                TextHelper(text: 'Net Amount :', fontsize: 12),
-                                TextHelper(
-                                  text: currenyFormater(value: us.netAmount, withDrCr: false),
-                                  width: 150,
-                                  fontsize: 12,
-                                  textalign: TextAlign.right,
-                                  fontweight: FontWeight.w600,
-                                  color: Colors.grey.shade700,
-                                ),
-                              ],
-                            ),
-                            Divider(),
-                          ],
-                        ),
                         if (balance > 0)
                           Row(
                             mainAxisAlignment: MainAxisAlignment.start,
@@ -467,6 +569,9 @@ class _AccSubscriptionDetailsState extends State<AccSubscriptionDetails> {
                                   height: 35,
                                   showBorder: true,
                                   leading: SizedBox.shrink(),
+                                  labelText: "Method",
+                                  placeHolder: "Select....",
+                                  // showLabelAlways: true,
                                   trailing: Icon(Icons.arrow_drop_down, color: getMainStore().theme.value.HeadColor.withAlpha(200)),
                                   fontSize: 11.8,
                                   rowHeight: 30,

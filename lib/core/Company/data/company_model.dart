@@ -1,4 +1,5 @@
 import 'package:healthandwellness/core/utility/helper.dart';
+import 'package:intl/intl.dart';
 
 class CompanyModel {
   String? activeFrom;
@@ -18,6 +19,10 @@ class CompanyModel {
   String pincode;
   String mobile;
 
+  DateTime dayStart;
+  DateTime dayEnd;
+  int slotTimeInMin;
+
   CompanyModel({
     this.activeFrom,
     this.groupCompanyId,
@@ -35,6 +40,9 @@ class CompanyModel {
     this.city = "",
     this.gstin = "",
     this.website = "",
+    required this.slotTimeInMin,
+    required this.dayEnd,
+    required this.dayStart,
   });
 
   factory CompanyModel.fromJson(Map<String, dynamic> json) {
@@ -55,6 +63,17 @@ class CompanyModel {
       pincode: parseString(data: json["pincode"], defaultValue: ""),
       state: parseString(data: json["state"], defaultValue: ""),
       website: parseString(data: json["website"], defaultValue: ""),
+      dayEnd: parseStringToDate(
+        data: json['dayEnd'],
+        predefinedDateFormat: "HH:mm",
+        defaultValue: DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day),
+      ),
+      dayStart: parseStringToDate(
+        data: json['dayStart'],
+        predefinedDateFormat: "HH:mm",
+        defaultValue: DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day),
+      ),
+      slotTimeInMin: parseInt(data: json['slotTimeInMin']),
     );
   }
 
@@ -68,6 +87,9 @@ class CompanyModel {
       'memberCreationMailSent': memberCreationMailSent,
       'memberCreationMailTo': memberCreationMailTo,
       'name': name,
+      'dayEnd': DateFormat('HH:mm').format(dayEnd),
+      'dayStart': DateFormat('HH:mm').format(dayStart),
+      'slotTimeInMin': slotTimeInMin.toString(),
     };
   }
 }

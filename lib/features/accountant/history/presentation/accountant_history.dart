@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:healthandwellness/app/TreeWidget.dart';
 import 'package:healthandwellness/app/mainstore.dart';
 import 'package:healthandwellness/core/utility/app_loader.dart';
 import 'package:healthandwellness/core/utility/helper.dart';
@@ -107,6 +109,7 @@ class _AccountantHistoryState extends State<AccountantHistory> {
                 onTap: () async {
                   try {
                     Loader.startLoading();
+                    controller.list = [];
                     controller.lastDocumentSnapshot = null;
                     await controller.getList(force: true);
                   } catch (e) {
@@ -160,6 +163,90 @@ class _AccountantHistoryState extends State<AccountantHistory> {
                     child: Builder(
                       builder: (context) {
                         List<PaymentModel> list = getFilteredList();
+                        return TreeWidget(
+                          treeKeyList: ['subscriptionId'],
+                          dataSource: list.map((m) => m.toJson()).toList(),
+                          childCellMaker: (item0) {
+                            final item = PaymentModel.fromJson(makeMapSerialize(item0));
+                            return CardHelper(
+                              onTap: () {
+                                paymentController.selectedPayment = item;
+                                Get.toNamed('/paymentDetails');
+                              },
+                              height: 75,
+                              margin: EdgeInsets.only(left: 20, bottom: 5),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: Row(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      spacing: 8,
+                                      children: [
+                                        Icon(FontAwesomeIcons.cashRegister, color: mainStore.theme.value.HeadColor.withAlpha(100), size: 16),
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            TextHelper(text: item.voucherNumber + getBranchName(item), fontsize: 13, fontweight: FontWeight.w600),
+                                            Row(
+                                              children: [
+                                                Row(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [
+                                                    TextHelper(text: 'Paid by: ', fontsize: 11),
+                                                    TextHelper(
+                                                      text: '${item.paymentModeName}${item.txnValue.isEmpty ? '' : ' ( ${item.txnValue} ) '}',
+                                                      fontsize: 10.5,
+                                                      fontweight: FontWeight.w600,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                            Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                TextHelper(text: 'Member : ', fontsize: 11),
+                                                TextHelper(text: item.userName, fontsize: 10.5, fontweight: FontWeight.w600),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      TextHelper(
+                                        text: currenyFormater(value: item.paidAmount, withDrCr: false),
+                                        fontsize: 14,
+                                        fontweight: FontWeight.w600,
+                                        textalign: TextAlign.end,
+                                      ),
+                                      TextHelper(text: DateFormat('dd-MM-yyyy').format(item.createdAt.toDate()), fontsize: 10),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                          headerCellMaker: (data) {
+                            return Container(
+                              padding: EdgeInsets.all(7),
+                              child: Row(
+                                spacing: 8,
+                                children: [
+                                  Icon(FontAwesomeIcons.notesMedical, color: mainStore.theme.value.secondaryColor, size: 16),
+                                  TextHelper(text: data.value, fontweight: FontWeight.w600, color: mainStore.theme.value.LightTextColor),
+                                ],
+                              ),
+                            );
+                          },
+                          // uniqueKey: "paymentHistory",
+                          withSummery: false,
+                        );
                         return ListView.builder(
                           itemCount: list.length,
                           controller: scrollController,

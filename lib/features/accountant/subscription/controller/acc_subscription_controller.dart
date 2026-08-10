@@ -366,8 +366,9 @@ class AccSubscriptionController extends GetxController {
       paidAmountCalc0 = dueAmount > paidAmountCalc0 ? paidAmountCalc0 : dueAmount;
       paidAmountCalc = dueAmount > paidAmountCalc ? 0 : (paidAmountCalc - dueAmount);
 
-      subscriptions[i]['paidAmount'] = paidAmountCalc0;
-      batch.update(db.collection('userSubscription').doc(f['id']), {'isActive': true, 'dueAmount': due});
+      double previousPaidAmount = parseDouble(data: subscriptions[i]['paidAmount']);
+      subscriptions[i]['paidAmount'] = paidAmountCalc0 + previousPaidAmount;
+      batch.update(db.collection('userSubscription').doc(f['id']), {'isActive': true, 'dueAmount': due, 'paidAmount': subscriptions[i]['paidAmount']});
     }
 
     batch.set(db.collection('payment').doc(uID), {

@@ -18,7 +18,7 @@ class UserSubscriptionDetailsController extends GetxController {
     final db = await fb.getDB();
     final [sessionSnaps, paymentSnaps] = await Future.wait([
       db.collection('session').where('subscriptionId', isEqualTo: selectedSubscription!.id).get(),
-      db.collection('payment').where('subscriptionId', isEqualTo: selectedSubscription!.id).get(),
+      db.collection('payment').where('subscriptionId', isEqualTo: selectedSubscription!.name).get(),
     ]);
     sessions = sessionSnaps.docs.map((doc) => SessionModel.fromFirestore(doc)).toList();
     payments = paymentSnaps.docs.map((doc) => PaymentModel.fromJson(makeMapSerialize(doc.data()))).toList();
